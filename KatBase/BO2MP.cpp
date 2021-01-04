@@ -82,14 +82,14 @@ namespace BO2
 		CG_DrawRotatedPicPhysical(MP_Scr_Placment, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white", 7));
 	}
 
-	vec3_t AimTarget_GetTagPos(centity_t* client, const char* tag)
+	vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag)
 	{
 		vec3_t _Pos;
 		AimTarget_GetTagPos_0(client, SL_GetString(tag, 0), _Pos);
 		return _Pos;
 	}
 
-	void drawBones(centity_t* entity, float* color)
+	void drawBones(centity_tBo2* entity, float* color)
 	{
 		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
 		{
@@ -100,7 +100,7 @@ namespace BO2
 		}
 	}
 
-	bool isTeam(centity_t* cen)
+	bool isTeam(centity_tBo2* cen)
 	{
 		if (CG_IsEntityFriendlyNotEnemy(0, cen))
 			return true;
@@ -152,7 +152,7 @@ namespace BO2
 		{
 			vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
 			vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
-			vectoAngles(Angles, anglesOut);
+			VecToAngels(Angles, anglesOut);
 			if (nearestClient != cgGame->clientNum)
 				ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
 		}

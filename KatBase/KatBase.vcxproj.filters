@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="BO3">
+      <UniqueIdentifier>{43c33489-883f-44af-9615-7faf29d44faf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BO2">
+      <UniqueIdentifier>{cc0a5d66-97d6-45d8-89a1-8bcc45b2714a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -29,11 +35,14 @@
     <ClCompile Include="menuFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BO2MP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vector.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BO2MP.cpp">
+      <Filter>BO2</Filter>
+    </ClCompile>
+    <ClCompile Include="BO3MP.cpp">
+      <Filter>BO3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +67,19 @@
     <ClInclude Include="menuFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BO2MP.h">
+    <ClInclude Include="vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vector.h">
+    <ClInclude Include="kernel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BO2MP.h">
+      <Filter>BO2</Filter>
+    </ClInclude>
+    <ClInclude Include="BO3MP.h">
+      <Filter>BO3</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

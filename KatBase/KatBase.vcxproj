@@ -224,7 +224,7 @@
       <AdditionalOptions>/ignore:4089 /dll /entry:"_DllMainCRTStartup" /ALIGN:128,4096 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ImageXex>
-      <ConfigurationFile>F:\Development\Console\config.xml</ConfigurationFile>
+      <ConfigurationFile>config.xml</ConfigurationFile>
     </ImageXex>
     <Deploy>
       <DeploymentType>CopyToHardDrive</DeploymentType>
@@ -233,16 +233,20 @@
   <ItemGroup>
     <ClInclude Include="Addresses.h" />
     <ClInclude Include="BO2MP.h" />
+    <ClInclude Include="BO3MP.h" />
     <ClInclude Include="Funtions.h" />
+    <ClInclude Include="kernel.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="menuFunctions.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Structs.h" />
+    <ClInclude Include="types.h" />
     <ClInclude Include="utilites.h" />
     <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BO2MP.cpp" />
+    <ClCompile Include="BO3MP.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Funtions.cpp" />
     <ClCompile Include="menu.cpp" />

@@ -1,5 +1,17 @@
 #pragma once
 
+struct Material
+{
+	const char* name;
+};
+
+struct Font
+{
+	const char* name;
+	int pixelHeight;
+};
+
+
 namespace BO2
 {
 	enum XASSET
@@ -71,17 +83,6 @@ namespace BO2
 		ET_STREAMER_HINT,
 		ET_ZBARRIER,
 		ET_EVENTS,
-	};
-
-	struct Material
-	{
-		const char* name;
-	};
-
-	struct Font
-	{
-		const char* name;
-		int pixelHeight;
 	};
 
 	struct UIContext
@@ -217,7 +218,7 @@ namespace BO2
 		char padding05[0x7];        //0x36D
 	};
 
-	struct centity_t
+	struct centity_tBo2
 	{
 		cpose_t pose;
 		LerpEntityState curState;
@@ -440,7 +441,191 @@ namespace BO2
 
 	extern UIContext* cgDC;
 	extern cg_s* cgGame;
-	extern centity_t* cg_entitiesArray;
+	extern centity_tBo2* cg_entitiesArray;
 	extern ClientActive_t* ClientActive;
 
 }
+
+namespace BO3
+{
+	enum XASSET
+	{
+		XASSET_PHYSPRESET,
+		XASSET_PHYSCONSTRAINTS,
+		XASSET_DESTRUCTIBLEDEF,
+		XASSET_XANIM,
+		XASSET_XMODEL,
+		XASSET_XMODELMESH,
+		XASSET_MATERIAL,
+		XASSET_PIXELSHADER,
+		XASSET_TECHSET,
+		XASSET_IMAGE,
+		XASSET_SOUND,
+		XASSET_SOUND_PATCH,
+		XASSET_COL_MAP,
+		XASSET_COM_MAP,
+		XASSET_GAME_MAP,
+		XASSET_MAP_ENTS,
+		XASSET_GFX_MAP,
+		XASSET_LIGHTDEF,
+		XASSET_LENSFLAREDEF,
+		XASSET_UI_MAP,
+		XASSET_FONT,
+		XASSET_FONTICON,
+		XASSET_LOCALIZE,
+		XASSET_WEAPON,
+		XASSET_WEAPONDEF,
+		XASSET_WEAPONVARIANT,
+		XASSET_WEAPONFULL,
+		XASSET_CGMEDIATABLE,
+		XASSET_PLAYERSOUNDSTABLE,
+		XASSET_PLAYERFXTABLE,
+		XASSET_SHAREDWEAPONSOUNDS,
+		XASSET_ATTACHMENT,
+		XASSET_ATTACHMENTUNIQUE,
+		XASSET_WEAPONCAMO,
+		XASSET_CUSTOMIZATIONTABLE,
+		XASSET_CUSTOMIZATIONTABLE_FEIMAGES,
+		XASSET_CUSTOMIZATIONTABLECOLOR,
+		XASSET_SNDDRIVERGLOBALS,
+		XASSET_FX,
+		XASSET_FX_ALIAS,
+		XASSET_TAGFX,
+	};
+
+	enum entityType_t
+	{
+		ET_GENERAL,
+		ET_PLAYER,
+		ET_PLAYER_CORPSE,
+		ET_ITEM,
+		ET_MISSILE,
+		ET_INVISIBLE,
+		ET_SCRIPTMOVER,
+		ET_SOUND_BLEND,
+		ET_FX,
+		ET_LOOP_FX,
+		ET_PRIMARY_LIGHT,
+		ET_TURRET,
+		ET_HELICOPTER,
+		ET_PLANE,
+		ET_VEHICLE,
+		ET_VEHICLE_CORPSE,
+		ET_ACTOR,
+		ET_ACTOR_SPAWNER,
+		ET_ACTOR_CORPSE,
+		ET_STREAMER_HINT,
+		ET_ZBARRIER,
+		ET_EVENTS,
+	};
+
+	struct UIContext
+	{
+		int contextIndex; //0x0000
+		float bias; //0x0004
+		std::int32_t realTime; //0x0008
+		std::int32_t frameTime; //0x000C
+		char pad_0010[12]; //0x0010
+		std::int32_t screenWidth; //0x001C
+		std::int32_t screenHeight; //0x0020
+		float screenAspect; //0x0024
+		float FPS; //0x0028
+		char pad_002C[20]; //0x002C
+
+		float CenterX()
+		{
+			return this->screenWidth / 2;
+		}
+		float CenterY()
+		{
+			return this->screenHeight / 2;
+		}
+	};
+
+	struct Centity
+	{
+		char pad_0000[2]; //0x0000
+		int8_t EType; //0x0002
+		char pad_0003[37]; //0x0003
+		vec3_t Origin; //0x0028
+		vec3_t ViewAngle; //0x0034
+		char pad_0040[536]; //0x0040
+		int32_t ClientNum; //0x0258
+		char pad_025C[988]; //0x025C
+		char StateFlag; //0x0638
+		char pad_0639[7];
+	};
+	struct ClientInfo
+	{
+		char pad_0000[12]; //0x0000
+		char Name[32]; //0x000C
+		int32_t Team; //0x002C
+		char pad_0030[155]; //0x0030
+		int8_t Health; //0x00CB
+		char pad_00CC[2228]; //0x00CC
+	};
+	struct CgArray
+	{
+		int32_t MyClientNum; //0x0000
+		char pad_0004[128]; //0x0004
+		int32_t Ping; //0x0084
+		int32_t ServerTime; //0x0088
+		int32_t PhysicalTime; //0x008C
+		int64_t CmdTime; //0x0090
+		char pad_0098[40]; //0x0098
+		vec3_t Origin; //0x00C0
+		vec3_t Velocity; //0x00CC
+		char pad_00D8[884]; //0x00D8
+	};
+	struct ClientActive_t
+	{
+		char pad_0000[348]; //0x0000
+		vec3_t SpawnAngles; //0x015C
+		char pad_0168[12344]; //0x0168
+		vec3_t ViewAngles; //0x31A0
+		char _0xd[0x22010];
+		int cmdnumber;
+	};
+	struct RefDef
+	{
+		char pad_0000[132]; //0x0000
+		vec3_t ViewOrigin; //0x0084
+		char pad_0090[16]; //0x0090
+		vec3_t ViewAxis[3]; //0x00A0
+		char pad_00C4[1952]; //0x00C4
+	};
+	struct trace_t
+	{
+		vec3_t normal; // 0x0
+		char padding[0x04]; // 0xC
+		float fraction; // 0x10
+		int surfaceType; // 0x14
+		int surfaceFlags; // 0x18
+		int hitType; // 0x1C
+		short hitId; // 0x20
+		short modelIndex; // 0x22
+		short partName;//0x24
+		short boneIndex;//0x26
+		short partGroup;//0x28
+		bool allsolid; // 0x2A
+		bool startsolid; // 0x2B
+		bool walkable; // 0x2C
+		char padding2[0x13];//0x2D   //og size 0x0B
+	};
+	static char* Bones[] = {
+		"j_helmet", "j_head", "j_neck",
+		"j_shoulder_le", "j_elbow_le", "j_wrist_le", "j_elbow_le", "j_shoulder_le", "j_neck",
+		"j_shoulder_ri", "j_elbow_ri", "j_wrist_ri", "j_elbow_ri", "j_shoulder_ri", "j_neck",
+		"j_spineupper", "j_spinelower", "j_hip_le", "j_knee_le", "j_ankle_le", "j_knee_le",
+		"j_hip_le", "j_spinelower", "j_hip_ri", "j_knee_ri", "j_ankle_ri"
+	};
+
+
+	extern UIContext* cgDC;
+	extern CgArray* cgGame;
+	extern Centity* cg_entitiesArray;
+	extern ClientActive_t* ClientActive;
+	extern ClientInfo* Cinfo;
+	extern RefDef* Ref;
+}
+

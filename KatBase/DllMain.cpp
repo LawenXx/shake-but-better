@@ -39,14 +39,26 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-	
+		XNotify("[Project Toxic BO2] by kat", XNOTIFYUI_TYPE_SONGPLAYING);
+
 		BO2::InitAddress();
 		BO2::SetupVariables();
 
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
+		break;
+	case COD_BLACK_OPS_3:
+		while (*(int*)0x82A92094 == 0) 
+		{
+			Sleep(100);
+		}
+		XNotify("[Project Toxic BO3] by Kat", XNOTIFYUI_TYPE_SONGPLAYING);
 
+		BO3::InitAddress();
+		BO3::SetupVariables();
 
+		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
+		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
 		break;
 
 	default:

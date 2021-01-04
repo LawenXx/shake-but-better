@@ -18,7 +18,7 @@
 #include <sstream>
 #include <functional>
 #include <map>
-#include <Kernel.h>
+#include "kernel.h"
 #include <time.h>
 #include <xbdm.h>
 #include <cstdint>
@@ -40,5 +40,6 @@
 #include "Funtions.h"
 #include "menuFunctions.h"
 #include "BO2MP.h"
+#include "BO3MP.h"
 
 // TODO: reference additional headers your program requires here
