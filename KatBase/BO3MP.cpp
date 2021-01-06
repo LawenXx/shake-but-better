@@ -58,11 +58,13 @@ namespace BO3
 	void DrawMenu()
 	{
 		DrawMenuShader();
+		printf("Shader drawn");
 		DrawMenuTabs();
+		printf("tabs drawn");
 
 		//Options
 		DrawMenuText();
-
+		printf("Text drawn");
 	}
 
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
@@ -79,7 +81,7 @@ namespace BO3
 		vec3_t Vect;
 		int Dobj = Com_ClientDObj(client, 0);
 
-		if (!Dobj) 
+		if (!Dobj)
 			return vec3_t(0, 0, 0);
 		else {
 			if (!CG_DobjGetWorldTagPos(&cg_entitiesArray[client], Dobj, Sl_GetString(tag, 0), &Vect))
@@ -143,17 +145,17 @@ namespace BO3
 	void doAimbot()
 	{
 		GetNearestPlayer();
-	
-			int Nearest = GetNearestPlayer();
-			if (Cinfo[Nearest].Health > 0) {
-				if (Nearest != -1) {
-					vec3_t Bone = AimTarget_GetTagPos(Nearest, "j_neck");
-					vec3_t Angle = Bone - Ref->ViewOrigin;
-					VecToAngels(Angle, anglesOut);
-					ClientActive->ViewAngles = anglesOut - ClientActive->SpawnAngles;
-					playerReady = false;
-				}
-			
+
+		int Nearest = GetNearestPlayer();
+		if (Cinfo[Nearest].Health > 0) {
+			if (Nearest != -1) {
+				vec3_t Bone = AimTarget_GetTagPos(Nearest, "j_neck");
+				vec3_t Angle = Bone - Ref->ViewOrigin;
+				VecToAngels(Angle, anglesOut);
+				ClientActive->ViewAngles = anglesOut - ClientActive->SpawnAngles;
+				playerReady = false;
+			}
+
 		}
 	}
 
@@ -163,13 +165,14 @@ namespace BO3
 		readStructs();
 
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-		if (options.menuOpen)
-		DrawMenu();
-
-		
-			//doAimbot();
-		
+		if (options.menuOpen) {
+			DrawText("Birb send help", cgDC->CenterX(), 100, "fonts/normalfont", 1, white);
+			DrawMenu();
+		}
 	}
+	//doAimbot();
+
+	
 
 	int speed = 0;
 	int ticks = 0;

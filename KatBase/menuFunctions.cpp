@@ -232,19 +232,20 @@ namespace BO3
 		return font->pixelHeight;
 	}
 
-	void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align)
-	{
-		int fontA = Textwidth(text, strlen(text), R_RegisterFont(font), 0) * fontSize;
+void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align)
+{
+	int fontA = Textwidth(text, strlen(text), R_RegisterFont(font), 0) * fontSize;
 
-		if (align == align_left)
-			x = x;
-		if (align == align_right)
-			x = x - fontA;
-		if (align == align_center)
-			x = x - (fontA / 2);
+	if (align == align_left)
+		x = x;
+	if (align == align_right)
+		x = x - fontA;
+	if (align == align_center)
+		x = x - (fontA / 2);
 
-		R_AddCmdDrawText(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, 0, color, 3);
-	}
+	R_AddCmdDrawText(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, 0, color, 3);
+}
+
 
 	void DrawShader(float x, float y, float width, float height, const float* color, const char* shader)
 	{
@@ -258,6 +259,7 @@ namespace BO3
 		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
+
 
 	void SetupVariables()
 	{
@@ -279,7 +281,7 @@ namespace BO3
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 
-	
+		SetupBool(&options.testing, false);
 	}
 
 	void DrawMenuTabs()
@@ -287,7 +289,7 @@ namespace BO3
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current;
 		int textWidth = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
 		int textShaderW = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
-		DrawText("Project Toxic", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
+		DrawText("Base for Katz", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
 
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
