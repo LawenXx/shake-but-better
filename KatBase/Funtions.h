@@ -74,12 +74,8 @@ namespace BO3
 	extern void InitAddress();
 	extern void readStructs();
 	extern int R_TextHeight(Font* font);
-	extern void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align = align_left);
-	extern void DrawShader(float x, float y, float width, float height, const float* color, const char* shader = "white");
-	extern void BoundingBox(float x, float y, float width, float height, float* color, float thickness);
-	extern int Com_ClientDObj(int ClientNum, int LocalPlayer);
 
-	extern const char* FontForIndex(int index);
+	extern int Com_ClientDObj(int ClientNum, int LocalPlayer);
 	extern bool AimTarget_IsVisible(vec3_t BonePos, int i);
 	extern short Sl_GetString(const char* String, int usr);
 	extern Material* Material_RegisterHandle(const char* name);

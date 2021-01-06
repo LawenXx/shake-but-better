@@ -55,57 +55,6 @@ namespace BO2
 		ClientActive = *(ClientActive_t**)0x82C70F4C;
 	}
 
-
-	const char* FontForIndex(int index)
-	{
-		if (index == 0)
-			return "fonts/720/smallDevFont";
-		if (index == 1)
-			return "fonts/720/bigDevFont";
-		if (index == 2)
-			return "fonts/720/consoleFont";
-		if (index == 3)
-			return "fonts/720/smallFont";
-		if (index == 4)
-			return "fonts/720/normalFont";
-		if (index == 5)
-			return "fonts/720/boldFont";
-		else
-			return "fonts/720/smallFont";
-	}
-
-	int R_TextHeight(Font* font)
-	{
-		return font->pixelHeight;
-	}
-
-	void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align)
-	{
-		int fontA = R_TextWidth(0, text, strlen(text), R_RegisterFont(font, 0)) * fontSize;
-
-		if (align == align_left)
-			x = x;
-		if (align == align_right)
-			x = x - fontA;
-		if (align == align_center)
-			x = x - (fontA / 2);
-
-		R_AddCmdDrawText(text, strlen(text), R_RegisterFont(font, 0), x, y, fontSize, fontSize, 0, color, 3);
-	}
-
-	void DrawShader(float x, float y, float width, float height, const float* color, const char* shader)
-	{
-		CG_DrawRotatedPicPhysical(BO2::MP_Scr_Placment, x, y, width, height, 0.0f, color, Material_RegisterHandle(shader, 7));
-	}
-
-	void BoundingBox(float x, float y, float width, float height, float* color, float thickness)
-	{
-		DrawShader(x - thickness, y - thickness, width + (thickness * 2), thickness, color); // Top
-		DrawShader(x - thickness, y + height, width + (thickness * 2), thickness, color); // Bottom
-		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
-		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
-	}
-
 }
 
 
@@ -141,56 +90,6 @@ namespace BO3
 		Cinfo = (ClientInfo*)(*(int*)0x82E819D8 + 0x54E10);
 	}
 
-
-	const char* FontForIndex(int index)
-	{
-		if (index == 0)
-			return "fonts/smallDevFont";
-		if (index == 1)
-			return "fonts/bigDevFont";
-		if (index == 2)
-			return "fonts/consoleFont";
-		if (index == 3)
-			return "fonts/smallFont";
-		if (index == 4)
-			return "fonts/normalFont";
-		if (index == 5)
-			return "fonts/boldFont";
-		else
-			return "fonts/smallFont";
-	}
-
-	int R_TextHeight(Font* font)
-	{
-		return font->pixelHeight;
-	}
-
-	void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align)
-	{
-		int fontA = Textwidth(text, strlen(text), R_RegisterFont(font), 0) * fontSize;
-
-		if (align == align_left)
-			x = x;
-		if (align == align_right)
-		x = x - fontA;
-		if (align == align_center)
-			x = x - (fontA / 2);
-
-		R_AddCmdDrawText(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, 0, color, 3);
-	}
-
-	void DrawShader(float x, float y, float width, float height, const float* color, const char* shader)
-	{
-		CG_DrawRotatedPicPhysical(0x83088EC0, x, y, width, height, 0.0f, color, Material_RegisterHandle(shader));
-	}
-
-	void BoundingBox(float x, float y, float width, float height, float* color, float thickness)
-	{
-		DrawShader(x - thickness, y - thickness, width + (thickness * 2), thickness, color); // Top
-		DrawShader(x - thickness, y + height, width + (thickness * 2), thickness, color); // Bottom
-		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
-		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
-	}
 
 	int Com_ClientDObj(int ClientNum, int LocalPlayer)
 	{

@@ -94,6 +94,11 @@ namespace BO3
 	extern void DrawMenuTabs();
 	extern void DrawMenuShader();
 
+	extern void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align = align_left);
+	extern void DrawShader(float x, float y, float width, float height, const float* color, const char* shader = "white");
+	extern void BoundingBox(float x, float y, float width, float height, float* color, float thickness);
+	extern const char* FontForIndex(int index);
+
 	//Menu DrawOptions 
 	extern void DrawButton(const char* text);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
