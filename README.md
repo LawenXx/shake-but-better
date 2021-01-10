@@ -1,6 +1,6 @@
 # shake-but-better
-From Kat
-Zone big dumb
+[![Contributors][contributors-shield]][contributors-url]
+*Birb project manager <br /> 
+*Reeko "helper" and base maker <br /> 
+*Kat person who makes and breaks things
 
-# Project on hold until kat fixes console smh
-# because reeko smhhh
