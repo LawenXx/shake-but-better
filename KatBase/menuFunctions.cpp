@@ -56,10 +56,15 @@ namespace BO2
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
 
-	void ScoreBoard_Draw(std::vector<clientInfo_t>, int team, float x, float y) {
+	void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y) {
 		//TODO start after some rest
 
+		const char* faction = BG_GetFactionForTeam(team, cgServer->mapName);
 
+		DrawShader(x, y, 500, 500, black);
+		for (int i = 0; i < 18; i++) {
+			DrawText(va("Score: %i", v[i].score), x, y, "fonts/720/normalfont", 0.6, white);
+		}
 	}
 
 	void SetupVariables()

@@ -28,7 +28,8 @@ namespace BO2
 {
 
 	UIContext* cgDC;
-	cg_s* cgGame;
+	cg_t* cgGame;
+	Cgs_t* cgServer;
 	centity_tBo2* cg_entitiesArray;
 	ClientActive_t* ClientActive;
 	gentity_t* g_entitiesArray;
@@ -54,11 +55,11 @@ namespace BO2
 	void readStructs()
 	{
 		cgDC = (UIContext*)MP_UIContext;
-		cgGame = *(cg_s**)MP_CG;
+		cgGame = *(cg_t**)MP_CG;
 		cg_entitiesArray = *(centity_tBo2**)MP_Centitiy;
 		ClientActive = *(ClientActive_t**)0x82C70F4C;
 		g_entitiesArray = (gentity_t*)0x833D0640;
-
+		cgServer = (Cgs_t*)0x82BBAE44;
 	}
 
 	void PlayerCmd_SetRank(int rank, int index)

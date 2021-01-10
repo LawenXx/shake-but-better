@@ -7,8 +7,6 @@ enum alignment
 	align_center,
 };
 
-
-
 extern float white[];
 extern float black[];
 extern float blue[];

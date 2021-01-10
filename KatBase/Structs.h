@@ -85,29 +85,6 @@ namespace BO2
 		ET_EVENTS,
 	};
 
-	struct UIContext
-	{
-		int contextIndex; //0x0000
-		float bias; //0x0004
-		std::int32_t realTime; //0x0008
-		std::int32_t frameTime; //0x000C
-		char pad_0010[12]; //0x0010
-		std::int32_t screenWidth; //0x001C
-		std::int32_t screenHeight; //0x0020
-		float screenAspect; //0x0024
-		float FPS; //0x0028
-		char pad_002C[20]; //0x002C
-
-		float CenterX()
-		{
-			return this->screenWidth / 2;
-		}
-		float CenterY()
-		{
-			return this->screenHeight / 2;
-		}
-	};
-
 
 	union DvarValue
 	{
@@ -165,6 +142,29 @@ namespace BO2
 		dvar_s* next;                               //0x68
 	}; //Size = 0x6C
 
+	struct UIContext
+	{
+		int contextIndex; //0x0000
+		float bias; //0x0004
+		std::int32_t realTime; //0x0008
+		std::int32_t frameTime; //0x000C
+		char pad_0010[12]; //0x0010
+		std::int32_t screenWidth; //0x001C
+		std::int32_t screenHeight; //0x0020
+		float screenAspect; //0x0024
+		float FPS; //0x0028
+		char pad_002C[20]; //0x002C
+
+		float CenterX()
+		{
+			return this->screenWidth / 2;
+		}
+		float CenterY()
+		{
+			return this->screenHeight / 2;
+		}
+	};
+
 
 	struct cpose_t
 	{
@@ -179,22 +179,25 @@ namespace BO2
 
 	struct trajectory_t
 	{
-		unsigned char trType; //0x015C 
-		char _0x015D[3];
-		__int32 trTime; //0x0160 
-		__int32 trDuration; //0x0164 
-		vec3_t NewOrigin; //0x0168 
-		vec3_t trDelta; //0x0174 
-	};
+		std::int8_t trType; //0x0000
+		char pad_0001[3]; //0x0001
+		std::int32_t trTime; //0x0004
+		std::int32_t trDuration; //0x0008
+		vec3_t trBase; //0x000C
+		vec3_t trDelta; //0x0018
+	}; //Size: 0x0024
+
 
 	struct LerpEntityState
 	{
-		__int32 Flags; //0x0154 
-		__int32 eFlags2; //0x0158 
-		trajectory_t pos;
+		std::int32_t eFlags; //0x0000
+		std::int32_t eFlags2; //0x0004
+		class trajectory_t pos; //0x0008
+		class trajectory_t apos; //0x002C
+		std::int32_t useCount; //0x0050
+	}; //Size: 0x0054
 
-	};
-
+	
 	struct entityState_t
 	{
 		__int32 ClientNumber; //0x01D0 
@@ -362,7 +365,7 @@ namespace BO2
 		char _0x05C8[576];
 	}; //0x808
 
-	struct cg_s
+	struct cg_t
 	{
 		__int32 clientNum; //0x0000 
 		__int32 localClientNum; //0x0004 
@@ -400,7 +403,20 @@ namespace BO2
 		char _0x72B20[0xE060];
 		float weaponSpreadScale; //0x80B80
 	};
-
+	struct Cgs_t
+	{
+		char _0x0000[8];
+		__int32 screenX; //0x0008 
+		__int32 screenY; //0x000C 
+		char _0x0010[32];
+		char gametype[4]; //0x0030
+		char _0x0034[0x1C];
+		char hostName[0x14]; //0x50
+		char _0x0064[0xEC];
+		DWORD MaxClients; // 0x150
+		char _0x0154[0x44];
+		char mapName[0x18]; //0x198
+	};
 	struct Usercmd_t// size 0x3C
 	{
 		int serverTime;		// 0x00
@@ -453,7 +469,7 @@ namespace BO2
 		std::int32_t gravity; //0x008C
 		float leanf; //0x0090
 		std::int32_t delta_angles; //0x0094
-		vec3_t delta_angles; //0x0098
+		vec3_t delta_aangles; //0x0098
 		std::int32_t groundEntityNum; //0x00A4
 		std::int32_t groundType; //0x00A8
 		char pad_00AC[332]; //0x00AC
@@ -467,44 +483,11 @@ namespace BO2
 		std::int32_t prestige; //0x555C
 		char pad_5560[4]; //0x5560
 	}; //Size: 0x5564
-	struct trajectory_t
-	{
-		std::int8_t trType; //0x0000
-		char pad_0001[3]; //0x0001
-		std::int32_t trTime; //0x0004
-		std::int32_t trDuration; //0x0008
-		vec3_t trBase; //0x000C
-		vec3_t trDelta; //0x0018
-	}; //Size: 0x0024
-
-	struct LerpEntityState
-	{
-		std::int32_t eFlags; //0x0000
-		std::int32_t eFlags2; //0x0004
-		class trajectory_t pos; //0x0008
-		class trajectory_t apos; //0x002C
-		std::int32_t useCount; //0x0050
-	}; //Size: 0x0054
-
-	struct entityState_s
-	{
-		std::int32_t number; //0x0000
-		class LerpEntityState lerp; //0x0004
-		std::int32_t time2; //0x0058
-		std::uint32_t loopSoundId; //0x005C
-		std::int32_t solid; //0x0060
-		char pad_0064[116]; //0x0064
-		std::int16_t eType; //0x00D8
-		std::uint16_t groundEntityNum; //0x00DA
-		char pad_00DC[10]; //0x00DC
-		std::int16_t weapon; //0x00E6
-		char pad_00E8[104]; //0x00E8
-	}; //Size: 0x0150
-
+	
 	class gentity_t
 	{
 	public:
-		entityState_s s; //0x00
+		entityState_t s; //0x00
 		char pad_0150[4]; //0x0150
 		class gClient_t* client; //0x0154
 		char pad_0158[452]; //0x0158
@@ -520,7 +503,8 @@ namespace BO2
 
 
 	extern UIContext* cgDC;
-	extern cg_s* cgGame;
+	extern cg_t* cgGame;
+	extern Cgs_t* cgServer;
 	extern centity_tBo2* cg_entitiesArray;
 	extern ClientActive_t* ClientActive;
 	extern gentity_t* g_entitiesArray;

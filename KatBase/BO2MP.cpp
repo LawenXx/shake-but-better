@@ -195,6 +195,7 @@ namespace BO2
 
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 
+			//ScoreBoard_Draw(h, 1, 200, 200);
 			SpoofLevel();
 			doAimbot();
 		}

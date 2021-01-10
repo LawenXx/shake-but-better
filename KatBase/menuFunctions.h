@@ -37,7 +37,6 @@ namespace BO2
 		BoolMenuOption IpSpoof;
 	};
 	extern Options_t options;
-
 	enum menus
 	{
 		MAIN,
@@ -50,6 +49,8 @@ namespace BO2
 	extern void SetupVariables();
 	extern void DrawMenuTabs();
 	extern void DrawMenuShader();
+
+	extern void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y);
 
 	//Menu DrawOptions 
 	extern void DrawButton(const char* text);

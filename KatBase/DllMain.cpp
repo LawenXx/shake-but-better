@@ -39,7 +39,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-		XNotify("Shake [Bo2] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [BO2] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO2::InitAddress();
 		BO2::SetupVariables();
@@ -53,7 +53,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-		XNotify("Shake [Bo3] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [BO3] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO3::InitAddress();
 		BO3::SetupVariables();
