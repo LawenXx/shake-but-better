@@ -2,6 +2,7 @@
 
 [![Issues][issues-shield]][issues-url]
 
+# Contributers
 ***Birb project manager<br />***
 ***Reeko "helper" and base maker<br />*** <br /> 
 ***Kat person who makes and breaks*** things<br />
