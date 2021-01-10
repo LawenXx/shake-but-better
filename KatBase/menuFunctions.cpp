@@ -83,6 +83,7 @@ namespace BO2
 		SetupBool(&options.EspBoxToggle, false);
 		SetupBool(&options.EspDrawBones, false);
 		SetupBool(&options.EspDrawLine, false);
+		SetupBool(&options.EspFrogChan, false);
 	}
 
 	void DrawMenuTabs()

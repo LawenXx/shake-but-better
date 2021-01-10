@@ -32,6 +32,7 @@ namespace BO2
 		BoolMenuOption EspBoxToggle;
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
+		BoolMenuOption EspFrogChan;
 	
 	};
 	extern Options_t options;
@@ -42,7 +43,6 @@ namespace BO2
 		AIMBOT,
 		VISUALS,
 		PLAYERS,
-		HostOnly,
 		SETTINGS
 	};
 

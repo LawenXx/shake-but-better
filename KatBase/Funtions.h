@@ -12,7 +12,7 @@ enum alignment
 extern float white[];
 extern float black[];
 extern float blue[];
-
+extern float Red[];
 //Black Ops 2
 
 typedef Material* (*Material_RegisterHandle_t)(const char* shaderName, int imgTrack);
@@ -72,6 +72,7 @@ namespace BO2
 	extern 	bool Dvar_GetBool(const char* dvarName);
 	extern void PlayerCmd_SetPrestige(int prestige, int index);
 	extern void PlayerCmd_SetRank(int rank, int index);
+	extern void drawHeart(float x, float y, float w, float h, float* outline, float* fill);
 }
 
 namespace BO3

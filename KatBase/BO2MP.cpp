@@ -16,7 +16,7 @@ namespace BO2
 		*result = 0x820FB3B0;
 		return result;
 	}
-	
+
 	int bdStatsInfo(int a1)
 	{
 		__int64 v2; // r11
@@ -65,6 +65,7 @@ namespace BO2
 		case VISUALS:
 			DrawToggle("Esp Box", &options.EspBoxToggle);
 			DrawToggle("Esp Bones", &options.EspDrawBones);
+			DrawToggle("Esp BoxFrog", &options.EspFrogChan);
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
@@ -74,9 +75,7 @@ namespace BO2
 					DrawButton(va("[%i] %s [%s]", i, cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"));
 			}
 			break;
-		case HostOnly:
-			DrawToggle("Spoof Rank", &options.BoolRank);
-			break;
+
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			break;
@@ -157,39 +156,42 @@ namespace BO2
 
 		if (Dvar_GetBool("cl_ingame"))
 		{
-			
-				for (int i = 0; i < 18; i++)
-				{
-					if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
-						continue;
-					if (!(cg_entitiesArray[i].nextState.Alive))
-						continue;
-					if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
-						continue;
 
-					vec2_t Pos = vec2_t();
-					vec2_t head = vec2_t();
-					vec3_t origin = cg_entitiesArray[i].pose.Origin;
+			for (int i = 0; i < 18; i++)
+			{
+				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+					continue;
+				if (!(cg_entitiesArray[i].nextState.ClientNumber != 0))
+					continue;
+				if (!(cg_entitiesArray[i].nextState.Alive))
+					continue;
+				if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
+					continue;
 
-					vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
-					headPos.z += 10;
-					origin.z -= 5;
+				vec2_t Pos = vec2_t();
+				vec2_t head = vec2_t();
+				vec3_t origin = cg_entitiesArray[i].pose.Origin;
 
-					if (!WorldToScreen(0, origin, &Pos))
-						continue;
-					if (!WorldToScreen(0, headPos, &head))
-						continue;
+				vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
+				headPos.z += 10;
+				origin.z -= 5;
 
-					float playerHeight = fabsf(head.y - Pos.y);
-					float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+				if (!WorldToScreen(0, origin, &Pos))
+					continue;
+				if (!WorldToScreen(0, headPos, &head))
+					continue;
 
-					if(options.EspBoxToggle.state)
+				float playerHeight = fabsf(head.y - Pos.y);
+				float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+
+				if (options.EspBoxToggle.state)
 					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
-					if(options.EspDrawBones.state)
+				if (options.EspDrawBones.state)
 					drawBones(&cg_entitiesArray[i], white);
-					if(options.EspDrawLine.state)
+				if (options.EspDrawLine.state)
 					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
-				
+				if (options.EspFrogChan.state)
+					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, Red);
 			}
 			SpoofLevel();
 			doAimbot();
