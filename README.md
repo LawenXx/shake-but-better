@@ -1,6 +1,6 @@
 # shake-but-better
-From Kat
-Zone big dumb
 
-# Project on hold until kat fixes console smh
-# because reeko smhhh
+*Birb project manager
+*Reeko "helper" amd base maker
+*Kat person who makes and breaks things
+
