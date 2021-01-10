@@ -241,8 +241,6 @@ namespace BO2
 		//size 0x374
 	};
 
-
-
 	struct playerstate_s
 	{
 		__int32 commandTime; //0x0090 
@@ -430,6 +428,18 @@ namespace BO2
 		int CurrentCmdNumber;		 //0x44AA8
 	};
 
+	struct gentity_t
+	{
+		char pad_0000[340]; //0x0000
+		struct
+		{
+			char _0x00[0x5558];
+			int rank;
+			int prestige;
+		}*pClient;
+		char pad_0158[452]; //0x0158
+	}; //Size: 0x031C
+
 	static char* Bones[] = {
 		"j_helmet", "j_head", "j_neck",
 		"j_shoulder_le", "j_elbow_le", "j_wrist_le", "j_elbow_le", "j_shoulder_le", "j_neck",
@@ -443,7 +453,7 @@ namespace BO2
 	extern cg_s* cgGame;
 	extern centity_tBo2* cg_entitiesArray;
 	extern ClientActive_t* ClientActive;
-
+	extern gentity_t* g_entitiesArray;
 }
 
 namespace BO3

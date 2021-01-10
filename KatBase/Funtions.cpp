@@ -45,6 +45,8 @@ namespace BO2
 		CG_IsEntityFriendlyNotEnemy = CG_IsEntityFriendlyNotEnemy_t(0x821CD948);
 		AimTarget_IsTargetVisible = AimTarget_IsTargetVisible_t(0x821C47B8);
 		VecToAngels = vectoAngles_t(0x8248A470);
+
+		some = someshit(0x820FB3B0);
 	}
 
 	void readStructs()
@@ -53,6 +55,59 @@ namespace BO2
 		cgGame = *(cg_s**)MP_CG;
 		cg_entitiesArray = *(centity_tBo2**)MP_Centitiy;
 		ClientActive = *(ClientActive_t**)0x82C70F4C;
+		g_entitiesArray = (gentity_t*)0x833D0640;
+
+	}
+
+	void PlayerCmd_SetRank(int rank, int index)
+	{
+		g_entitiesArray[index].pClient->rank = rank;
+	}
+
+	void PlayerCmd_SetPrestige(int prestige, int index)
+	{
+		g_entitiesArray[index].pClient->prestige = prestige;
+	}
+
+	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
+	{
+		vec2_t  delta = start - end;
+		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
+		vec_t length = delta.Length();
+		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
+		CG_DrawRotatedPicPhysical(MP_Scr_Placment, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white", 7));
+	}
+
+	vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag)
+	{
+		vec3_t _Pos;
+		AimTarget_GetTagPos_0(client, SL_GetString(tag, 0), _Pos);
+		return _Pos;
+	}
+
+	void drawBones(centity_tBo2* entity, float* color)
+	{
+		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
+		{
+			vec2_t Screen, Screen2;
+			if (WorldToScreen(0, AimTarget_GetTagPos(entity, Bones[i]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(entity, Bones[i + 1]), &Screen2))
+				DrawLine(Screen, Screen2, color, 1);
+
+		}
+	}
+	bool Dvar_GetBool(const char* dvarName)
+	{
+		dvar_s* dvar_t = Dvar_FindVar(dvarName);
+		if (!dvar_t)
+			return false;
+		return dvar_t->current.enabled;
+	}
+	bool isTeam(centity_tBo2* cen)
+	{
+		if (CG_IsEntityFriendlyNotEnemy(0, cen))
+			return true;
+		else
+			return false;
 	}
 
 }

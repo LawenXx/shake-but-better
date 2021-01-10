@@ -36,6 +36,7 @@ namespace BO2
 		AIMBOT,
 		VISUALS,
 		PLAYERS,
+		HostOnly,
 		SETTINGS
 	};
 

@@ -64,7 +64,7 @@ namespace BO3
 
 		//Options
 		DrawMenuText();
-		printf("Text drawn");
+		//printf("Text drawn");
 	}
 
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
@@ -164,15 +164,19 @@ namespace BO3
 		MinHook[1].Stub();
 		readStructs();
 
-		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-		if (options.menuOpen) {
-			DrawText("Birb send help", cgDC->CenterX(), 100, "fonts/normalfont", 1, white);
-			DrawMenu();
-		}
-	}
-	//doAimbot();
+		//doAimbot();
 
-	
+	}
+
+	void Menu_PaintAll(int r3)
+	{
+		MinHook[2].Stub(r3);
+		readStructs();
+
+		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
+		if (options.menuOpen)
+			DrawMenu();
+	}
 
 	int speed = 0;
 	int ticks = 0;

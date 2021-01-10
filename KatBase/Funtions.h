@@ -65,8 +65,13 @@ namespace BO2
 	extern void DrawShader(float x, float y, float width, float height, const float* color, const char* shader = "white");
 	extern void BoundingBox(float x, float y, float width, float height, float* color, float thickness);
 	extern const char* FontForIndex(int index);
-
-
+	extern vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag);
+	extern void DrawLine(vec2_t start, vec2_t end, float* color, float size);
+	extern void drawBones(centity_tBo2* entity, float* color);
+	extern bool isTeam(centity_tBo2* cen);
+	extern 	bool Dvar_GetBool(const char* dvarName);
+	extern void PlayerCmd_SetPrestige(int prestige, int index);
+	extern void PlayerCmd_SetRank(int rank, int index);
 }
 
 namespace BO3
