@@ -8,6 +8,5 @@ namespace BO2
 	extern void leaderboard();
 
 	typedef DWORD(*someshit)(void*);
-	extern someshit some;
 	extern DWORD* bdStatsInfoPtr();
 }

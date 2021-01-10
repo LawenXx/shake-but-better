@@ -79,6 +79,8 @@ namespace BO2
 
 		SetupBool(&options.testing, false);
 		SetupBool(&options.BoolRank, false);
+		SetupBool(&options.AimbotToggle, false);
+		SetupBool(&options.EspBoxToggle, false);
 	}
 
 	void DrawMenuTabs()
@@ -105,12 +107,17 @@ namespace BO2
 		textWidth += R_TextWidth(0, "Visuals", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 		textShaderW += R_TextWidth(0, "Visuals", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 
-
 		DrawText("Players", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == PLAYERS)
 			DrawShader(options.menuX.current + options.menuBorder.current + 10 + textShaderW, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Players", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
 		textWidth += R_TextWidth(0, "Players", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 		textShaderW += R_TextWidth(0, "Players", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
+
+		DrawText("Host Only", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
+		if (options.menuPageIndex == HostOnly)
+			DrawShader(options.menuX.current + options.menuBorder.current + 10 + textShaderW, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
+		textWidth += R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
+		textShaderW += R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 
 
 		DrawText("Settings", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);

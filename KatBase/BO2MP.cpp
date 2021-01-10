@@ -65,14 +65,14 @@ namespace BO2
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
-			DrawButton("Button Testing");
+			DrawToggle("Aimbot", &options.AimbotToggle);
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
 			break;
 		case VISUALS:
-			DrawButton("Button Testing");
+			DrawToggle("Esp Box", &options.EspBoxToggle);
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
@@ -146,21 +146,23 @@ namespace BO2
 
 	void doAimbot()
 	{
-		if (!Dvar_GetBool("cl_ingame"))
-			return;
-		if (cgGame->ps.health < 1)
-			return;
+		if (options.AimbotToggle.state) {
+			if (!Dvar_GetBool("cl_ingame"))
+				return;
+			if (cgGame->ps.health < 1)
+				return;
 
-		int nearestClient = GetNearestPlayer(cgGame->clientNum);
-		if (playerReady && nearestClient != -1)
-		{
-			vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
-			vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
-			VecToAngels(Angles, anglesOut);
-			if (nearestClient != cgGame->clientNum)
-				ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+			int nearestClient = GetNearestPlayer(cgGame->clientNum);
+			if (playerReady && nearestClient != -1)
+			{
+				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
+				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
+				VecToAngels(Angles, anglesOut);
+				if (nearestClient != cgGame->clientNum)
+					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+			}
+			playerReady = false;
 		}
-		playerReady = false;
 	}
 
 	void Menu_PaintAll(int r3)
@@ -174,37 +176,40 @@ namespace BO2
 
 		if (Dvar_GetBool("cl_ingame"))
 		{
-			for (int i = 0; i < 18; i++)
-			{
-				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
-					continue;
-				if (!(cg_entitiesArray[i].nextState.Alive))
-					continue;
-				if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
-					continue;
+			
+				for (int i = 0; i < 18; i++)
+				{
+					if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+						continue;
+					if (!(cg_entitiesArray[i].nextState.Alive))
+						continue;
+					if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
+						continue;
 
-				vec2_t Pos = vec2_t();
-				vec2_t head = vec2_t();
-				vec3_t origin = cg_entitiesArray[i].pose.Origin;
+					vec2_t Pos = vec2_t();
+					vec2_t head = vec2_t();
+					vec3_t origin = cg_entitiesArray[i].pose.Origin;
 
-				vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
-				headPos.z += 10;
-				origin.z -= 5;
+					vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
+					headPos.z += 10;
+					origin.z -= 5;
 
-				if (!WorldToScreen(0, origin, &Pos))
-					continue;
-				if (!WorldToScreen(0, headPos, &head))
-					continue;
+					if (!WorldToScreen(0, origin, &Pos))
+						continue;
+					if (!WorldToScreen(0, headPos, &head))
+						continue;
 
-				float playerHeight = fabsf(head.y - Pos.y);
-				float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+					float playerHeight = fabsf(head.y - Pos.y);
+					float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+
+					if(options.EspBoxToggle.state)
+					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
 
 
-				BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
+					//drawBones(&cg_entitiesArray[i], white);
 
-				drawBones(&cg_entitiesArray[i], white);
-
-				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
+					//DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
+				
 			}
 			SpoofLevel();
 			doAimbot();

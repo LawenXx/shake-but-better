@@ -28,6 +28,10 @@ namespace BO2
 
 		BoolMenuOption testing;
 		BoolMenuOption BoolRank;
+		BoolMenuOption AimbotToggle;
+		BoolMenuOption EspBoxToggle;
+		BoolMenuOption EspDrawLine;
+		BoolMenuOption EspDrawBones;
 	};
 	extern Options_t options;
 

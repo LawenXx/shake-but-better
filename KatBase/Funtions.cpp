@@ -29,6 +29,7 @@ namespace BO2
 	cg_s* cgGame;
 	centity_tBo2* cg_entitiesArray;
 	ClientActive_t* ClientActive;
+	gentity_t* g_entitiesArray;
 
 	void InitAddress()
 	{
@@ -46,7 +47,6 @@ namespace BO2
 		AimTarget_IsTargetVisible = AimTarget_IsTargetVisible_t(0x821C47B8);
 		VecToAngels = vectoAngles_t(0x8248A470);
 
-		some = someshit(0x820FB3B0);
 	}
 
 	void readStructs()
