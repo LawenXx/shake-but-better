@@ -56,48 +56,29 @@ namespace BO2
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			DrawButton("Button Testing");
-			DrawToggle("Button Testing", &options.testing);
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawIntSlider("Testing Int", &options.menuX, "%i");
+			DrawToggle("Spoof Rank", &options.BoolRank);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.AimbotToggle);
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
 			break;
 		case VISUALS:
 			DrawToggle("Esp Box", &options.EspBoxToggle);
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			DrawToggle("Esp Bones", &options.EspDrawBones);
 			break;
 		case PLAYERS:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			for (int i = 0; i < 18; i++) {
+				if (!strcmp(cgGame->clientInfo[i].name, ""))
+					DrawButton("N/A");
+				else
+					DrawButton(va("[%i] %s [%s]", i, cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"));
+			}
 			break;
 		case HostOnly:
 			DrawToggle("Spoof Rank", &options.BoolRank);
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
 			break;
 		case SETTINGS:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			DrawIntSlider("Menu X", &options.menuX, "%i");
 			break;
 		}
 	}
@@ -204,11 +185,10 @@ namespace BO2
 
 					if(options.EspBoxToggle.state)
 					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
-
-
-					//drawBones(&cg_entitiesArray[i], white);
-
-					//DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
+					if(options.EspDrawBones.state)
+					drawBones(&cg_entitiesArray[i], white);
+					if(options.EspDrawLine.state)
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
 				
 			}
 			SpoofLevel();

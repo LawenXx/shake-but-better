@@ -39,7 +39,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-		XNotify("[Project Toxic BO2] by kat", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [Bo2] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO2::InitAddress();
 		BO2::SetupVariables();
@@ -52,7 +52,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-		XNotify("[Project Toxic BO3] by Kat", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [Bo3] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO3::InitAddress();
 		BO3::SetupVariables();
@@ -69,7 +69,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			if (!firstDash)
 			{
-				XNotify("Loaded!");
+				XNotify("Shake Unloaded Hooks");
 				firstDash = true;
 			}
 			onDash = true;

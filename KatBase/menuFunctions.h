@@ -32,6 +32,7 @@ namespace BO2
 		BoolMenuOption EspBoxToggle;
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
+	
 	};
 	extern Options_t options;
 

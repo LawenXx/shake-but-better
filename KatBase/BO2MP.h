@@ -7,6 +7,5 @@ namespace BO2
 	extern DWORD XamInputGetState(int userIndex, int flags, PXINPUT_STATE pState);
 	extern void leaderboard();
 
-	typedef DWORD(*someshit)(void*);
 	extern DWORD* bdStatsInfoPtr();
 }
