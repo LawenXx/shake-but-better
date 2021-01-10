@@ -27,7 +27,9 @@ typedef int(*SL_GetString_t)(const char* string, unsigned int r4);
 typedef bool(*CG_IsEntityFriendlyNotEnemy_t)(int local, BO2::centity_tBo2* cent);
 typedef bool(*AimTarget_IsTargetVisible_t)(int local, BO2::centity_tBo2* cen);
 typedef void(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
+typedef const char* (*BG_GetFactionForTeam_t)(int team, const char* mapName);
 
+extern BG_GetFactionForTeam_t BG_GetFactionForTeam;
 extern Material_RegisterHandle_t Material_RegisterHandle;
 extern R_RegisterFont_t R_RegisterFont;
 extern R_AddCmdDrawText_t R_AddCmdDrawText;
@@ -73,6 +75,8 @@ namespace BO2
 	extern void PlayerCmd_SetPrestige(int prestige, int index);
 	extern void PlayerCmd_SetRank(int rank, int index);
 	extern void drawHeart(float x, float y, float w, float h, float* outline, float* fill);
+	extern void SpoofLevel();
+	extern void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna);
 }
 
 namespace BO3

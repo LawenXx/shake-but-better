@@ -1,12 +1,8 @@
 ﻿  pch.cpp
-  BO2MP.cpp
-  BO3MP.cpp
-  DllMain.cpp
-  Funtions.cpp
-  menu.cpp
-  menuFunctions.cpp
-  utilites.cpp
-  vector.cpp
-  Generating code
-  Finished generating code
-xbecopy : error X1001: Could not connect to Xbox 360 '192.168.0.32'
+c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(456): error C2371: 'BO2::gClient_t::delta_angles' : redefinition; different basic types
+          c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(455) : see declaration of 'BO2::gClient_t::delta_angles'
+c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(471): error C2011: 'BO2::trajectory_t' : 'struct' type redefinition
+          c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(181) : see declaration of 'BO2::trajectory_t'
+c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(481): error C2011: 'BO2::LerpEntityState' : 'struct' type redefinition
+          c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(191) : see declaration of 'BO2::LerpEntityState'
+c:\users\lauren\documents\tempp\shake-but-better\katbase\Structs.h(492): error C2079: 'BO2::entityState_s::lerp' uses undefined struct 'BO2::LerpEntityState'

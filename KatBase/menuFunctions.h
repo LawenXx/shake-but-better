@@ -33,7 +33,8 @@ namespace BO2
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
 		BoolMenuOption EspFrogChan;
-	
+		BoolMenuOption NoRecoil;
+		BoolMenuOption IpSpoof;
 	};
 	extern Options_t options;
 

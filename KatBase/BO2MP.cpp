@@ -36,13 +36,6 @@ namespace BO2
 	}
 	void leaderboard() {}
 
-	void SpoofLevel() {
-		if (options.BoolRank.state) {
-			PlayerCmd_SetPrestige(1337, cgGame->clientNum);
-			PlayerCmd_SetRank(1337, cgGame->clientNum);
-		}
-	}
-
 	void DrawMenuText()
 	{
 		options.menuMaxScroll = 0;
@@ -56,7 +49,11 @@ namespace BO2
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			DrawToggle("Spoof Rank", &options.BoolRank);
+			if (cgGame->clientNum == 0) {
+				DrawToggle("Spoof Rank", &options.BoolRank);
+
+			}
+			DrawToggle("No Recoil", &options.NoRecoil);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
@@ -78,6 +75,8 @@ namespace BO2
 
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
+			DrawIntSlider("Menu Y", &options.menuY, "%i");
+			DrawToggle("Ip Spoof", &options.IpSpoof);
 			break;
 		}
 	}
@@ -89,7 +88,6 @@ namespace BO2
 
 		//Options
 		DrawMenuText();
-
 	}
 
 	int nearestClient;
@@ -142,6 +140,7 @@ namespace BO2
 					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
 			}
 			playerReady = false;
+			options.NoRecoil.state = true;
 		}
 	}
 
@@ -187,12 +186,15 @@ namespace BO2
 				if (options.EspBoxToggle.state)
 					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
 				if (options.EspDrawBones.state)
-					drawBones(&cg_entitiesArray[i], white);
+					drawBones(&cg_entitiesArray[i], Red);
 				if (options.EspDrawLine.state)
 					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
 				if (options.EspFrogChan.state)
 					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, Red);
 			}
+
+			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
+
 			SpoofLevel();
 			doAimbot();
 		}
@@ -251,6 +253,8 @@ namespace BO2
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
+				options.menuScroll = 0;
+
 				if (options.menuPageIndex < 5)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
@@ -259,6 +263,8 @@ namespace BO2
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_LEFT_SHOULDER))
 			{
+				options.menuScroll = 0;
+
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)

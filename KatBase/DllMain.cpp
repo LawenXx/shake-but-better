@@ -46,6 +46,7 @@ void checkTitleId(std::uintptr_t id)
 
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
+		MinHook[2] = MinHook_t(0x8293E5C4, (std::uint64_t)BO2::NetDll_XNetGetTitleXnAddrHook, true);
 		break;
 	case COD_BLACK_OPS_3:
 		while (*(int*)0x82A92094 == 0) 

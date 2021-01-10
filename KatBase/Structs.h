@@ -427,16 +427,86 @@ namespace BO2
 		Usercmd_t Usercmd[128];		 //0x42CA8
 		int CurrentCmdNumber;		 //0x44AA8
 	};
-
-	struct gentity_t
+	struct gClient_t
 	{
-		char pad_0000[340]; //0x0000
-		struct
-		{
-			char _0x00[0x5558];
-			int rank;
-			int prestige;
-		}*pClient;
+		std::int32_t commandTime; //0x0000
+		std::int32_t pm_type; //0x0004
+		std::int32_t bobCycle; //0x0008
+		std::int32_t pm_flags; //0x000C
+		std::int32_t weapFlags; //0x0010
+		std::int32_t otherFlags; //0x0014
+		std::int32_t pm_time; //0x0018
+		std::int32_t loopSoundId; //0x001C
+		std::int32_t loopSoundFade; //0x0020
+		char pad_0024[4]; //0x0024
+		vec3_t origin; //0x0028
+		vec3_t velocity; //0x0034
+		char pad_0040[12]; //0x0040
+		std::int32_t weaponTime; //0x004C
+		std::int32_t weaponDelay; //0x0050
+		std::int32_t weaponTimeLeft; //0x0054
+		std::int32_t weaponDelayLeft; //0x0058
+		std::int32_t weaponIdleTime; //0x005C
+		std::int32_t grenadeTimeLeft; //0x0060
+		std::int32_t throwBackGrenadeOwner; //0x0064
+		char pad_0068[36]; //0x0068
+		std::int32_t gravity; //0x008C
+		float leanf; //0x0090
+		std::int32_t delta_angles; //0x0094
+		vec3_t delta_angles; //0x0098
+		std::int32_t groundEntityNum; //0x00A4
+		std::int32_t groundType; //0x00A8
+		char pad_00AC[332]; //0x00AC
+		vec3_t viewangles; //0x01F8
+		std::int32_t viewHeightTarget; //0x0204
+		float viewHeightCurrent; //0x0208
+		char pad_020C[21288]; //0x020C
+		char name[32]; //0x5534
+		char pad_5554[4]; //0x5554
+		std::int32_t rank; //0x5558
+		std::int32_t prestige; //0x555C
+		char pad_5560[4]; //0x5560
+	}; //Size: 0x5564
+	struct trajectory_t
+	{
+		std::int8_t trType; //0x0000
+		char pad_0001[3]; //0x0001
+		std::int32_t trTime; //0x0004
+		std::int32_t trDuration; //0x0008
+		vec3_t trBase; //0x000C
+		vec3_t trDelta; //0x0018
+	}; //Size: 0x0024
+
+	struct LerpEntityState
+	{
+		std::int32_t eFlags; //0x0000
+		std::int32_t eFlags2; //0x0004
+		class trajectory_t pos; //0x0008
+		class trajectory_t apos; //0x002C
+		std::int32_t useCount; //0x0050
+	}; //Size: 0x0054
+
+	struct entityState_s
+	{
+		std::int32_t number; //0x0000
+		class LerpEntityState lerp; //0x0004
+		std::int32_t time2; //0x0058
+		std::uint32_t loopSoundId; //0x005C
+		std::int32_t solid; //0x0060
+		char pad_0064[116]; //0x0064
+		std::int16_t eType; //0x00D8
+		std::uint16_t groundEntityNum; //0x00DA
+		char pad_00DC[10]; //0x00DC
+		std::int16_t weapon; //0x00E6
+		char pad_00E8[104]; //0x00E8
+	}; //Size: 0x0150
+
+	class gentity_t
+	{
+	public:
+		entityState_s s; //0x00
+		char pad_0150[4]; //0x0150
+		class gClient_t* client; //0x0154
 		char pad_0158[452]; //0x0158
 	}; //Size: 0x031C
 

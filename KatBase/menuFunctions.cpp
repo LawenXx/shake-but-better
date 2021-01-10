@@ -56,6 +56,11 @@ namespace BO2
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
 
+	void ScoreBoard_Draw(std::vector<clientInfo_t>, int team, float x, float y) {
+		//TODO start after some rest
+
+
+	}
 
 	void SetupVariables()
 	{
@@ -79,7 +84,9 @@ namespace BO2
 
 		SetupBool(&options.testing, false);
 		SetupBool(&options.BoolRank, false);
+		SetupBool(&options.NoRecoil, false);
 		SetupBool(&options.AimbotToggle, false);
+		SetupBool(&options.IpSpoof, false);
 		SetupBool(&options.EspBoxToggle, false);
 		SetupBool(&options.EspDrawBones, false);
 		SetupBool(&options.EspDrawLine, false);
@@ -91,7 +98,7 @@ namespace BO2
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
 		int textWidth = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
 		int textShaderW = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
-		DrawText("Base for Katz", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
+		DrawText("Shake Bo2", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
 
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);

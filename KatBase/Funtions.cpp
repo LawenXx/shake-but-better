@@ -17,6 +17,7 @@ DB_FindXAssetHeader_t DB_FindXAssetHeader;
 Sl_GetStringOfSize_t Sl_GetStringOfSize;
 CG_LocationTrace_t CG_LocationTrace;
 R_TextWidth_fookinreeko Textwidth;
+BG_GetFactionForTeam_t BG_GetFactionForTeam;
 
 float white[] = { 1,1,1,1 };
 float black[] = { 0.07, 0.15, 0.22,1 };
@@ -47,7 +48,7 @@ namespace BO2
 		CG_IsEntityFriendlyNotEnemy = CG_IsEntityFriendlyNotEnemy_t(0x821CD948);
 		AimTarget_IsTargetVisible = AimTarget_IsTargetVisible_t(0x821C47B8);
 		VecToAngels = vectoAngles_t(0x8248A470);
-
+		BG_GetFactionForTeam = BG_GetFactionForTeam_t(0x821A6AA8);
 	}
 
 	void readStructs()
@@ -62,12 +63,29 @@ namespace BO2
 
 	void PlayerCmd_SetRank(int rank, int index)
 	{
-		g_entitiesArray[index].pClient->rank = rank;
+		g_entitiesArray[index].client->rank = rank;
 	}
 
 	void PlayerCmd_SetPrestige(int prestige, int index)
 	{
-		g_entitiesArray[index].pClient->prestige = prestige;
+		g_entitiesArray[index].client->prestige = prestige;
+	}
+
+	void SpoofLevel() {
+		if (options.BoolRank.state) {
+			PlayerCmd_SetPrestige(15, cgGame->clientNum);
+			PlayerCmd_SetRank(1337, cgGame->clientNum);
+		}
+	}
+
+	void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna)
+	{
+		MinHook[2].Stub(xnc, pXna);
+		if (options.IpSpoof.state)
+		{
+			BYTE IP[] = { 0x2, 0x2, 0x33, 0x3 };
+			pXna->inaOnline.S_un.S_addr = *(DWORD*)&IP;
+		}
 	}
 
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
