@@ -78,6 +78,7 @@ namespace BO2
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 
 		SetupBool(&options.testing, false);
+		SetupBool(&options.BoolRank, false);
 	}
 
 	void DrawMenuTabs()

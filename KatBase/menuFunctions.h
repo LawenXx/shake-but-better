@@ -27,6 +27,7 @@ namespace BO2
 		FloatMenuOption menuFontSize;
 
 		BoolMenuOption testing;
+		BoolMenuOption BoolRank;
 	};
 	extern Options_t options;
 

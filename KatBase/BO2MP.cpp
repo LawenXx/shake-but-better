@@ -37,8 +37,10 @@ namespace BO2
 	void leaderboard() {}
 
 	void SpoofLevel() {
-		PlayerCmd_SetPrestige(1337, cgGame->clientNum);
-		PlayerCmd_SetRank(1337, cgGame->clientNum);
+		if (options.BoolRank.state) {
+			PlayerCmd_SetPrestige(1337, cgGame->clientNum);
+			PlayerCmd_SetRank(1337, cgGame->clientNum);
+		}
 	}
 
 	void DrawMenuText()
@@ -84,7 +86,7 @@ namespace BO2
 			DrawButton("Button Testing");
 			break;
 		case HostOnly:
-			DrawButton("Spoof Rank");
+			DrawToggle("Spoof Rank", &options.BoolRank);
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
 			DrawButton("Button Testing");
@@ -204,7 +206,7 @@ namespace BO2
 
 				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
 			}
-
+			SpoofLevel();
 			doAimbot();
 		}
 	}
