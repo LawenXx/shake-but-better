@@ -1,6 +1,6 @@
 
 # shake-but-better
-it's shake but better
+it's shakepackage but way better
 # Todo:
 - [x] Finish menu visuals
 - [ ] Add ESP things
