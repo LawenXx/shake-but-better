@@ -3,6 +3,8 @@
 it's shakepackage but way better
 # Todo:
 - [x] Finish menu visuals
+- [ ] Add Autowall
+- [ ] Add NoSpread
 - [ ] Add ESP things
 - [ ] Fix Issues
 
