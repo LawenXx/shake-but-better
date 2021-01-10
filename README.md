@@ -1,5 +1,10 @@
-# shake-but-better
 
+# shake-but-better
+it's shake but better
+# Todo:
+- [x] Finish menu visuals
+- [ ] Add ESP things
+- [ ] Fix Issues
 
 
 # Contributers
