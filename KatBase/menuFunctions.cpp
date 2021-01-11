@@ -56,14 +56,15 @@ namespace BO2
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
 
-	void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y) {
-		//TODO start after some rest
+	void ScoreBoard_Draw(int team, float x, float y) {
+		std::vector<clientInfo_t> v;
+		if (options.Scoreboard.state) {
+			const char* faction = BG_GetFactionForTeam(team, cgServer->mapName);
 
-		const char* faction = BG_GetFactionForTeam(team, cgServer->mapName);
-
-		DrawShader(x, y, 500, 500, black);
-		for (int i = 0; i < 18; i++) {
-			DrawText(va("Score: %i", v[i].score), x, y, "fonts/720/normalfont", 0.6, white);
+			DrawShader(x, y, 500, 500, black);
+			for (int i = 0; i < 18; i++) {
+				DrawText(va("Score: %i", v[i].score), x, y, "fonts/720/normalfont", 0.6, white);
+			}
 		}
 	}
 
@@ -89,13 +90,19 @@ namespace BO2
 
 		SetupBool(&options.testing, false);
 		SetupBool(&options.BoolRank, false);
+		SetupBool(&options.IpSpoof, false);
+
 		SetupBool(&options.NoRecoil, false);
 		SetupBool(&options.AimbotToggle, false);
-		SetupBool(&options.IpSpoof, false);
+		SetupBool(&options.AimRequired, false);
+
 		SetupBool(&options.EspBoxToggle, false);
 		SetupBool(&options.EspDrawBones, false);
 		SetupBool(&options.EspDrawLine, false);
 		SetupBool(&options.EspFrogChan, false);
+		SetupBool(&options.Scoreboard, false);
+		SetupBool(&options.DrawItem, false);
+
 	}
 
 	void DrawMenuTabs()

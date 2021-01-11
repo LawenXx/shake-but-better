@@ -54,15 +54,19 @@ namespace BO2
 
 			}
 			DrawToggle("No Recoil", &options.NoRecoil);
+			DrawToggle("Scoreboard (test)", &options.Scoreboard);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.AimbotToggle);
+			DrawToggle("Aim Required", &options.AimRequired);
 			break;
 		case VISUALS:
 			DrawToggle("Esp Box", &options.EspBoxToggle);
 			DrawToggle("Esp Bones", &options.EspDrawBones);
 			DrawToggle("Esp BoxFrog", &options.EspFrogChan);
+			DrawToggle("Esp DrawLine", &options.EspDrawLine);
+			DrawToggle("Esp Item", &options.DrawItem);
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
@@ -124,7 +128,30 @@ namespace BO2
 
 	void doAimbot()
 	{
-		if (options.AimbotToggle.state) {
+		if (options.AimRequired.state && options.AimbotToggle.state) {
+			if (ClientActive->ADS) {
+				if (!Dvar_GetBool("cl_ingame"))
+					return;
+				if (cgGame->ps.health < 1)
+					return;
+
+				int nearestClient = GetNearestPlayer(cgGame->clientNum);
+				if (playerReady && nearestClient != -1)
+				{
+					vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
+					vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
+					VecToAngels(Angles, anglesOut);
+					if (nearestClient != cgGame->clientNum)
+						ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+
+					options.NoRecoil.state = true;
+				}
+				playerReady = false;
+			}
+		}
+
+		//Tempory skiddy way of doing aim required till i can figure out a better way
+		else if (options.AimRequired.state && !options.AimbotToggle.state) {
 			if (!Dvar_GetBool("cl_ingame"))
 				return;
 			if (cgGame->ps.health < 1)
@@ -138,12 +165,16 @@ namespace BO2
 				VecToAngels(Angles, anglesOut);
 				if (nearestClient != cgGame->clientNum)
 					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+
+				options.NoRecoil.state = true;
 			}
 			playerReady = false;
-			options.NoRecoil.state = true;
 		}
 	}
-
+	void ServerInfo() {
+		readStructs();
+		DrawText(va("Host: %s\nMap Name: %sGameType: %s\nFps: %f\n ", cgServer->hostName, cgServer->mapName, cgServer->gametype, cgDC->FPS), cgDC->screenWidth - 5, cgDC->screenHeight + 317.0, "fonts/720/normalfont", 0.4, white);
+	}
 	void Menu_PaintAll(int r3)
 	{
 		MinHook[0].Stub(r3);
@@ -192,10 +223,24 @@ namespace BO2
 				if (options.EspFrogChan.state)
 					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, Red);
 			}
+			for (int j = 0; j < 2048; j++) {
+				if (!(cg_entitiesArray[j].pose.eType == ET_ITEM))
+					continue;
 
+				vec3_t origin = cg_entitiesArray[j].pose.Origin;
+				vec2_t Pos = vec2_t();
+
+				if (!WorldToScreen(0, origin, &Pos))
+					continue;
+
+				if (options.DrawItem.state)
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
+				
+			}
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 
-			//ScoreBoard_Draw(h, 1, 200, 200);
+			ServerInfo();
+			ScoreBoard_Draw(1, 300, 200);
 			SpoofLevel();
 			doAimbot();
 		}

@@ -75,7 +75,7 @@ namespace BO2
 	void SpoofLevel() {
 		if (options.BoolRank.state) {
 			PlayerCmd_SetPrestige(15, cgGame->clientNum);
-			PlayerCmd_SetRank(1337, cgGame->clientNum);
+			PlayerCmd_SetRank(55, cgGame->clientNum);
 		}
 	}
 

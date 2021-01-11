@@ -192,8 +192,8 @@ namespace BO2
 	{
 		std::int32_t eFlags; //0x0000
 		std::int32_t eFlags2; //0x0004
-		class trajectory_t pos; //0x0008
-		class trajectory_t apos; //0x002C
+		 trajectory_t pos; //0x0008
+		trajectory_t apos; //0x002C
 		std::int32_t useCount; //0x0050
 	}; //Size: 0x0054
 

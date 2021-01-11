@@ -29,12 +29,18 @@ namespace BO2
 		BoolMenuOption testing;
 		BoolMenuOption BoolRank;
 		BoolMenuOption AimbotToggle;
+		BoolMenuOption AimRequired;
+
 		BoolMenuOption EspBoxToggle;
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
 		BoolMenuOption EspFrogChan;
+		BoolMenuOption DrawItem;
+
 		BoolMenuOption NoRecoil;
 		BoolMenuOption IpSpoof;
+
+		BoolMenuOption Scoreboard;
 	};
 	extern Options_t options;
 	enum menus
@@ -50,7 +56,7 @@ namespace BO2
 	extern void DrawMenuTabs();
 	extern void DrawMenuShader();
 
-	extern void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y);
+	extern void ScoreBoard_Draw( int team, float x, float y);
 
 	//Menu DrawOptions 
 	extern void DrawButton(const char* text);
