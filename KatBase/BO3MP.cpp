@@ -16,20 +16,12 @@ namespace BO3
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			DrawButton("Button Testing");
 			DrawToggle("Button Testing", &options.testing);
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
 			DrawIntSlider("Testing Int", &options.menuX, "%i");
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			DrawToggle("Aimbot", &options.Aimbot);
 			break;
 		case VISUALS:
 			DrawButton("Button Testing");
@@ -145,17 +137,18 @@ namespace BO3
 	void doAimbot()
 	{
 		GetNearestPlayer();
+		if (options.Aimbot.state) {
+			int Nearest = GetNearestPlayer();
+			if (Cinfo[Nearest].Health > 0) {
+				if (Nearest != -1) {
+					vec3_t Bone = AimTarget_GetTagPos(Nearest, "j_neck");
+					vec3_t Angle = Bone - Ref->ViewOrigin;
+					VecToAngels(Angle, anglesOut);
+					ClientActive->ViewAngles = anglesOut - ClientActive->SpawnAngles;
+					playerReady = false;
+				}
 
-		int Nearest = GetNearestPlayer();
-		if (Cinfo[Nearest].Health > 0) {
-			if (Nearest != -1) {
-				vec3_t Bone = AimTarget_GetTagPos(Nearest, "j_neck");
-				vec3_t Angle = Bone - Ref->ViewOrigin;
-				VecToAngels(Angle, anglesOut);
-				ClientActive->ViewAngles = anglesOut - ClientActive->SpawnAngles;
-				playerReady = false;
 			}
-
 		}
 	}
 
@@ -165,18 +158,12 @@ namespace BO3
 		readStructs();
 
 		//doAimbot();
-
-	}
-
-	void Menu_PaintAll(int r3)
-	{
-		MinHook[2].Stub(r3);
-		readStructs();
-
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
 	}
+
+
 
 	int speed = 0;
 	int ticks = 0;

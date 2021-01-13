@@ -57,13 +57,15 @@ namespace BO2
 	}
 
 	void ScoreBoard_Draw(int team, float x, float y) {
-		std::vector<clientInfo_t> v;
+	
 		if (options.Scoreboard.state) {
-			const char* faction = BG_GetFactionForTeam(team, cgServer->mapName);
+			const char* faction = BG_GetFactionForTeam(team, cgServer->MapName);
 
 			DrawShader(x, y, 500, 500, black);
 			for (int i = 0; i < 18; i++) {
-				DrawText(va("Score: %i", v[i].score), x, y, "fonts/720/normalfont", 0.6, white);
+				DrawText(va("Score: %i", cgGame->clientInfo[i].score), x, y/2, "fonts/720/normalfont", 1, white);
+				DrawText(faction, x, y, "fonts/720/normalfont", 1, white);
+				
 			}
 		}
 	}
@@ -110,7 +112,7 @@ namespace BO2
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
 		int textWidth = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
 		int textShaderW = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
-		DrawText("Shake Bo2", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
+		DrawText("Shake BO2", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
 
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
@@ -264,6 +266,7 @@ namespace BO3
 
 void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align)
 {
+	
 	int fontA = Textwidth(text, strlen(text), R_RegisterFont(font), 0) * fontSize;
 
 	if (align == align_left)
@@ -272,8 +275,8 @@ void DrawText(const char* text, float x, float y, const char* font, float fontSi
 		x = x - fontA;
 	if (align == align_center)
 		x = x - (fontA / 2);
-
-	R_AddCmdDrawText(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, 0, color, 3);
+		
+	R_AddCmdDrawText_test(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, color, 0);
 }
 
 
@@ -312,6 +315,7 @@ void DrawText(const char* text, float x, float y, const char* font, float fontSi
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 
 		SetupBool(&options.testing, false);
+		SetupBool(&options.Aimbot, false);
 	}
 
 	void DrawMenuTabs()
@@ -319,8 +323,7 @@ void DrawText(const char* text, float x, float y, const char* font, float fontSi
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current;
 		int textWidth = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
 		int textShaderW = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
-		DrawText("Base for Katz", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
-
+		DrawText("Shake BO3", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == MAIN)

@@ -48,7 +48,9 @@ typedef int32_t(*DB_FindXAssetHeader_t)(int type, const char* name, int imgTrack
 typedef short(*Sl_GetStringOfSize_t)(const char* String, int uzr, int SizeOfString);
 typedef void(*CG_LocationTrace_t)(BO3::trace_t* results, vec3_t* start, vec3_t* end, int passEntityNum, int contentMask, bool checkRopes, int* context);
 typedef int(*R_TextWidth_fookinreeko)(const char* text, int maxchars, Font* font, int r6);
+typedef void(*R_AddCmdDrawText_bo3)(const char* text, int maxChars, Font* font, float x, float y, float xScale, float yScale,  float* color, int style);
 
+extern R_AddCmdDrawText_bo3 R_AddCmdDrawText_test;
 extern R_TextWidth_fookinreeko Textwidth;
 extern CG_LocationTrace_t CG_LocationTrace;
 extern Sl_GetStringOfSize_t Sl_GetStringOfSize;
@@ -69,6 +71,7 @@ namespace BO2
 	extern void DrawLine(vec2_t start, vec2_t end, float* color, float size);
 	extern void drawBones(centity_tBo2* entity, float* color);
 	extern bool isTeam(centity_tBo2* cen);
+	extern 	bool isDead(centity_tBo2* cen);
 	extern 	bool Dvar_GetBool(const char* dvarName);
 	extern void PlayerCmd_SetPrestige(int prestige, int index);
 	extern void PlayerCmd_SetRank(int rank, int index);
@@ -79,6 +82,7 @@ namespace BO2
 
 namespace BO3
 {
+	
 	extern void InitAddress();
 	extern void readStructs();
 	extern int R_TextHeight(Font* font);

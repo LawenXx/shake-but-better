@@ -97,6 +97,7 @@ namespace BO2
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
+	const char* Tag;
 
 	int GetNearestPlayer(int client)
 	{
@@ -111,6 +112,11 @@ namespace BO2
 
 			if (isTeam(&cg_entitiesArray[i]))
 				continue;
+
+			if (cg_entitiesArray[i].WeaponID == 89)
+				Tag = "j_ankle_ri";
+			else
+				Tag = "j_neck";
 
 			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
 			if (AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]))
@@ -128,8 +134,8 @@ namespace BO2
 
 	void doAimbot()
 	{
-		if (options.AimRequired.state && options.AimbotToggle.state) {
-			if (ClientActive->ADS) {
+		if (options.AimbotToggle.state) {
+			
 				if (!Dvar_GetBool("cl_ingame"))
 					return;
 				if (cgGame->ps.health < 1)
@@ -138,7 +144,8 @@ namespace BO2
 				int nearestClient = GetNearestPlayer(cgGame->clientNum);
 				if (playerReady && nearestClient != -1)
 				{
-					vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
+					
+					vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient],Tag);
 					vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
 					VecToAngels(Angles, anglesOut);
 					if (nearestClient != cgGame->clientNum)
@@ -147,46 +154,21 @@ namespace BO2
 					options.NoRecoil.state = true;
 				}
 				playerReady = false;
-			}
+			
 		}
 
-		//Tempory skiddy way of doing aim required till i can figure out a better way
-		else if (options.AimRequired.state && !options.AimbotToggle.state) {
-			if (!Dvar_GetBool("cl_ingame"))
-				return;
-			if (cgGame->ps.health < 1)
-				return;
-
-			int nearestClient = GetNearestPlayer(cgGame->clientNum);
-			if (playerReady && nearestClient != -1)
-			{
-				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], "j_neck");
-				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
-				VecToAngels(Angles, anglesOut);
-				if (nearestClient != cgGame->clientNum)
-					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
-
-				options.NoRecoil.state = true;
-			}
-			playerReady = false;
-		}
 	}
 	void ServerInfo() {
 		readStructs();
-		DrawText(va("Host: %s\nMap Name: %sGameType: %s\nFps: %f\n ", cgServer->hostName, cgServer->mapName, cgServer->gametype, cgDC->FPS), cgDC->screenWidth - 5, cgDC->screenHeight + 317.0, "fonts/720/normalfont", 0.4, white);
+		DrawText(va("Host: %s\n Map Name: %sGameType: %s \nFps: %f \n ", cgServer->hostName, cgServer->MapName, cgServer->gametype, cgDC->FPS), cgDC->screenWidth- sizeof(cgServer->MapName) - 10, cgDC->screenHeight-690, "fonts/720/normalfont", 1, white, align_center);
 	}
 	void Menu_PaintAll(int r3)
 	{
 		MinHook[0].Stub(r3);
 		readStructs();
 
-		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-		if (options.menuOpen)
-			DrawMenu();
-
 		if (Dvar_GetBool("cl_ingame"))
 		{
-
 			for (int i = 0; i < 18; i++)
 			{
 				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
@@ -237,13 +219,18 @@ namespace BO2
 					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
 				
 			}
+			options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
+			if (options.menuOpen)
+				DrawMenu();
+
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 
-			ServerInfo();
+			
 			ScoreBoard_Draw(1, 300, 200);
 			SpoofLevel();
 			doAimbot();
 		}
+		ServerInfo();
 	}
 
 	int speed = 0;
@@ -299,8 +286,6 @@ namespace BO2
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
-				options.menuScroll = 0;
-
 				if (options.menuPageIndex < 5)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
@@ -309,12 +294,11 @@ namespace BO2
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_LEFT_SHOULDER))
 			{
-				options.menuScroll = 0;
 
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)
-					options.menuPageIndex = 4;
+					options.menuPageIndex = 4;			
 			}
 
 

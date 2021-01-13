@@ -1,4 +1,3 @@
-#pragma once
 namespace BO2
 {
 	enum Address

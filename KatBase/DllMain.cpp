@@ -60,7 +60,6 @@ void checkTitleId(std::uintptr_t id)
 
 		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
 		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
-		MinHook[2] = MinHook_t(0x822112F0, (std::uint16_t)BO3::Menu_PaintAll, true);
 		break;
 
 	default:

@@ -92,6 +92,7 @@ namespace BO3
 		IntMenuOption menuFontIndex;
 		FloatMenuOption menuFontSize;
 
+		BoolMenuOption Aimbot;
 		BoolMenuOption testing;
 	};
 	extern Options_t options;

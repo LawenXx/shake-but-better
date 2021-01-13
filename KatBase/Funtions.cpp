@@ -3,6 +3,7 @@
 Material_RegisterHandle_t Material_RegisterHandle;
 R_RegisterFont_t R_RegisterFont;
 R_AddCmdDrawText_t R_AddCmdDrawText;
+R_AddCmdDrawText_bo3 R_AddCmdDrawText_test;
 CG_DrawRotatedPicPhysical_t CG_DrawRotatedPicPhysical;
 R_TextWidth_t R_TextWidth;
 Dvar_FindVar_t Dvar_FindVar;
@@ -28,7 +29,7 @@ namespace BO2
 {
 
 	UIContext* cgDC;
-	cg_t* cgGame;
+	cg_s* cgGame;
 	Cgs_t* cgServer;
 	centity_tBo2* cg_entitiesArray;
 	ClientActive_t* ClientActive;
@@ -55,21 +56,21 @@ namespace BO2
 	void readStructs()
 	{
 		cgDC = (UIContext*)MP_UIContext;
-		cgGame = *(cg_t**)MP_CG;
+		cgGame = *(cg_s**)MP_CG;
 		cg_entitiesArray = *(centity_tBo2**)MP_Centitiy;
 		ClientActive = *(ClientActive_t**)0x82C70F4C;
 		g_entitiesArray = (gentity_t*)0x833D0640;
-		cgServer = (Cgs_t*)0x82BBAE44;
+		cgServer = *(Cgs_t**)0x82BBAE44;
 	}
 
 	void PlayerCmd_SetRank(int rank, int index)
 	{
-		g_entitiesArray[index].client->rank = rank;
+		g_entitiesArray[index].pClient->rank = rank;
 	}
 
 	void PlayerCmd_SetPrestige(int prestige, int index)
 	{
-		g_entitiesArray[index].client->prestige = prestige;
+		g_entitiesArray[index].pClient->prestige = prestige;
 	}
 
 	void SpoofLevel() {
@@ -157,6 +158,13 @@ namespace BO2
 		else
 			return false;
 	}
+	bool isDead(centity_tBo2* cen)
+	{
+		if (!cen->pose.eType == ET_PLAYER_CORPSE)
+			return true;
+		else
+			return false;
+	}
 
 }
 
@@ -173,7 +181,7 @@ namespace BO3
 	void InitAddress()
 	{
 		DB_FindXAssetHeader = DB_FindXAssetHeader_t(0x82328110);
-		R_AddCmdDrawText = R_AddCmdDrawText_t(0x824AE7C0);
+		 R_AddCmdDrawText_test = R_AddCmdDrawText_bo3(0x824AE7C0);
 		CG_DrawRotatedPicPhysical = CG_DrawRotatedPicPhysical_t(0x82210468);
 		WorldToScreen = (WorldToScreen_t)0x82208018;
 		CG_DobjGetWorldTagPos = (CG_DobjGetWorldTagPos_t)0x8221ACF0;

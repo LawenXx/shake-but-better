@@ -1,5 +1,3 @@
-#pragma once
-
 struct Material
 {
 	const char* name;
@@ -85,6 +83,29 @@ namespace BO2
 		ET_EVENTS,
 	};
 
+	struct UIContext
+	{
+		int contextIndex; //0x0000
+		float bias; //0x0004
+		std::int32_t realTime; //0x0008
+		std::int32_t frameTime; //0x000C
+		char pad_0010[12]; //0x0010
+		std::int32_t screenWidth; //0x001C
+		std::int32_t screenHeight; //0x0020
+		float screenAspect; //0x0024
+		float FPS; //0x0028
+		char pad_002C[20]; //0x002C
+
+		float CenterX()
+		{
+			return this->screenWidth / 2;
+		}
+		float CenterY()
+		{
+			return this->screenHeight / 2;
+		}
+	};
+
 
 	union DvarValue
 	{
@@ -142,29 +163,6 @@ namespace BO2
 		dvar_s* next;                               //0x68
 	}; //Size = 0x6C
 
-	struct UIContext
-	{
-		int contextIndex; //0x0000
-		float bias; //0x0004
-		std::int32_t realTime; //0x0008
-		std::int32_t frameTime; //0x000C
-		char pad_0010[12]; //0x0010
-		std::int32_t screenWidth; //0x001C
-		std::int32_t screenHeight; //0x0020
-		float screenAspect; //0x0024
-		float FPS; //0x0028
-		char pad_002C[20]; //0x002C
-
-		float CenterX()
-		{
-			return this->screenWidth / 2;
-		}
-		float CenterY()
-		{
-			return this->screenHeight / 2;
-		}
-	};
-
 
 	struct cpose_t
 	{
@@ -179,25 +177,22 @@ namespace BO2
 
 	struct trajectory_t
 	{
-		std::int8_t trType; //0x0000
-		char pad_0001[3]; //0x0001
-		std::int32_t trTime; //0x0004
-		std::int32_t trDuration; //0x0008
-		vec3_t trBase; //0x000C
-		vec3_t trDelta; //0x0018
-	}; //Size: 0x0024
-
+		unsigned char trType; //0x015C 
+		char _0x015D[3];
+		__int32 trTime; //0x0160 
+		__int32 trDuration; //0x0164 
+		vec3_t NewOrigin; //0x0168 
+		vec3_t trDelta; //0x0174 
+	};
 
 	struct LerpEntityState
 	{
-		std::int32_t eFlags; //0x0000
-		std::int32_t eFlags2; //0x0004
-		 trajectory_t pos; //0x0008
-		trajectory_t apos; //0x002C
-		std::int32_t useCount; //0x0050
-	}; //Size: 0x0054
+		__int32 Flags; //0x0154 
+		__int32 eFlags2; //0x0158 
+		trajectory_t pos;
 
-	
+	};
+
 	struct entityState_t
 	{
 		__int32 ClientNumber; //0x01D0 
@@ -365,7 +360,7 @@ namespace BO2
 		char _0x05C8[576];
 	}; //0x808
 
-	struct cg_t
+	struct cg_s
 	{
 		__int32 clientNum; //0x0000 
 		__int32 localClientNum; //0x0004 
@@ -405,17 +400,20 @@ namespace BO2
 	};
 	struct Cgs_t
 	{
-		char _0x0000[8];
-		__int32 screenX; //0x0008 
-		__int32 screenY; //0x000C 
-		char _0x0010[32];
+		char pad_0000[8]; //0x0000
+		int32_t screenX; //0x0008
+		int32_t screenY; //0x000C
+		char pad_0010[32]; //0x0010
 		char gametype[4]; //0x0030
-		char _0x0034[0x1C];
-		char hostName[0x14]; //0x50
-		char _0x0064[0xEC];
-		DWORD MaxClients; // 0x150
-		char _0x0154[0x44];
-		char mapName[0x18]; //0x198
+		char pad_0034[28]; //0x0034
+		char hostName[12]; //0x0050
+		char pad_005C[244]; //0x005C
+		int32_t MaxClients; //0x0150
+		char pad_0154[4]; //0x0154
+		char MapFileName[32]; //0x0158
+		char pad_0178[32]; //0x0178
+		char MapName[16]; //0x0198
+		char pad_01A8[456]; //0x01A8
 	};
 	struct Usercmd_t// size 0x3C
 	{
@@ -443,53 +441,16 @@ namespace BO2
 		Usercmd_t Usercmd[128];		 //0x42CA8
 		int CurrentCmdNumber;		 //0x44AA8
 	};
-	struct gClient_t
+
+	struct gentity_t
 	{
-		std::int32_t commandTime; //0x0000
-		std::int32_t pm_type; //0x0004
-		std::int32_t bobCycle; //0x0008
-		std::int32_t pm_flags; //0x000C
-		std::int32_t weapFlags; //0x0010
-		std::int32_t otherFlags; //0x0014
-		std::int32_t pm_time; //0x0018
-		std::int32_t loopSoundId; //0x001C
-		std::int32_t loopSoundFade; //0x0020
-		char pad_0024[4]; //0x0024
-		vec3_t origin; //0x0028
-		vec3_t velocity; //0x0034
-		char pad_0040[12]; //0x0040
-		std::int32_t weaponTime; //0x004C
-		std::int32_t weaponDelay; //0x0050
-		std::int32_t weaponTimeLeft; //0x0054
-		std::int32_t weaponDelayLeft; //0x0058
-		std::int32_t weaponIdleTime; //0x005C
-		std::int32_t grenadeTimeLeft; //0x0060
-		std::int32_t throwBackGrenadeOwner; //0x0064
-		char pad_0068[36]; //0x0068
-		std::int32_t gravity; //0x008C
-		float leanf; //0x0090
-		std::int32_t delta_angles; //0x0094
-		vec3_t delta_aangles; //0x0098
-		std::int32_t groundEntityNum; //0x00A4
-		std::int32_t groundType; //0x00A8
-		char pad_00AC[332]; //0x00AC
-		vec3_t viewangles; //0x01F8
-		std::int32_t viewHeightTarget; //0x0204
-		float viewHeightCurrent; //0x0208
-		char pad_020C[21288]; //0x020C
-		char name[32]; //0x5534
-		char pad_5554[4]; //0x5554
-		std::int32_t rank; //0x5558
-		std::int32_t prestige; //0x555C
-		char pad_5560[4]; //0x5560
-	}; //Size: 0x5564
-	
-	class gentity_t
-	{
-	public:
-		entityState_t s; //0x00
-		char pad_0150[4]; //0x0150
-		class gClient_t* client; //0x0154
+		char pad_0000[340]; //0x0000
+		struct
+		{
+			char _0x00[0x5558];
+			int rank;
+			int prestige;
+		}*pClient;
 		char pad_0158[452]; //0x0158
 	}; //Size: 0x031C
 
@@ -503,7 +464,7 @@ namespace BO2
 
 
 	extern UIContext* cgDC;
-	extern cg_t* cgGame;
+	extern cg_s* cgGame;
 	extern Cgs_t* cgServer;
 	extern centity_tBo2* cg_entitiesArray;
 	extern ClientActive_t* ClientActive;
@@ -692,4 +653,3 @@ namespace BO3
 	extern ClientInfo* Cinfo;
 	extern RefDef* Ref;
 }
-
