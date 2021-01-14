@@ -13,6 +13,6 @@ it's shakepackage but way better
 ***Reeko "helper" and base maker<br />*** 
 ***Kat person who makes and breaks things<br />***
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/vt5fpE0bzSY)
+[![Watch the video](https://i.imgur.com/bbh2Vrw.png)](https://youtu.be/4qRFJ52xMkE)
 
 
