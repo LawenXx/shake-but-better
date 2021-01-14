@@ -2,7 +2,6 @@
 
 namespace BO3
 {
-
 	void DrawMenuText()
 	{
 		options.menuMaxScroll = 0;
@@ -16,33 +15,34 @@ namespace BO3
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			DrawToggle("Button Testing", &options.testing);
-			DrawIntSlider("Testing Int", &options.menuX, "%i");
+			DrawToggle("No Recoil", &options.NoRecoil);
+			DrawToggle("No Sway", &options.NoSway);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.Aimbot);
+			DrawToggle("AutoShoot", &options.AutoShoot);
 			break;
 		case VISUALS:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			DrawToggle("Esp BoxFrog", &options.EspHeart);
+			DrawToggle("Esp Bones", &options.EspBones);
+			DrawToggle("Esp Snaplines", &options.EspSnap);
+			DrawToggle("Esp Names", &options.EspNames);
+			DrawToggle("Esp Healthbar", &options.EspHealth);
+			DrawToggle("OverHeadNames", &options.OverHeadNames);
+			DrawToggle("Tracer Rounds", &options.Tracers);
 			break;
 		case PLAYERS:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			for (int i = 0; i < 18; i++) {
+				if (!strcmp(Cinfo[i].Name, ""))
+					DrawButton("N/A");
+				else
+					DrawButton(va("[%i] %s [%s]", i, Cinfo[i].Name, isTeam(i) ? "^2Friendly^7" : "^1Enemy^7"));
+			}
 			break;
 		case SETTINGS:
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
-			DrawButton("Button Testing");
+			DrawIntSlider("MenuX", &options.menuX, "%i");
+			DrawIntSlider("MenuY", &options.menuY, "%i");
 			break;
 		}
 	}
@@ -50,13 +50,10 @@ namespace BO3
 	void DrawMenu()
 	{
 		DrawMenuShader();
-		printf("Shader drawn");
 		DrawMenuTabs();
-		printf("tabs drawn");
 
 		//Options
 		DrawMenuText();
-		//printf("Text drawn");
 	}
 
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
@@ -66,23 +63,6 @@ namespace BO3
 		vec_t length = delta.Length();
 		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
 		CG_DrawRotatedPicPhysical(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
-	}
-
-	vec3_t AimTarget_GetTagPos(int client, const char* tag)
-	{
-		vec3_t Vect;
-		int Dobj = Com_ClientDObj(client, 0);
-
-		if (!Dobj)
-			return vec3_t(0, 0, 0);
-		else {
-			if (!CG_DobjGetWorldTagPos(&cg_entitiesArray[client], Dobj, Sl_GetString(tag, 0), &Vect))
-				printf("AimTarget_GetTagPos: Failed to locate tag: [%s] on [%i]\n", tag, client);
-			else
-				return Vect;
-		}
-
-		return vec3_t();
 	}
 
 	void drawBones(Centity* entity, float* color)
@@ -95,14 +75,31 @@ namespace BO3
 
 		}
 	}
+	std::vector<cTracer> GlobalTrace;
 
-	bool isTeam(int cen)
+	float deltaFade(int ms, int tracerTime)
 	{
-		if (Cinfo[cen].Team == Cinfo[cgGame->MyClientNum].Team)
-			return true;
-		return false;
+		return float(1 - (cgGame->CmdTime - tracerTime) / ms);
 	}
+	void DrawTracer() {
+		if (options.Tracers.state) {
+			auto it = GlobalTrace.begin();
+			while (it != GlobalTrace.end())
+			{
+				vec2_t Hit2D = vec2_t();
+				vec2_t Start2D = vec2_t();
+				WorldToScreen(0, it->hit3D, &Hit2D);
+				WorldToScreen(0, it->start3D, &Start2D);
 
+				DrawLine(Hit2D, Start2D, blue, 2);
+				//SoulStar(Hit2D.x, Hit2D.y, 40, 40, 2, Black2);
+				if (deltaFade(2000, it->startTime) <= 0)
+					it = GlobalTrace.erase(it);
+				else
+					++it;
+			}
+		}
+	}
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
@@ -124,7 +121,7 @@ namespace BO3
 							{
 								max = Distance;
 								nearestClient = i;
-								//options.Fire.state = true;
+								options.Fire.state = true;
 							}
 						}
 					}
@@ -156,15 +153,109 @@ namespace BO3
 	{
 		MinHook[1].Stub();
 		readStructs();
+		vec2_t BoxPos, BoxPos2, Screen, Screen2, Spine;
 
-		//doAimbot();
+		const char* Tag = "j_head";
+
+		if (inGame) {
+			for (int i = 0; i < 18; i++) {
+
+				if (!(cg_entitiesArray[i].EType == 1))
+					continue;
+
+				if (!(cg_entitiesArray[i].ClientNum != 0))
+					continue;
+
+				if (Cinfo[i].Health < 1)
+					continue;
+
+				if (!WorldToScreen(0, cg_entitiesArray[i].Origin, &BoxPos))
+					continue;
+
+				if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
+					continue;
+				if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
+					continue;
+
+				float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
+				float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
+
+				//SoulsAmazingStar Esp
+				/*if (options.EspStar.state)
+					SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
+				//Souls amazing heart esp
+				if (options.EspHeart.state)
+					drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, Red, Red);
+				//Esp Name
+				if (options.EspNames.state)
+					DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, "fonts/normalfont", 0.6, black, align_center);
+				//Esp Health
+				if (options.EspHealth.state)
+					ESP_ClientHealth(i);
+
+				//SnapLines
+				if (options.EspSnap.state)
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, Red, 2);
+
+				//Bones
+				for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
+					if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
+						if (options.EspBones.state)
+							DrawLine(vec2_t(Screen.x, Screen.y), vec2_t(Screen2.x, Screen2.y), white, 2);
+					}
+				}
+			}
+		*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
+		//No recoil
+		*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
+		//No Sway
+		*(uint32_t*)0x82201008 = options.NoSway.state ? 0x60000000 : 0x4BFFE659;
+
+		
+			doAimbot();
+			DrawTracer();
+		}
+
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
 	}
 
+	void CL_ReadyToSendPacket(int local) {
+		MinHook[2].Stub(local);
+		readStructs();
+		userCmd_t* curCmd = &UserCmd[ClientActive->cmdnumber & 0x7F];
+		userCmd_t* oldCmd = &UserCmd[(ClientActive->cmdnumber - 1) & 0x7F];
 
+		*oldCmd = *curCmd;
+		oldCmd->serverTime -= 1;
 
+		if (options.AutoShoot.state)
+		{
+			if (options.Fire.state) {
+				oldCmd->buttonFlag &= ~0x80000000;
+				curCmd->buttonFlag |= 0x80000000;
+				options.Fire.state = false;
+			}
+
+		}
+
+	}
+
+	void CG_BulletHitEvent(int localClientNum, int sourceEntityNum, int targetEntityNum, int weapon, vec3_t* startPos, vec3_t* position, vec3_t* normal, vec3_t* seeThruDecalNormal, int surfType, int event, int eventParam, int hitContents, char boneIndex)
+	{
+		MinHook[3].Stub(localClientNum, sourceEntityNum, targetEntityNum, weapon, startPos, position, normal, seeThruDecalNormal, surfType, event, eventParam, hitContents, boneIndex);
+		readStructs();
+
+		if (sourceEntityNum == cgGame->MyClientNum) {
+			cTracer Trace;
+			Trace.hit3D = *position;
+			Trace.startTime = cgGame->CmdTime;
+			Trace.start3D = *startPos;
+
+			GlobalTrace.emplace_back(Trace);
+		}
+	}
 	int speed = 0;
 	int ticks = 0;
 	bool run = false;

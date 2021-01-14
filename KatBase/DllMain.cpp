@@ -47,6 +47,7 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
 		MinHook[2] = MinHook_t(0x8293E5C4, (std::uint64_t)BO2::NetDll_XNetGetTitleXnAddrHook, true);
+		MinHook[3] = MinHook_t(0x8226C9C8, (std::uint64_t)BO2::Cl_WritePacket, true);
 		break;
 	case COD_BLACK_OPS_3:
 		while (*(int*)0x82A92094 == 0) 
@@ -60,6 +61,8 @@ void checkTitleId(std::uintptr_t id)
 
 		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
 		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
+		MinHook[2] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
+		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
 		break;
 
 	default:

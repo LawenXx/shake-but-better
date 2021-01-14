@@ -67,6 +67,7 @@ namespace BO2
 			DrawToggle("Esp BoxFrog", &options.EspFrogChan);
 			DrawToggle("Esp DrawLine", &options.EspDrawLine);
 			DrawToggle("Esp Item", &options.DrawItem);
+			DrawToggle("Wallhack", &options.Wallhack);
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
@@ -83,6 +84,16 @@ namespace BO2
 			DrawToggle("Ip Spoof", &options.IpSpoof);
 			break;
 		}
+	}
+
+	void ServerInfo() {
+		readStructs();
+
+		DrawTextInBox("Shake BO2 Alpha", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake BO2 Alpha", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
 	}
 
 	void DrawMenu()
@@ -135,33 +146,41 @@ namespace BO2
 	void doAimbot()
 	{
 		if (options.AimbotToggle.state) {
-			
-				if (!Dvar_GetBool("cl_ingame"))
-					return;
-				if (cgGame->ps.health < 1)
-					return;
 
-				int nearestClient = GetNearestPlayer(cgGame->clientNum);
-				if (playerReady && nearestClient != -1)
-				{
-					
-					vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient],Tag);
-					vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
-					VecToAngels(Angles, anglesOut);
-					if (nearestClient != cgGame->clientNum)
-						ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+			if (!Dvar_GetBool("cl_ingame"))
+				return;
+			if (cgGame->ps.health < 1)
+				return;
 
-					options.NoRecoil.state = true;
-				}
-				playerReady = false;
-			
+			int nearestClient = GetNearestPlayer(cgGame->clientNum);
+			if (playerReady && nearestClient != -1)
+			{
+
+				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
+				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
+				VecToAngels(Angles, anglesOut);
+				if (nearestClient != cgGame->clientNum)
+					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+
+				options.NoRecoil.state = true;
+			}
+			playerReady = false;
+
 		}
 
 	}
-	void ServerInfo() {
-		readStructs();
-		DrawText(va("Host: %s\n Map Name: %sGameType: %s \nFps: %f \n ", cgServer->hostName, cgServer->MapName, cgServer->gametype, cgDC->FPS), cgDC->screenWidth- sizeof(cgServer->MapName) - 10, cgDC->screenHeight-690, "fonts/720/normalfont", 1, white, align_center);
+
+	void NoSpread(Usercmd_t* cmd) {
+		unsigned int CmdTimeSeed = cgGame->ps.commandTime;
+		float minSpread, maxSpread;
+
+		BG_seedRandWithGameTime(&CmdTimeSeed);
+		G_GetSpreadForWeapon(playerstate, cg_entitiesArray->WeaponID, &minSpread, &maxSpread);
+
+		double spread;
+
 	}
+
 	void Menu_PaintAll(int r3)
 	{
 		MinHook[0].Stub(r3);
@@ -206,7 +225,10 @@ namespace BO2
 					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, Red);
 			}
 			for (int j = 0; j < 2048; j++) {
-				if (!(cg_entitiesArray[j].pose.eType == ET_ITEM))
+				if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
+					continue;
+
+				if (!(cg_entitiesArray[j].nextState.Alive))
 					continue;
 
 				vec3_t origin = cg_entitiesArray[j].pose.Origin;
@@ -216,8 +238,8 @@ namespace BO2
 					continue;
 
 				if (options.DrawItem.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
-				
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
+
 			}
 			options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 			if (options.menuOpen)
@@ -225,14 +247,22 @@ namespace BO2
 
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 
-			
+			*(uint32_t*)0x821fc04c = options.Wallhack.state ? 0x38C0FFFF : 0x7FA6EB78;
+			*(uint32_t*)0x83c56038 = options.Wallhack.state ? 0xF51F0000DF : 0x3F800000;
+
+
 			ScoreBoard_Draw(1, 300, 200);
 			SpoofLevel();
-			doAimbot();
 		}
 		ServerInfo();
 	}
+	void Cl_WritePacket(int a) {
+		MinHook[3].Stub(a);
 
+		if (Dvar_GetBool("cl_ingame"))
+			doAimbot();
+
+	}
 	int speed = 0;
 	int ticks = 0;
 	bool run = false;
@@ -298,7 +328,7 @@ namespace BO2
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)
-					options.menuPageIndex = 4;			
+					options.menuPageIndex = 4;
 			}
 
 

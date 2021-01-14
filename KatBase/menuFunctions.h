@@ -36,6 +36,7 @@ namespace BO2
 		BoolMenuOption EspDrawBones;
 		BoolMenuOption EspFrogChan;
 		BoolMenuOption DrawItem;
+		BoolMenuOption Wallhack;
 
 		BoolMenuOption NoRecoil;
 		BoolMenuOption IpSpoof;
@@ -60,6 +61,7 @@ namespace BO2
 
 	//Menu DrawOptions 
 	extern void DrawButton(const char* text);
+	extern void DrawTextInBox(const char* text, int x, int y, int w, int h);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
 	extern void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt);
 	extern void DrawStringSlider(const char* text, IntMenuOption* value, const char* string);
@@ -92,6 +94,21 @@ namespace BO3
 		IntMenuOption menuFontIndex;
 		FloatMenuOption menuFontSize;
 
+		BoolMenuOption OverHeadNames;
+		BoolMenuOption Tracers;
+		BoolMenuOption NoRecoil;
+		BoolMenuOption NoSway;
+
+		BoolMenuOption EspSnap;
+		BoolMenuOption EspBox;
+		BoolMenuOption EspHeart;
+		BoolMenuOption EspBones;
+		BoolMenuOption EspNames;
+		BoolMenuOption EspHealth;
+
+
+		BoolMenuOption AutoShoot;
+		BoolMenuOption Fire;
 		BoolMenuOption Aimbot;
 		BoolMenuOption testing;
 	};

@@ -11,6 +11,8 @@ extern float white[];
 extern float black[];
 extern float blue[];
 extern float Red[];
+extern float Yellow[4];
+extern float Green[4];
 //Black Ops 2
 
 typedef Material* (*Material_RegisterHandle_t)(const char* shaderName, int imgTrack);
@@ -26,7 +28,11 @@ typedef bool(*CG_IsEntityFriendlyNotEnemy_t)(int local, BO2::centity_tBo2* cent)
 typedef bool(*AimTarget_IsTargetVisible_t)(int local, BO2::centity_tBo2* cen);
 typedef void(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
 typedef const char* (*BG_GetFactionForTeam_t)(int team, const char* mapName);
+typedef void(*BG_seedRandWithGameTime_t)(unsigned int* pHoldrand);
+typedef void(*G_GetSpreadForWeapon_t)(BO2::playerstate_s *ps, int weapon, float* minSpread, float* maxSpread);
 
+extern G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
+extern BG_seedRandWithGameTime_t BG_seedRandWithGameTime;
 extern BG_GetFactionForTeam_t BG_GetFactionForTeam;
 extern Material_RegisterHandle_t Material_RegisterHandle;
 extern R_RegisterFont_t R_RegisterFont;
@@ -60,6 +66,7 @@ extern CG_DobjGetWorldTagPos_t CG_DobjGetWorldTagPos;
 
 namespace BO2
 {
+	
 	extern void InitAddress();
 	extern void readStructs();
 	extern int R_TextHeight(Font* font);
@@ -82,11 +89,17 @@ namespace BO2
 
 namespace BO3
 {
-	
 	extern void InitAddress();
 	extern void readStructs();
 	extern int R_TextHeight(Font* font);
 
+	extern void CG_BulletHitEvent(int localClientNum, int sourceEntityNum, int targetEntityNum, int weapon, vec3_t* startPos, vec3_t* position, vec3_t* normal, vec3_t* seeThruDecalNormal, int surfType, int event, int eventParam, int hitContents, char boneIndex);
+	extern void ESP_ClientHealth(int cen);
+	extern vec3_t AimTarget_GetTagPos(int client, const char* tag);
+	extern void drawHeart(float x, float y, float w, float h, float* outline, float* fill);
+	extern void DrawLine(vec2_t start, vec2_t end, float* color, float size);
+	extern bool inGame();
+	extern bool isTeam(int cen);
 	extern int Com_ClientDObj(int ClientNum, int LocalPlayer);
 	extern bool AimTarget_IsVisible(vec3_t BonePos, int i);
 	extern short Sl_GetString(const char* String, int usr);

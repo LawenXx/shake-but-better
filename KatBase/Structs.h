@@ -462,7 +462,7 @@ namespace BO2
 		"j_hip_le", "j_spinelower", "j_hip_ri", "j_knee_ri", "j_ankle_ri"
 	};
 
-
+	extern playerstate_s* playerstate;
 	extern UIContext* cgDC;
 	extern cg_s* cgGame;
 	extern Cgs_t* cgServer;
@@ -637,6 +637,25 @@ namespace BO3
 		bool walkable; // 0x2C
 		char padding2[0x13];//0x2D   //og size 0x0B
 	};
+	struct userCmd_t
+	{
+		int serverTime;//0x00
+		int buttonFlag;//0x004
+		char _0x08[0x8];
+		int viewAngles[3]; //0x10
+		char _0x1C[0xC];
+		char fMove; //0x28
+		char rMove; //0x29
+		char _0x30[0x13]; //0x17
+	};//0x40
+	class cTracer
+	{
+	public:
+		vec3_t hit3D;
+		vec3_t start3D;
+		int startTime;
+	};
+
 	static char* Bones[] = {
 		"j_helmet", "j_head", "j_neck",
 		"j_shoulder_le", "j_elbow_le", "j_wrist_le", "j_elbow_le", "j_shoulder_le", "j_neck",
@@ -645,7 +664,8 @@ namespace BO3
 		"j_hip_le", "j_spinelower", "j_hip_ri", "j_knee_ri", "j_ankle_ri"
 	};
 
-
+	extern cTracer Tracer;
+	extern userCmd_t* UserCmd;
 	extern UIContext* cgDC;
 	extern CgArray* cgGame;
 	extern Centity* cg_entitiesArray;

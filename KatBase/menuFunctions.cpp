@@ -55,7 +55,11 @@ namespace BO2
 		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
-
+	void DrawTextInBox(const char* text, int x, int y, int w, int h) {
+		DrawShader(x, y, w, h, black);
+		BoundingBox(x , y , w, h, blue, 1);
+		DrawText(text, x+5, y+h-5, "fonts/720/normalfont", 0.65, white);
+	}
 	void ScoreBoard_Draw(int team, float x, float y) {
 	
 		if (options.Scoreboard.state) {
@@ -104,6 +108,7 @@ namespace BO2
 		SetupBool(&options.EspFrogChan, false);
 		SetupBool(&options.Scoreboard, false);
 		SetupBool(&options.DrawItem, false);
+		SetupBool(&options.Wallhack, false);
 
 	}
 
@@ -161,7 +166,7 @@ namespace BO2
 
 		//Footer
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 50 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 30, black);
-		DrawText(va("%i/%i", options.menuScroll + 1, options.menuMaxScroll - 1), 5 + options.menuX.current + 5, 1 + options.menuY.current + 60 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+		DrawText(va("%i/%i", options.menuScroll + 1, options.menuMaxScroll), 5 + options.menuX.current + 5, 1 + options.menuY.current + 60 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
 
 	}
 
@@ -314,6 +319,18 @@ void DrawText(const char* text, float x, float y, const char* font, float fontSi
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 
+		SetupBool(&options.EspBones, false);
+		SetupBool(&options.EspHeart, false);
+		SetupBool(&options.EspHealth, false);
+		SetupBool(&options.EspNames, false);
+		SetupBool(&options.EspSnap, false);
+
+		SetupBool(&options.NoRecoil, false);
+		SetupBool(&options.NoSway, false);
+		SetupBool(&options.OverHeadNames, false);
+		SetupBool(&options.Tracers, false);
+		SetupBool(&options.Fire, false);
+		SetupBool(&options.AutoShoot, false);
 		SetupBool(&options.testing, false);
 		SetupBool(&options.Aimbot, false);
 	}
@@ -366,7 +383,7 @@ void DrawText(const char* text, float x, float y, const char* font, float fontSi
 
 		//Footer
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 50 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), 310, 30, black);
-		DrawText(va("%i/%i", options.menuScroll + 1, options.menuMaxScroll + 1), 5 + options.menuX.current + 5, 1 + options.menuY.current + 60 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+		DrawText(va("%i/%i", options.menuScroll + 1, options.menuMaxScroll), 5 + options.menuX.current + 5, 1 + options.menuY.current + 60 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
 
 	}
 
