@@ -10,7 +10,7 @@ it's shakepackage but way better
 
 # Known Issues:
 - [ ] Crashing when player joins late (caused by esp)
-- [ ] Aimbot not shooting behind
+- [ ] Aimbot not seeing people behind
 
 # Contributers
 ***Birb project manager<br />***
