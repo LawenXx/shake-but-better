@@ -8,6 +8,10 @@ it's shakepackage but way better
 - [x] Add ESP things
 - [ ] Fix Issues
 
+# Known Issues:
+- [ ] Crashing when player joins late (caused by esp)
+- [ ] Aimbot not shooting behind
+
 # Contributers
 ***Birb project manager<br />***
 ***Reeko "helper" and base maker<br />*** 
