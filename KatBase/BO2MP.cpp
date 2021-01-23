@@ -260,8 +260,22 @@ namespace BO2
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
 
-		if (Dvar_GetBool("cl_ingame"))
+		if (Dvar_GetBool("cl_ingame")) {
 			doAimbot();
+
+			Usercmd_t* cmd;
+			cmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber-1);
+			NoSpread(cmd);
+
+			cmd->serverTime += 1;
+			if (options.AutoShoot.state) {
+				if (options.Fire.state) {
+						cmd->buttons |= (1 << 31);
+						options.Fire.state = false;
+					
+				}
+			}
+		}
 
 	}
 	int speed = 0;
