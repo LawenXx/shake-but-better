@@ -261,21 +261,6 @@ namespace BO2
 			
 			}
 		}
-
-			Usercmd_t* cmd;
-			cmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber-1);
-			NoSpread(cmd);
-
-			cmd->serverTime += 1;
-			if (options.AutoShoot.state) {
-				if (options.Fire.state) {
-						cmd->buttons |= (1 << 31);
-						options.Fire.state = false;
-					
-				}
-			}
-		}
-
 	}
 	int speed = 0;
 	int ticks = 0;
