@@ -11,6 +11,7 @@ it's shakepackage but way better
 # Known Issues:
 - [ ] Crashing when player joins late (caused by esp)
 - [ ] Aimbot not seeing people behind
+- [ ] Menu not resiszing for host tab
 
 # Contributers
 ***Birb project manager<br />***
