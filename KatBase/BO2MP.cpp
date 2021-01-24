@@ -218,6 +218,7 @@ namespace BO2
 			}
 
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
+			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
 
 			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
 
@@ -258,6 +259,20 @@ namespace BO2
 						options.Fire.state = false;
 					}
 			
+			}
+		}
+
+			Usercmd_t* cmd;
+			cmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber-1);
+			NoSpread(cmd);
+
+			cmd->serverTime += 1;
+			if (options.AutoShoot.state) {
+				if (options.Fire.state) {
+						cmd->buttons |= (1 << 31);
+						options.Fire.state = false;
+					
+				}
 			}
 		}
 
