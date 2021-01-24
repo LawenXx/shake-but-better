@@ -81,6 +81,6 @@ void SubInt_List(int menuScroll);
 void ResetInt_List(int menuScroll);
 
 void AddFloatMenuOptionToList(FloatMenuOption* option);
-void AddFloat_List(int menuScroll);
-void SubFloat_List(int menuScroll);
+void AddFloat_List(float menuScroll);
+void SubFloat_List(float menuScroll);
 void ResetFloat_List(int menuScroll);

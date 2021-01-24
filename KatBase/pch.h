@@ -1,4 +1,5 @@
-// stdafx.h : include file for standard system include files,
+// stdafx.h : include 
+//for standard system include files,
 // or project specific include files that are used frequently, but
 // are changed infrequently
 //
@@ -34,6 +35,7 @@
 //Source Headers
 #include "utilites.h"
 #include "Addresses.h"
+#include "Models.h"
 #include "vector.h"
 #include "Structs.h"
 #include "menu.h"
@@ -41,5 +43,8 @@
 #include "menuFunctions.h"
 #include "BO2MP.h"
 #include "BO3MP.h"
+#include "Minecraft.h"
+#include "Ghost.h"
+
 
 // TODO: reference additional headers your program requires here

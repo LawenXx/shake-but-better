@@ -14,6 +14,7 @@ enum TitleId : std::uintptr_t
 	COD_BLACK_OPS_2 = 0x415608C3,
 	COD_BLACK_OPS_3 = 0x4156091D,
 	COD_GHOSTS = 0x415608FC,
+	MINECRAFT = 0x584111F7,
 	COD_ADVANCED_WARFARE = 0x41560914,
 	CSGO = 0x5841125A,
 	DESTINY = 0x415608F8,
@@ -139,4 +140,3 @@ extern MinHook_t MinHook[10];
 void StopHooks();
 void CleanHooks();
 void StartHooks();
-

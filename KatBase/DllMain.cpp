@@ -4,6 +4,9 @@ std::uintptr_t CurrentId;
 bool unloading, onDash, firstDash;
 HANDLE Thread;
 DWORD ThreadId;
+LPCWSTR buttons[2] = { L"Zone likes big PP",L"Davide likes big PP" };
+MESSAGEBOX_RESULT result;
+XOVERLAPPED overlapped;
 
 DWORD CheckUnload()
 {
@@ -22,7 +25,8 @@ DWORD CheckUnload()
 	return 0;
 }
 void checkTitleId(std::uintptr_t id)
-{
+{	
+	
 	CurrentId = id;
 
 	switch (id)
@@ -39,10 +43,16 @@ void checkTitleId(std::uintptr_t id)
 		{
 			Sleep(100);
 		}
-		XNotify("Shake [BO2] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [BO2] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO2::InitAddress();
 		BO2::SetupVariables();
+
+		// CG_ShouldSimulateBulletFire
+		*(DWORD*)(0x82258D60) = 0x60000000;
+		*(DWORD*)(0x82258D68) = 0x60000000;
+		*(DWORD*)(0x82258D64) = 0x60000000;
+		*(DWORD*)(0x82258D6C) = 0x60000000;
 
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
@@ -50,11 +60,11 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[3] = MinHook_t(0x8226C9C8, (std::uint64_t)BO2::Cl_WritePacket, true);
 		break;
 	case COD_BLACK_OPS_3:
-		while (*(int*)0x82A92094 == 0) 
+		while (*(int*)0x82A92094 == 0)
 		{
 			Sleep(100);
 		}
-		XNotify("Shake [BO3] By Kat And Reeko", XNOTIFYUI_TYPE_SONGPLAYING);
+		XNotify("Shake [BO3] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
 
 		BO3::InitAddress();
 		BO3::SetupVariables();
@@ -64,7 +74,29 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[2] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
 		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
 		break;
+	case COD_GHOSTS:
+		while (*(int*)Ghost::XamInputGetKeyState == 0)
+		{
+			Sleep(100);
+		}
+		XNotify("Shake [Ghost] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
+		
+		Ghost::InitAddress();
+		Ghost::SetupVariables();
 
+		/*MinHook[0] = MinHook_t(Ghost::Menu_PaintAll_MP, (std::uint64_t)Ghost::Menu_Paint_All, true);
+		MinHook[1] = MinHook_t(Ghost::XamInputGetKeyState, (std::uint64_t)Ghost::XamInputGetState, false);
+		MinHook[2] = MinHook_t(Ghost::Cl_WritePacket_MP, (std::uint64_t)Ghost::Cl_WritePacket, true);*/
+		break;
+	case MINECRAFT:
+		while (*(int*)Minecraft::XamInputGetKeyState == 0)
+		{
+			Sleep(100);
+		}
+		XNotify("Shake [Minecraft] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
+
+		MinHook[0] = MinHook_t(0x8247D000, (std::uint64_t)Minecraft::HookMc, true);
+		break;
 	default:
 		goto done;
 	nogame:
@@ -72,7 +104,8 @@ void checkTitleId(std::uintptr_t id)
 		{
 			if (!firstDash)
 			{
-				XNotify("Shake Unloaded Hooks");
+				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nThis wouldnt be possible without the help from:\nReeko\nSmokey xKoVx", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
+
 				firstDash = true;
 			}
 			onDash = true;
@@ -106,7 +139,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		HANDLE hThread; 
+		HANDLE hThread;
 		DWORD dwThreadId;
 		ExCreateThread(&hThread, NULL, &dwThreadId, (PVOID)XapiThreadStartup, (LPTHREAD_START_ROUTINE)TitleID, 0, 2 | CREATE_SUSPENDED);
 		XSetThreadProcessor(hThread, 4);

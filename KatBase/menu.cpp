@@ -213,7 +213,7 @@ void AddFloatMenuOptionToList(FloatMenuOption* option)
 	FloatMenuOption_List.push_back(option);
 }
 
-void AddFloat_List(int menuScroll)
+void AddFloat_List(float menuScroll)
 {
 	for each (FloatMenuOption * option in FloatMenuOption_List)
 	{
@@ -222,7 +222,7 @@ void AddFloat_List(int menuScroll)
 	}
 }
 
-void SubFloat_List(int menuScroll)
+void SubFloat_List(float menuScroll) 
 {
 	for each (FloatMenuOption * option in FloatMenuOption_List)
 	{

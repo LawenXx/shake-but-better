@@ -54,19 +54,19 @@ typedef struct _STRING {
 	USHORT Length;
 	USHORT MaximumLength;
 	PCHAR Buffer;
-} STRING, *PSTRING;
+} STRING, * PSTRING;
 
 typedef struct _CSTRING {
 	USHORT Length;
 	USHORT MaximumLength;
-	CONST char *Buffer;
-} CSTRING, *PCSTRING;
+	CONST char* Buffer;
+} CSTRING, * PCSTRING;
 
 typedef struct _UNICODE_STRING {
 	USHORT Length;
 	USHORT MaximumLength;
 	PWSTR  Buffer;
-} UNICODE_STRING, *PUNICODE_STRING;
+} UNICODE_STRING, * PUNICODE_STRING;
 
 typedef STRING			OBJECT_STRING;
 typedef CSTRING			COBJECT_STRING;
@@ -75,17 +75,17 @@ typedef PCSTRING		PCOBJECT_STRING;
 typedef STRING			OEM_STRING;
 typedef PSTRING			POEM_STRING;
 typedef CHAR			OCHAR;
-typedef CHAR*			POCHAR;
+typedef CHAR* POCHAR;
 typedef PSTR			POSTR;
 typedef PCSTR			PCOSTR;
-typedef CHAR*			PSZ;
-typedef CONST CHAR*		PCSZ;
+typedef CHAR* PSZ;
+typedef CONST CHAR* PCSZ;
 typedef STRING			ANSI_STRING;
 typedef PSTRING			PANSI_STRING;
 typedef CSTRING			CANSI_STRING;
 typedef PCSTRING		PCANSI_STRING;
 #define ANSI_NULL		((CHAR)0)     // winnt
-typedef CONST UNICODE_STRING*	PCUNICODE_STRING;
+typedef CONST UNICODE_STRING* PCUNICODE_STRING;
 #define UNICODE_NULL			((WCHAR)0) // winnt
 
 #define OTEXT(quote) __OTEXT(quote)
@@ -96,9 +96,9 @@ typedef struct _IO_STATUS_BLOCK {
 		PVOID Pointer;
 	} st;
 	ULONG_PTR Information;
-} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
+} IO_STATUS_BLOCK, * PIO_STATUS_BLOCK;
 
-typedef VOID(NTAPI *PIO_APC_ROUTINE) (
+typedef VOID(NTAPI* PIO_APC_ROUTINE) (
 	IN PVOID ApcContext,
 	IN PIO_STATUS_BLOCK IoStatusBlock,
 	IN ULONG Reserved
@@ -108,7 +108,7 @@ typedef struct _OBJECT_ATTRIBUTES {
 	HANDLE RootDirectory;
 	POBJECT_STRING ObjectName;
 	ULONG Attributes;
-} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+} OBJECT_ATTRIBUTES, * POBJECT_ATTRIBUTES;
 
 // VOID InitializeObjectAttributes(
 //     OUT POBJECT_ATTRIBUTES p,
@@ -130,7 +130,7 @@ typedef struct _FILE_NETWORK_OPEN_INFORMATION {
 	LARGE_INTEGER  AllocationSize;
 	LARGE_INTEGER  EndOfFile;
 	ULONG  FileAttributes;
-} FILE_NETWORK_OPEN_INFORMATION, *PFILE_NETWORK_OPEN_INFORMATION;
+} FILE_NETWORK_OPEN_INFORMATION, * PFILE_NETWORK_OPEN_INFORMATION;
 
 /* description about xex exe headers in memory */
 typedef struct _XBOX_HARDWARE_INFO {
@@ -140,12 +140,12 @@ typedef struct _XBOX_HARDWARE_INFO {
 	unsigned char Reserved[6];
 	unsigned short BldrMagic;
 	unsigned short BldrFlags;
-} XBOX_HARDWARE_INFO, *PXBOX_HARDWARE_INFO;
+} XBOX_HARDWARE_INFO, * PXBOX_HARDWARE_INFO;
 
 typedef struct _XEX_IMPORT_TABLE_ENT {
 	DWORD ImportDestAddr;
 	DWORD ImportStubAddr;
-} XEX_IMPORT_TABLE_ENT, *PXEX_IMPORT_TABLE_ENT;
+} XEX_IMPORT_TABLE_ENT, * PXEX_IMPORT_TABLE_ENT;
 
 typedef struct _XEX_IMPORT_TABLE {
 	DWORD TableSize;
@@ -156,7 +156,7 @@ typedef struct _XEX_IMPORT_TABLE {
 	BYTE ModuleIndex;
 	WORD ImportCount;
 	DWORD ImportStubAddr[1];
-} XEX_IMPORT_TABLE, *PXEX_IMPORT_TABLE;
+} XEX_IMPORT_TABLE, * PXEX_IMPORT_TABLE;
 
 typedef struct _XEX_IMPORT_DESCRIPTOR {
 	DWORD Size;
@@ -164,7 +164,7 @@ typedef struct _XEX_IMPORT_DESCRIPTOR {
 	DWORD ModuleCount;
 	// nametable is here of nametable size
 	// followed by modulecount number of xex import tables
-} XEX_IMPORT_DESCRIPTOR, *PXEX_IMPORT_DESCRIPTOR;
+} XEX_IMPORT_DESCRIPTOR, * PXEX_IMPORT_DESCRIPTOR;
 
 typedef struct _IMAGE_EXPORT_ADDRESS_TABLE {
 	DWORD Magic[3]; // 48 00 00 00 00 48 56 45 48 00 00 00
@@ -174,7 +174,7 @@ typedef struct _IMAGE_EXPORT_ADDRESS_TABLE {
 	DWORD Count;
 	DWORD Base;
 	DWORD ordOffset[1]; // ordOffset[0]+ (ImageBaseAddress<<8) = function offset of ordinal 1
-} IMAGE_EXPORT_ADDRESS_TABLE, *PIMAGE_EXPORT_ADDRESS_TABLE;
+} IMAGE_EXPORT_ADDRESS_TABLE, * PIMAGE_EXPORT_ADDRESS_TABLE;
 
 typedef struct _XEX_SECURITY_INFO {
 	unsigned long Size;
@@ -193,12 +193,12 @@ typedef struct _XEX_SECURITY_INFO {
 	DWORD GameRegion;
 	DWORD AllowedMediaTypes;
 	DWORD PageDescriptorCount;
-} XEX_SECURITY_INFO, *PXEX_SECURITY_INFO;
+} XEX_SECURITY_INFO, * PXEX_SECURITY_INFO;
 
 typedef struct _XEX_HEADER_STRING {
 	ULONG Size;
 	UCHAR Data[1];
-} XEX_HEADER_STRING, *PXEX_HEADER_STRING;
+} XEX_HEADER_STRING, * PXEX_HEADER_STRING;
 
 typedef struct _IMAGE_XEX_HEADER {
 	DWORD Magic;
@@ -207,7 +207,7 @@ typedef struct _IMAGE_XEX_HEADER {
 	DWORD SizeOfDiscardableHeaders;
 	PXEX_SECURITY_INFO SecurityInfo;
 	DWORD HeaderDirectoryEntryCount;
-} IMAGE_XEX_HEADER, *PIMAGE_XEX_HEADER;
+} IMAGE_XEX_HEADER, * PIMAGE_XEX_HEADER;
 
 typedef struct _LDR_DATA_TABLE_ENTRY {
 	LIST_ENTRY InLoadOrderLinks;
@@ -236,7 +236,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY {
 			PVOID TraversalParent; // LDR_DATA_TABLE_ENTRY
 		} asEntry;
 	} inf;
-} LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
+} LDR_DATA_TABLE_ENTRY, * PLDR_DATA_TABLE_ENTRY;
 
 typedef struct _HV_IMAGE_IMPORT_TABLE
 {
@@ -246,13 +246,13 @@ typedef struct _HV_IMAGE_IMPORT_TABLE
 	BYTE Unused;
 	BYTE ModuleIndex;
 	WORD ImportCount;
-} HV_IMAGE_IMPORT_TABLE, *PHV_IMAGE_IMPORT_TABLE;
+} HV_IMAGE_IMPORT_TABLE, * PHV_IMAGE_IMPORT_TABLE;
 
 typedef struct _XEX_IMPORT_TABLE_ORG
 {
 	DWORD TableSize;
 	HV_IMAGE_IMPORT_TABLE ImportTable;
-} XEX_IMPORT_TABLE_ORG, *PXEX_IMPORT_TABLE_ORG;
+} XEX_IMPORT_TABLE_ORG, * PXEX_IMPORT_TABLE_ORG;
 
 typedef struct _XEX_EXECUTION_ID {
 	DWORD		 MediaID;
@@ -270,14 +270,14 @@ typedef struct _XEX_EXECUTION_ID {
 	BYTE		 DiscNum;
 	BYTE		 DiscsInSet;
 	DWORD		 SaveGameID;
-} XEX_EXECUTION_ID, *PXEX_EXECUTION_ID;
+} XEX_EXECUTION_ID, * PXEX_EXECUTION_ID;
 
 typedef struct _XBOX_KRNL_VERSION {
 	USHORT Major; // for 360 this is always 2
 	USHORT Minor; // usually 0
 	USHORT Build; // current version, for example 9199
 	USHORT Qfe;
-} XBOX_KRNL_VERSION, *PXBOX_KRNL_VERSION;
+} XBOX_KRNL_VERSION, * PXBOX_KRNL_VERSION;
 
 typedef enum _POOL_TYPE {
 	NonPagedPool = 0,
@@ -315,7 +315,7 @@ extern "C" {
 	//NTSYSAPI EXPORTNUM(447) void* NTAPI VdGlobalXamDevice(void);
 	// SDK library function
 	VOID XapiThreadStartup(
-		IN		VOID(__cdecl *StartRoutine)(VOID *),
+		IN		VOID(__cdecl* StartRoutine)(VOID*),
 		IN		PVOID StartContext,
 		IN		DWORD dwExitCode
 	);
@@ -615,7 +615,7 @@ extern "C" {
 		VOID
 		NTAPI
 		XeCryptRandom(
-			IN OUT	BYTE * pb,
+			IN OUT	BYTE* pb,
 			IN		DWORD cb
 		);
 

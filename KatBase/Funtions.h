@@ -1,4 +1,5 @@
 #pragma once
+#define ANGLE2SHORT(x) ((int)((x)*65536/360) & 65535)
 
 enum alignment
 {
@@ -30,7 +31,13 @@ typedef void(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
 typedef const char* (*BG_GetFactionForTeam_t)(int team, const char* mapName);
 typedef void(*BG_seedRandWithGameTime_t)(unsigned int* pHoldrand);
 typedef void(*G_GetSpreadForWeapon_t)(BO2::playerstate_s *ps, int weapon, float* minSpread, float* maxSpread);
+typedef void(*AngleVectors_t)(vec3_t* angles, vec3_t* forward, vec3_t* right, vec3_t* up);
+typedef BO2::playerstate_s* (*CG_GetPredictedPlayerState_t)(int localClientNum);
+typedef void(*RandomBulletDir_t)(int randSeed, float* x, float* y);
 
+extern RandomBulletDir_t RandomBulletDir;
+extern CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
+extern AngleVectors_t AngleVectors;
 extern G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
 extern BG_seedRandWithGameTime_t BG_seedRandWithGameTime;
 extern BG_GetFactionForTeam_t BG_GetFactionForTeam;
@@ -56,6 +63,11 @@ typedef void(*CG_LocationTrace_t)(BO3::trace_t* results, vec3_t* start, vec3_t* 
 typedef int(*R_TextWidth_fookinreeko)(const char* text, int maxchars, Font* font, int r6);
 typedef void(*R_AddCmdDrawText_bo3)(const char* text, int maxChars, Font* font, float x, float y, float xScale, float yScale,  float* color, int style);
 
+//infinity ward
+typedef __int64(*R_TextWidth_iw)(const char* text, int maxChars, Font* font);
+extern R_TextWidth_iw R_TextWidthIW;
+
+
 extern R_AddCmdDrawText_bo3 R_AddCmdDrawText_test;
 extern R_TextWidth_fookinreeko Textwidth;
 extern CG_LocationTrace_t CG_LocationTrace;
@@ -66,7 +78,7 @@ extern CG_DobjGetWorldTagPos_t CG_DobjGetWorldTagPos;
 
 namespace BO2
 {
-	
+	extern void GodmodeFix();
 	extern void InitAddress();
 	extern void readStructs();
 	extern int R_TextHeight(Font* font);
@@ -105,4 +117,11 @@ namespace BO3
 	extern short Sl_GetString(const char* String, int usr);
 	extern Material* Material_RegisterHandle(const char* name);
 	extern Font* R_RegisterFont(const char* name);
+}
+
+namespace Ghost 
+{
+	extern void InitAddress();
+	extern void ReadStructs();
+	extern int R_TextHeight(Font* font);
 }

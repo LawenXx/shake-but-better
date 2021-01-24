@@ -226,8 +226,10 @@
     <ImageXex>
       <ConfigurationFile>config.xml</ConfigurationFile>
     </ImageXex>
+    <Deploy />
     <Deploy>
       <DeploymentType>CopyToHardDrive</DeploymentType>
+      <ForceCopy>true</ForceCopy>
     </Deploy>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -235,9 +237,12 @@
     <ClInclude Include="BO2MP.h" />
     <ClInclude Include="BO3MP.h" />
     <ClInclude Include="Funtions.h" />
+    <ClInclude Include="Ghost.h" />
     <ClInclude Include="kernel.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="menuFunctions.h" />
+    <ClInclude Include="Minecraft.h" />
+    <ClInclude Include="Models.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="types.h" />
@@ -249,8 +254,10 @@
     <ClCompile Include="BO3MP.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Funtions.cpp" />
+    <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="menuFunctions.cpp" />
+    <ClCompile Include="Minecraft.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='CodeAnalysis|Xbox 360'">Create</PrecompiledHeader>

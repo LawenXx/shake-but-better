@@ -2,40 +2,6 @@
 
 namespace BO2
 {
-
-#define LODWORD(x)  (*((DWORD*)&(x)))  // low dword
-#define HIDWORD(x)  (*((DWORD*)&(x)+1))
-	DWORD* bdTaskResult()
-	{
-		DWORD* result;
-		*result = 0x820F6E58;
-		return result;
-	}
-	DWORD* bdStatsInfoPtr() {
-		DWORD* result;
-		*result = 0x820FB3B0;
-		return result;
-	}
-
-	int bdStatsInfo(int a1)
-	{
-		__int64 v2; // r11
-
-		bdTaskResult();
-		LODWORD(v2) = 0;
-		HIDWORD(v2);
-		*(DWORD*)(a1 + 4) = 0; //leaderboard id
-		*(DWORD*)a1;
-		*(QWORD*)(a1 + 8) = v2;
-		*(DWORD*)(a1 + 16) = 1;
-		*(QWORD*)(a1 + 24) = v2;
-		*(QWORD*)(a1 + 32) = v2;
-		*(DWORD*)(a1 + 108) = 0;
-		memset(&a1 + 40, 0, 65);
-		return a1;
-	}
-	void leaderboard() {}
-
 	void DrawMenuText()
 	{
 		options.menuMaxScroll = 0;
@@ -49,23 +15,25 @@ namespace BO2
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			if (cgGame->clientNum == 0) {
-				DrawToggle("Spoof Rank", &options.BoolRank);
-
-			}
 			DrawToggle("No Recoil", &options.NoRecoil);
-			DrawToggle("Scoreboard (test)", &options.Scoreboard);
+			DrawToggle("No Spread", &options.NoSpread);
+			DrawToggle("Laser", &options.Laser);
+			DrawToggle("IP Spoof", &options.IpSpoof);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
+			//case HostOnly:
+			//	DrawToggle("Spoof Rank", &options.BoolRank);
+			//	break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.AimbotToggle);
-			DrawToggle("Aim Required", &options.AimRequired);
+			DrawToggle("AutoShoot", &options.AutoShoot);
+			//	DrawToggle("Aim Required", &options.AimRequired);
 			break;
 		case VISUALS:
 			DrawToggle("Esp Box", &options.EspBoxToggle);
 			DrawToggle("Esp Bones", &options.EspDrawBones);
 			DrawToggle("Esp BoxFrog", &options.EspFrogChan);
-			DrawToggle("Esp DrawLine", &options.EspDrawLine);
+			DrawToggle("Esp SnapLines", &options.EspDrawLine);
 			DrawToggle("Esp Item", &options.DrawItem);
 			DrawToggle("Wallhack", &options.Wallhack);
 			break;
@@ -81,15 +49,16 @@ namespace BO2
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
-			DrawToggle("Ip Spoof", &options.IpSpoof);
+			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
 			break;
+
 		}
 	}
 
 	void ServerInfo() {
 		readStructs();
 
-		DrawTextInBox("Shake BO2 Alpha", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake BO2 Alpha", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
 		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
 		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
 		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
@@ -124,11 +93,6 @@ namespace BO2
 			if (isTeam(&cg_entitiesArray[i]))
 				continue;
 
-			if (cg_entitiesArray[i].WeaponID == 89)
-				Tag = "j_ankle_ri";
-			else
-				Tag = "j_neck";
-
 			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
 			if (AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]))
 			{
@@ -137,6 +101,7 @@ namespace BO2
 					nearestDistance = Distance;
 					nearestClient = i;
 					playerReady = true;
+					options.Fire.state = true;
 				}
 			}
 		}
@@ -155,14 +120,15 @@ namespace BO2
 			int nearestClient = GetNearestPlayer(cgGame->clientNum);
 			if (playerReady && nearestClient != -1)
 			{
-
+				if (cg_entitiesArray[nearestClient].WeaponID == 89)
+					Tag = "j_ankle_ri";
+				else
+					Tag = "j_neck";
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
 				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
 				VecToAngels(Angles, anglesOut);
 				if (nearestClient != cgGame->clientNum)
 					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
-
-				options.NoRecoil.state = true;
 			}
 			playerReady = false;
 
@@ -170,15 +136,23 @@ namespace BO2
 
 	}
 
-	void NoSpread(Usercmd_t* cmd) {
-		unsigned int CmdTimeSeed = cgGame->ps.commandTime;
-		float minSpread, maxSpread;
+	void NoSpread(Usercmd_t* Cmd, Usercmd_t* OldCmd) {
+		if (options.NoSpread.state) {
+			unsigned int CmdTimeSeed = cgGame->ps.commandTime;
+			float minSpread = 0.0f, maxSpread = 0.0f;
 
-		BG_seedRandWithGameTime(&CmdTimeSeed);
-		G_GetSpreadForWeapon(playerstate, cg_entitiesArray->WeaponID, &minSpread, &maxSpread);
+			BG_seedRandWithGameTime(&CmdTimeSeed);
+			G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
 
-		double spread;
+			float spread = minSpread + ((maxSpread - minSpread) * cgGame->weaponSpreadScale * 0.0039215689f);
 
+			vec2_t Spread = vec2_t();
+
+			RandomBulletDir(Cmd->serverTime, &Spread.x, &Spread.y);
+
+			OldCmd->viewAngles[0] += ANGLE2SHORT(Spread.y * spread);
+			OldCmd->viewAngles[1] += ANGLE2SHORT(Spread.x * spread);
+		}
 	}
 
 	void Menu_PaintAll(int r3)
@@ -188,6 +162,7 @@ namespace BO2
 
 		if (Dvar_GetBool("cl_ingame"))
 		{
+		
 			for (int i = 0; i < 18; i++)
 			{
 				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
@@ -216,13 +191,13 @@ namespace BO2
 				float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
 
 				if (options.EspBoxToggle.state)
-					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, white, 1.f);
+					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 				if (options.EspDrawBones.state)
-					drawBones(&cg_entitiesArray[i], Red);
+					drawBones(&cg_entitiesArray[i], blue);
 				if (options.EspDrawLine.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, white, 1);
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
 				if (options.EspFrogChan.state)
-					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, Red);
+					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
 			}
 			for (int j = 0; j < 2048; j++) {
 				if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
@@ -241,26 +216,50 @@ namespace BO2
 					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
 
 			}
-			options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-			if (options.menuOpen)
-				DrawMenu();
 
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
+
+			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
 
 			*(uint32_t*)0x821fc04c = options.Wallhack.state ? 0x38C0FFFF : 0x7FA6EB78;
 			*(uint32_t*)0x83c56038 = options.Wallhack.state ? 0xF51F0000DF : 0x3F800000;
 
-
-			ScoreBoard_Draw(1, 300, 200);
+		
 			SpoofLevel();
 		}
+		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
+		if (options.menuOpen)
+			DrawMenu();
+
 		ServerInfo();
 	}
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
 
-		if (Dvar_GetBool("cl_ingame"))
+		if (Dvar_GetBool("cl_ingame")) {
 			doAimbot();
+			GodmodeFix();
+
+			Usercmd_t* Cmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber);
+			Usercmd_t* newCmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber);
+			Usercmd_t* oldCmd = ClientActive->GetCmd(ClientActive->CurrentCmdNumber - 1);
+
+			memcpy(oldCmd, Cmd, sizeof(Usercmd_t));
+			memcpy(newCmd, Cmd, sizeof(Usercmd_t));
+
+			oldCmd->serverTime -= 1;
+			newCmd->serverTime += 1;
+			NoSpread(oldCmd, Cmd);
+
+			if (options.AutoShoot.state) {
+				if (options.Fire.state) {
+						oldCmd->buttons &= ~0x80000000;
+						newCmd->buttons |= 0x80000000;
+						options.Fire.state = false;
+					}
+			
+			}
+		}
 
 	}
 	int speed = 0;
@@ -316,7 +315,7 @@ namespace BO2
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
-				if (options.menuPageIndex < 5)
+				if (options.menuPageIndex < 4)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
 					options.menuPageIndex = 0;
@@ -331,6 +330,10 @@ namespace BO2
 					options.menuPageIndex = 4;
 			}
 
+			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_A)) 
+			{
+
+			}
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_X))
 			{

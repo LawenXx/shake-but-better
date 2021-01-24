@@ -21,6 +21,10 @@ R_TextWidth_fookinreeko Textwidth;
 BG_GetFactionForTeam_t BG_GetFactionForTeam;
 BG_seedRandWithGameTime_t BG_seedRandWithGameTime;
 G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
+AngleVectors_t AngleVectors;
+R_TextWidth_iw R_TextWidthIW;
+CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
+RandomBulletDir_t RandomBulletDir;
 
 float white[] = { 1,1,1,1 };
 float black[] = { 0.07, 0.15, 0.22,1 };
@@ -31,6 +35,7 @@ float Green[4] = { 0,1,0,1 };
 
 namespace BO2
 {
+	BulletTrace_t* bulletTrace;
 	playerstate_s* playerstate;
 	UIContext* cgDC;
 	cg_s* cgGame;
@@ -38,7 +43,7 @@ namespace BO2
 	centity_tBo2* cg_entitiesArray;
 	ClientActive_t* ClientActive;
 	gentity_t* g_entitiesArray;
-
+	Usercmd_t* UserCmd;
 	void InitAddress()
 	{
 		Material_RegisterHandle = Material_RegisterHandle_t(MP_Material_RegisterHandle);
@@ -57,6 +62,9 @@ namespace BO2
 		BG_GetFactionForTeam = BG_GetFactionForTeam_t(0x821A6AA8);
 		BG_seedRandWithGameTime = BG_seedRandWithGameTime_t(0x826961B8);
 		G_GetSpreadForWeapon = G_GetSpreadForWeapon_t(0x826BB4E0);
+		AngleVectors = AngleVectors_t(0x8248E408);
+		CG_GetPredictedPlayerState = CG_GetPredictedPlayerState_t(0x821E64E0);
+		RandomBulletDir = RandomBulletDir_t(0x82917190);
 	}
 
 	void readStructs()
@@ -157,9 +165,19 @@ namespace BO2
 		else
 			return false;
 	}
+	void GodmodeFix() {
+		while (options.XboGodmode.state) {
 
+			if (!Dvar_GetBool("cl_ingame")) continue;
+
+			UINT_PTR ClientStatePtr = (0x83551A10 + (0x57f8 * 0) + 0x1b);
+			INT32 CurrentState = *(INT32*)(ClientStatePtr);
+
+			//if (CurrentState == 5)
+			*(char*)(ClientStatePtr) = 4;
+		}
+	}
 }
-
 
 namespace BO3
 {
@@ -296,4 +314,26 @@ namespace BO3
 	{
 		return (Font*)DB_FindXAssetHeader(XASSET_FONT, name, 0);
 	}
+}
+
+namespace Ghost {	
+	CgsArray* CgServer;
+	RefDef* Ref;
+
+	void InitAddress() {
+		
+		DB_FindXAssetHeader = DB_FindXAssetHeader_t(0x82376680); //wrong addr
+		R_AddCmdDrawText = R_AddCmdDrawText_t(0x8266CEB8);
+		CG_DrawRotatedPicPhysical = CG_DrawRotatedPicPhysical_t(0x82270138);
+		R_RegisterFont = R_RegisterFont_t(0x8264DBF0);
+		Material_RegisterHandle = Material_RegisterHandle_t(0x8265A470);
+		R_TextWidthIW = (R_TextWidth_iw)0x8264DC78;
+	}
+	void ReadStructs() {
+		CgServer = *(CgsArray**)0x82AD56F8;
+		Ref = *(RefDef**)0x82ACCCE8;
+
+	}
+	
+	
 }

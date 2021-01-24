@@ -39,3 +39,21 @@ namespace BO3
 
 	};
 }
+
+namespace Minecraft {
+	enum Addresses
+	{
+		XamInputGetKeyState = 0x829A20AC
+
+	};
+}
+
+namespace Ghost {
+	enum Addresses
+	{
+		XamInputGetKeyState = 0x828103EC,
+		ScrPlace = 0x82BCDD10,
+		Cl_WritePacket_MP = 0x822D68C0,
+		Menu_PaintAll_MP = 0x8253E140
+	};
+}
