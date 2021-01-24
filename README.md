@@ -4,14 +4,14 @@ it's shakepackage but way better
 # Todo:
 - [x] Finish menu visuals
 - [ ] Add Autowall
-- [ ] Add NoSpread
+- [x] Add NoSpread
 - [x] Add ESP things
 - [ ] Fix Issues
 
 # Known Issues:
 - [ ] Crashing when player joins late (caused by esp)
 - [ ] Aimbot not seeing people behind
-- [ ] Menu not resiszing for host tab
+- [x] Menu not resiszing for host tab
 
 # Contributers
 ***Birb project manager<br />***
