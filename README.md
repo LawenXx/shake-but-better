@@ -9,7 +9,7 @@ it's shakepackage but way better
 - [ ] Fix Issues
 
 # Known Issues:
-- [ ] Crashing when player joins late (caused by esp)
+- [x] Crashing when player joins late (caused by esp)
 - [ ] Aimbot not seeing people behind
 - [x] Menu not resiszing for host tab
 
