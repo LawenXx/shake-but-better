@@ -16,26 +16,44 @@ namespace BO2
 		{
 		case MAIN:
 			DrawToggle("No Recoil", &options.NoRecoil);
+			DrawToggle("No Sway", &options.NoSway);
+			DrawToggle("No Flinch", &options.NoFlinch);
 			DrawToggle("No Spread", &options.NoSpread);
 			DrawToggle("Laser", &options.Laser);
 			DrawToggle("IP Spoof", &options.IpSpoof);
-			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
+			DrawToggle("End Round", &options.EndGame);
+			DrawToggle("Teabag Lethal", &options.AntiBetty);
+			DrawToggle("External Radar", &options.Radar);
+			DrawToggle("External Circle Radar", &options.CircleRadar);
+			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
+			if(cgGame->clientNum == 0)
+				DrawSubMenu("Host Only >>", &options.EspMenu);
 			break;
-			//case HostOnly:
-			//	DrawToggle("Spoof Rank", &options.BoolRank);
-			//	break;
+		case HostOnly:
+			DrawToggle("Spoof Rank", &options.BoolRank);
+			break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.AimbotToggle);
+			DrawToggle("Silent Aim", &options.SilentAim);
+			DrawStringSlider("AimTag", &options.MenuAimTargetIndex, AimTag(options.MenuAimTargetIndex.current));
 			DrawToggle("AutoShoot", &options.AutoShoot);
 			//	DrawToggle("Aim Required", &options.AimRequired);
 			break;
 		case VISUALS:
+			DrawToggle("Healthbar", &options.Healthbar);
+			DrawToggle("Wallhack", &options.Wallhack);
 			DrawToggle("Esp Box", &options.EspBoxToggle);
 			DrawToggle("Esp Bones", &options.EspDrawBones);
-			DrawToggle("Esp BoxFrog", &options.EspFrogChan);
+			DrawToggle("Esp Heart", &options.EspFrogChan);
 			DrawToggle("Esp SnapLines", &options.EspDrawLine);
 			DrawToggle("Esp Item", &options.DrawItem);
-			DrawToggle("Wallhack", &options.Wallhack);
+			DrawSubMenu("Esp Menu >>", &options.EspMenu);
+			break;
+		case EspMenu:
+			DrawIntSlider("SnapLine Position", &options.SnapPos, "%i");
+			DrawButton("IM A BUTTON");
+			DrawButton("IM A BUTTON");
+			DrawButton("IM A BUTTON");
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
@@ -49,7 +67,7 @@ namespace BO2
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
-			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
+			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 
 		}
@@ -58,11 +76,11 @@ namespace BO2
 	void ServerInfo() {
 		readStructs();
 
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
-		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
-		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
-		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
-		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont("fonts/720/normalfont", 0)));
+		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 	}
 
 	void DrawMenu()
@@ -123,7 +141,7 @@ namespace BO2
 				if (cg_entitiesArray[nearestClient].WeaponID == 89)
 					Tag = "j_ankle_ri";
 				else
-					Tag = "j_neck";
+					Tag = AimTag(options.MenuAimTargetIndex.current);
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
 				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
 				VecToAngels(Angles, anglesOut);
@@ -135,97 +153,118 @@ namespace BO2
 		}
 
 	}
+	void Esp() {
+		for (int i = 0; i < 18; i++)
+		{
+			if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+				continue;
+			if (!(cg_entitiesArray[i].nextState.ClientNumber != 0))
+				continue;
+			if (!(cg_entitiesArray[i].nextState.Alive))
+				continue;
+			if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
+				continue;
 
+			vec2_t Pos = vec2_t();
+			vec2_t head = vec2_t();
+			vec3_t origin = cg_entitiesArray[i].pose.Origin;
+
+			vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
+			headPos.z += 10;
+			origin.z -= 5;
+
+			if (!WorldToScreen(0, origin, &Pos))
+				continue;
+			if (!WorldToScreen(0, headPos, &head))
+				continue;
+
+			float playerHeight = fabsf(head.y - Pos.y);
+			float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+
+			if (options.EspBoxToggle.state)
+				BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
+			if (options.EspDrawBones.state)
+				drawBones(&cg_entitiesArray[i], blue);
+			if (options.EspDrawLine.state)
+				DrawLine(vec2_t(cgDC->screenWidth / 2,options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
+			if (options.EspFrogChan.state)
+				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
+		}
+		for (int j = 0; j < 2048; j++) {
+			if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
+				continue;
+
+			if (!(cg_entitiesArray[j].nextState.Alive))
+				continue;
+			if (!cg_entitiesArray[j].nextState.State &0x40000000);
+				continue;
+
+			vec3_t origin = cg_entitiesArray[j].pose.Origin;
+			vec2_t Pos = vec2_t();
+
+			if (!WorldToScreen(0, origin, &Pos))
+				continue;
+
+			if (options.DrawItem.state)
+				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
+
+		}
+
+	}
 	void NoSpread(Usercmd_t* Cmd, Usercmd_t* OldCmd) {
-		if (options.NoSpread.state) {
-			unsigned int CmdTimeSeed = cgGame->ps.commandTime;
-			float minSpread = 0.0f, maxSpread = 0.0f;
 
-			BG_seedRandWithGameTime(&CmdTimeSeed);
-			G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
+		unsigned int CmdTimeSeed = cgGame->ps.commandTime;
+		float minSpread = 0.0f, maxSpread = 0.0f;
 
-			float spread = minSpread + ((maxSpread - minSpread) * cgGame->weaponSpreadScale * 0.0039215689f);
+		BG_seedRandWithGameTime(&CmdTimeSeed);
+		G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
 
-			vec2_t Spread = vec2_t();
+		float spread = minSpread + ((maxSpread - minSpread) * cgGame->weaponSpreadScale * 0.0039215689f);
 
-			RandomBulletDir(Cmd->serverTime, &Spread.x, &Spread.y);
+		vec2_t Spread = vec2_t();
 
-			OldCmd->viewAngles[0] += ANGLE2SHORT(Spread.y * spread);
-			OldCmd->viewAngles[1] += ANGLE2SHORT(Spread.x * spread);
+		RandomBulletDir((unsigned int*)Cmd->serverTime, &Spread.x, &Spread.y);
+
+		OldCmd->viewAngles[0] += ANGLE2SHORT(Spread.y * spread);
+		OldCmd->viewAngles[1] += ANGLE2SHORT(Spread.x * spread);
+
+	}
+	bool round = false;
+	void EndRound() {
+		round = true;
+		if (round) {
+			Cbuf_AddText(0, va("cmd mr %i 3 endround", *(int*)0x82c15758));
+			round = false;
+			options.EndGame.state = false;
 		}
 	}
-
-	void Menu_PaintAll(int r3)
+	//TODO: move over to dof hook
+	void Menu_PaintAll(int a, int b)
 	{
-		MinHook[0].Stub(r3);
+		MinHook[0].Stub(a, b);
 		readStructs();
 
 		if (Dvar_GetBool("cl_ingame"))
 		{
-		
-			for (int i = 0; i < 18; i++)
-			{
-				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
-					continue;
-				if (!(cg_entitiesArray[i].nextState.ClientNumber != 0))
-					continue;
-				if (!(cg_entitiesArray[i].nextState.Alive))
-					continue;
-				if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
-					continue;
-
-				vec2_t Pos = vec2_t();
-				vec2_t head = vec2_t();
-				vec3_t origin = cg_entitiesArray[i].pose.Origin;
-
-				vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
-				headPos.z += 10;
-				origin.z -= 5;
-
-				if (!WorldToScreen(0, origin, &Pos))
-					continue;
-				if (!WorldToScreen(0, headPos, &head))
-					continue;
-
-				float playerHeight = fabsf(head.y - Pos.y);
-				float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
-
-				if (options.EspBoxToggle.state)
-					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
-				if (options.EspDrawBones.state)
-					drawBones(&cg_entitiesArray[i], blue);
-				if (options.EspDrawLine.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
-				if (options.EspFrogChan.state)
-					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
-			}
-			for (int j = 0; j < 2048; j++) {
-				if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
-					continue;
-
-				if (!(cg_entitiesArray[j].nextState.Alive))
-					continue;
-
-				vec3_t origin = cg_entitiesArray[j].pose.Origin;
-				vec2_t Pos = vec2_t();
-
-				if (!WorldToScreen(0, origin, &Pos))
-					continue;
-
-				if (options.DrawItem.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
-
-			}
+			Esp();
 
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
-
-			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
-
+			*(uint32_t*)0x826C6E6C = options.NoSway.state ? 0x60000000 : 0x4BFFE975;
+			*(uint32_t*)0x826C7A7C = options.NoSway.state ? 0x60000000 : 0x4BFFFA857F;
 			*(uint32_t*)0x821fc04c = options.Wallhack.state ? 0x38C0FFFF : 0x7FA6EB78;
 			*(uint32_t*)0x83c56038 = options.Wallhack.state ? 0xF51F0000DF : 0x3F800000;
 
-		
+			if (options.Healthbar.state)
+				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
+			if (options.CircleRadar.state)
+				renderRadar(cgDC->screenWidth - 250, cgDC->screenHeight - cgDC->screenHeight + 5, 180, 10, 0.5, true);
+			if (options.Radar.state)
+				renderRadar(cgDC->screenWidth - 250, cgDC->screenHeight - cgDC->screenHeight + 5, 180, 10, 0.5, false);
+
+			if (options.EndGame.state)
+				EndRound();
+
 			SpoofLevel();
 		}
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
@@ -234,8 +273,10 @@ namespace BO2
 
 		ServerInfo();
 	}
+	int silentAngles[3];
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
+		readStructs();
 
 		if (Dvar_GetBool("cl_ingame")) {
 			doAimbot();
@@ -250,18 +291,47 @@ namespace BO2
 
 			oldCmd->serverTime -= 1;
 			newCmd->serverTime += 1;
-			NoSpread(oldCmd, Cmd);
 
+			if (options.NoSpread.state)
+				NoSpread(Cmd, oldCmd);
+
+
+			if (options.SilentAim.state) {
+				oldCmd->serverTime += 2;
+				oldCmd->viewAngles[1] += ANGLE2SHORT(silentAngles[1]);
+				oldCmd->viewAngles[0] += ANGLE2SHORT(silentAngles[0]);
+			}
 			if (options.AutoShoot.state) {
 				if (options.Fire.state) {
-						oldCmd->buttons &= ~0x80000000;
-						newCmd->buttons |= 0x80000000;
-						options.Fire.state = false;
+					oldCmd->buttons &= ~0x80000000;
+					newCmd->buttons |= 0x80000000;
+					options.Fire.state = false;
+				}
+
+			}
+			bool betty = false;
+			for (int i = 0; i < 2048; i++) {
+				float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
+				if (!(cg_entitiesArray[i].pose.eType == ET_MISSILE))
+					continue;
+
+				if (options.AntiBetty.state) {
+					if (Distance < 5) {
+						betty = true;
+						if (betty) {
+							oldCmd->buttons &= ~0x400000;
+							//newCmd->buttons |= 0x800000;
+							betty = false;
+							options.AntiBetty.state = false;
+						}
+
 					}
-			
+
+				}
 			}
 		}
 	}
+
 	int speed = 0;
 	int ticks = 0;
 	bool run = false;
@@ -315,6 +385,7 @@ namespace BO2
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
+				options.menuScroll = 0;
 				if (options.menuPageIndex < 4)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
@@ -323,16 +394,16 @@ namespace BO2
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_LEFT_SHOULDER))
 			{
-
+				options.menuScroll = 0;
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)
 					options.menuPageIndex = 4;
 			}
 
-			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_A)) 
+			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_A))
 			{
-
+				SwitchToSubMenu(&options.EspMenu, options.menuPageIndex);
 			}
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_X))

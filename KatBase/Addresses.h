@@ -15,7 +15,7 @@ namespace BO2
 
 		MP_XamInputGetKeyState = 0x8293D884,
 		MP_Menu_PaintAll = 0x824744E0,
-
+		MP_R_ENDFRAME = 0x828B9F58
 	};
 }
 

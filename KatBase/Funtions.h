@@ -33,9 +33,13 @@ typedef void(*BG_seedRandWithGameTime_t)(unsigned int* pHoldrand);
 typedef void(*G_GetSpreadForWeapon_t)(BO2::playerstate_s *ps, int weapon, float* minSpread, float* maxSpread);
 typedef void(*AngleVectors_t)(vec3_t* angles, vec3_t* forward, vec3_t* right, vec3_t* up);
 typedef BO2::playerstate_s* (*CG_GetPredictedPlayerState_t)(int localClientNum);
-typedef void(*RandomBulletDir_t)(int randSeed, float* x, float* y);
+typedef void(* Cbuf_AddText_t)(int localClientNum, const char* text);
+typedef float(*BG_srand_t)(unsigned int* rand);
+typedef float(*BG_random_t)(unsigned int* rand);
 
-extern RandomBulletDir_t RandomBulletDir;
+extern BG_srand_t BG_srand;
+extern BG_random_t BG_random;
+extern Cbuf_AddText_t Cbuf_AddText;
 extern CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
 extern AngleVectors_t AngleVectors;
 extern G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
@@ -78,6 +82,7 @@ extern CG_DobjGetWorldTagPos_t CG_DobjGetWorldTagPos;
 
 namespace BO2
 {
+	extern void HealthBar(float x, float y, float w);
 	extern void GodmodeFix();
 	extern void InitAddress();
 	extern void readStructs();
@@ -97,6 +102,7 @@ namespace BO2
 	extern void drawHeart(float x, float y, float w, float h, float* outline, float* fill);
 	extern void SpoofLevel();
 	extern void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna);
+	extern void RandomBulletDir(unsigned int* randSeed, float* x, float* y);
 }
 
 namespace BO3

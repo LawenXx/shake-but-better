@@ -56,6 +56,7 @@ void SetupInt(IntMenuOption* option, int current, int init, int max, int min, in
 void AddInt(IntMenuOption* option);
 void SubInt(IntMenuOption* option);
 void ResetInt(IntMenuOption* option);
+void OpenSubMenu(SubMenuMenuOption* option);
 
 void SetupFloat(FloatMenuOption* option, float current, float init, float max, float min, float step, bool enabled = true);
 void AddFloat(FloatMenuOption* option);
@@ -69,9 +70,8 @@ extern std::vector<FloatMenuOption*> FloatMenuOption_List;
 
 void StartMenuPage();
 
-void AddSubMenuMenuOptionToList(SubMenuMenuOption* option);
 void SwitchToSubMenu_List(int menuScroll, int& menuPageIndex, bool& isInSubMenu, int& scroll, int& previousPageIndex, int& previousScroll);
-
+void AddSubMenuMenuOptionToList(int scroll);
 void AddBoolMenuOptionToList(BoolMenuOption* option);
 void ToggleBool_List(int menuScroll);
 

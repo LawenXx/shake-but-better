@@ -108,6 +108,7 @@ void SubFloat(FloatMenuOption* option)
 		option->current -= option->step;
 }
 
+
 void ResetFloat(FloatMenuOption* option)
 {
 	if (!option->enabled)
@@ -133,9 +134,13 @@ void StartMenuPage()
 
 // Sub Menu
 
-void AddSubMenuMenuOptionToList(SubMenuMenuOption* option)
+void AddSubMenuMenuOptionToList(int scroll)
 {
-	SubMenuMenuOption_List.push_back(option);
+	for each (SubMenuMenuOption * option in SubMenuMenuOption_List)
+	{
+		if (option->scrollIndex == scroll);
+		SwitchToSubMenu(option, scroll);
+	}
 }
 
 void SwitchToSubMenu_List(int menuScroll, int& menuPageIndex, bool& isInSubMenu, int& scroll, int& previousPageIndex, int& previousScroll)
@@ -174,6 +179,9 @@ void ToggleBool_List(int menuScroll)
 	}
 }
 
+void OpenSubMenu(SubMenuMenuOption* option) {
+	SubMenuMenuOption_List.push_back(option);
+}
 // int
 
 void AddIntMenuOptionToList(IntMenuOption* option)

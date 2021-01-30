@@ -24,7 +24,9 @@ G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
 AngleVectors_t AngleVectors;
 R_TextWidth_iw R_TextWidthIW;
 CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
-RandomBulletDir_t RandomBulletDir;
+Cbuf_AddText_t Cbuf_AddText;
+BG_srand_t BG_srand;
+BG_random_t BG_random;
 
 float white[] = { 1,1,1,1 };
 float black[] = { 0.07, 0.15, 0.22,1 };
@@ -64,7 +66,9 @@ namespace BO2
 		G_GetSpreadForWeapon = G_GetSpreadForWeapon_t(0x826BB4E0);
 		AngleVectors = AngleVectors_t(0x8248E408);
 		CG_GetPredictedPlayerState = CG_GetPredictedPlayerState_t(0x821E64E0);
-		RandomBulletDir = RandomBulletDir_t(0x82917190);
+		Cbuf_AddText = Cbuf_AddText_t(0x824015E0);
+		BG_srand = BG_srand_t(0x82697FC0);
+		BG_random = BG_random_t(0x82696250);
 	}
 
 	void readStructs()
@@ -104,29 +108,24 @@ namespace BO2
 		}
 	}
 
-	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
+	void RandomBulletDir(unsigned int* randSeed, float* x, float* y)
 	{
-		vec2_t  delta = start - end;
-		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
-		vec_t length = delta.Length();
-		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
-		CG_DrawRotatedPicPhysical(MP_Scr_Placment, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white", 7));
-	}
-	void drawHeart(float x, float y, float w, float h, float* outline, float* fill)
-	{
-		//Outline - thick
-		{
-			DrawLine(vec2_t(x + (w / 100 * 0), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 10), y + (h / 100 * 18)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 100), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 90), y + (h / 100 * 18)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 10), y + (h / 100 * 18)), vec2_t(x + (w / 100 * 30), y + (h / 100 * 9)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 90), y + (h / 100 * 18)), vec2_t(x + (w / 100 * 70), y + (h / 100 * 9)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 30), y + (h / 100 * 9)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 20)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 70), y + (h / 100 * 9)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 20)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 0), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 93)), outline, 2);
-			DrawLine(vec2_t(x + (w / 100 * 100), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 93)), outline, 2);
-		}
+		float r; // [esp+4h] [ebp-14h]
+		float theta; // [esp+10h] [ebp-8h]
+		float thetaa; // [esp+10h] [ebp-8h]
+		float sinT; // [esp+14h] [ebp-4h]
+		float cosT; // [esp+20h] [ebp+8h]
 
+		theta = BG_random(randSeed) * 360.0;
+		BG_srand(randSeed);
+		r = BG_random(randSeed);
+		thetaa = theta * 0.017453292;
+		cosT = cos(thetaa);
+		sinT = sin(thetaa);
+		*x = cosT * r;
+		*y = r * sinT;
 	}
+	
 	vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag)
 	{
 		vec3_t _Pos;

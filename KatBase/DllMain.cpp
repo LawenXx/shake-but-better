@@ -26,7 +26,6 @@ DWORD CheckUnload()
 }
 void checkTitleId(std::uintptr_t id)
 {	
-	
 	CurrentId = id;
 
 	switch (id)
@@ -48,16 +47,24 @@ void checkTitleId(std::uintptr_t id)
 		BO2::InitAddress();
 		BO2::SetupVariables();
 
-		// CG_ShouldSimulateBulletFire
+		//CG_ShouldSimulateBulletFire
 		*(DWORD*)(0x82258D60) = 0x60000000;
 		*(DWORD*)(0x82258D68) = 0x60000000;
 		*(DWORD*)(0x82258D64) = 0x60000000;
 		*(DWORD*)(0x82258D6C) = 0x60000000;
 
+		//cg_hitevent
+		//*(DWORD*)(0x822585F8) = 0x60000000;
+
+		//R_EndFrame
+		*(DWORD*)(0x828B9F64) = 0x60000000;
+		*(DWORD*)(0x828B9F68) = 0x60000000;
+
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
 		MinHook[2] = MinHook_t(0x8293E5C4, (std::uint64_t)BO2::NetDll_XNetGetTitleXnAddrHook, true);
 		MinHook[3] = MinHook_t(0x8226C9C8, (std::uint64_t)BO2::Cl_WritePacket, true);
+		//MinHook[4] = MinHook_t(0x82717790, (std::uint64_t)BO2::LUI_Hook, true);
 		break;
 	case COD_BLACK_OPS_3:
 		while (*(int*)0x82A92094 == 0)

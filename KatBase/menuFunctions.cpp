@@ -23,7 +23,10 @@ namespace BO2
 		else
 			return "fonts/720/smallFont";
 	}
-
+	const char* AimTag(int index) 
+	{
+		return Bones[index];
+	}
 	int R_TextHeight(Font* font)
 	{
 		return font->pixelHeight;
@@ -60,6 +63,117 @@ namespace BO2
 		BoundingBox(x, y, w, h, blue, 1);
 		DrawText(text, x + 5, y + h - 5, "fonts/720/normalfont", 0.65, white);
 	}
+	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
+	{
+		vec2_t  delta = start - end;
+		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
+		vec_t length = delta.Length();
+		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
+		CG_DrawRotatedPicPhysical(MP_Scr_Placment, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white", 7));
+	}
+	void drawHeart(float x, float y, float w, float h, float* outline, float* fill)
+	{
+		//Outline - thick
+		{
+			DrawLine(vec2_t(x + (w / 100 * 0), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 10), y + (h / 100 * 18)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 100), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 90), y + (h / 100 * 18)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 10), y + (h / 100 * 18)), vec2_t(x + (w / 100 * 30), y + (h / 100 * 9)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 90), y + (h / 100 * 18)), vec2_t(x + (w / 100 * 70), y + (h / 100 * 9)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 30), y + (h / 100 * 9)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 20)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 70), y + (h / 100 * 9)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 20)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 0), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 93)), outline, 2);
+			DrawLine(vec2_t(x + (w / 100 * 100), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 93)), outline, 2);
+		}
+	}
+
+	void HealthBar(float x, float y, float w) {
+		std::uint8_t health = cgGame->ps.health;
+		std::uint8_t maxHealth = cgGame->ps.maxHealth;
+		float* healthColor = (health < 30) ? Red : (health < 70) ? Yellow : Green;
+
+		R_AddCmdDrawText(va("Health: %i/%i", cgGame->ps.health, cgGame->ps.maxHealth), strlen(va("Health: %i/%i", cgGame->ps.health, cgGame->ps.maxHealth)), R_RegisterFont("fonts/720/normalfont", 0), x, y - 40, 0.6, 0.6, 90, black, 0);
+		DrawShader(x - w, y - health * 1.75 / 2, w, health * 1.75, healthColor);
+	}
+
+	void drawCircle(float x, float y, float w, float h, float thickness, float* color)
+	{
+		float angle1, angle2;
+		for (int i = 0; i < 32; i++)
+		{
+			angle1 = i * 2 * M_PI / 32;
+			angle2 = (i + 1) * 2 * M_PI / 32;
+			DrawLine(vec2_t((x + (w / 2) * cos(angle1)) + (w / 2), (y + (h / 2) * sin(angle1)) + (h / 2)), vec2_t(((x + (w / 2) * cos(angle2)) + (w / 2)), (y + (h / 2) * sin(angle2)) + (h / 2)), color, thickness);
+		}
+	}
+	void renderArrow(float x, float y, float scale, float angle, float* color)
+	{
+		scale /= 2;
+		x += scale;
+		y += scale;
+		angle = (3.14f / 180) * (angle - 27);
+
+		DrawLine(vec2_t(x - (cos(angle) * scale), y - (sin(angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
+		DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
+		//	DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
+			//DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
+		DrawLine(vec2_t(x - (cos(angle) * scale), y - (sin(angle) * scale)), vec2_t(x - (cos(angle) * scale / 80.76667), y - (sin(angle) * scale / 80.76667)), color, scale);
+		//	DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(y - (sin(M_PI * 1.33333 + angle) * scale), x - (cos(angle) * scale / 80.76667), y - (sin(angle) * scale / 80.76667)), color, scale);
+	}
+	void renderRadar(float x, float y, float scale, float icoSize, float zoom, bool round)
+	{
+		scale = scale - icoSize;
+		vec2_t RadarCenter = vec2_t(scale, scale);
+		vec2_t dif = vec2_t(((RadarCenter.x - (scale / 2)) - x), ((RadarCenter.y - (scale / 2)) - y));
+		float angle, FinalA, CircleX, CircleY;
+		//DrawShader(x, y, scale + icoSize, scale + icoSize,black);
+	//	BoundingBox(x, y, scale + icoSize, scale + icoSize, blue, 1);
+		//DrawLine1(vec2_t(x + (menuModInfo::showRadarSpread ? (structures::cg->weaponSpread / 5) : 0), y), vec2_t(x + (scale / 2) + (icoSize / 2), y + (scale / 2) + (icoSize / 2)), menuColors::menuColor[3]);
+		//DrawLine1(vec2_t(x + scale + icoSize - (menuModInfo::showRadarSpread ? (structures::cg->weaponSpread / 5) : 0), y), vec2_t(x + (scale / 2) + (icoSize / 2), y + (scale / 2) + (icoSize / 2)), menuColors::menuColor[3]);
+		DrawShader(x, y + (scale / 2) + (icoSize / 2), scale + icoSize, 1, black);
+		DrawShader(x + (scale / 2) + (icoSize / 2), y, 1, scale + icoSize, black);
+		if (round)
+			drawCircle(x, y, scale + icoSize, scale + icoSize, 1, blue);
+		for (int i = 0; i < 1024; i++)
+			if (cg_entitiesArray[i].nextState.Alive > 0)
+			{
+				int RadarX, RadarY;
+				RadarX = cg_entitiesArray[cgGame->clientNum].pose.Origin.x - cg_entitiesArray[i].pose.Origin.x;
+				RadarY = cg_entitiesArray[cgGame->clientNum].pose.Origin.y - cg_entitiesArray[i].pose.Origin.y;
+				float
+					Angle = cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y / 180 * 3.141,
+					RotateX = RadarY * cos(Angle) - RadarX * sin(Angle),
+					RotateY = RadarX * cos(Angle) + RadarY * sin(Angle),
+					FinalX = RadarCenter.x + (RotateX / (scale * zoom)),
+					FinalY = RadarCenter.y + (RotateY / (scale * zoom));
+
+				if (!round) {
+					if (FinalX < RadarCenter.x - scale / 2) FinalX = (RadarCenter.x - scale / 2);
+					if (FinalY < RadarCenter.y - scale / 2) FinalY = (RadarCenter.y - scale / 2);
+					if (FinalX > RadarCenter.x + scale / 2) FinalX = (RadarCenter.x + scale / 2);
+					if (FinalY > RadarCenter.y + scale / 2) FinalY = (RadarCenter.y + scale / 2);
+				}
+				else
+				{
+					angle = atan(RotateX / RotateY) * (180 / XM_PI);
+					FinalA = (FinalY > RadarCenter.y ? -angle - 180.0f : -angle);
+					if (FinalA < 0)
+						FinalA += 360.0f;
+					double radians = (XM_PI / 180) * (FinalA - 90.0f);
+					CircleX = RadarCenter.x + (cosf(radians) * (scale / 2));
+					CircleY = RadarCenter.y + (sinf(radians) * (scale / 2));
+				}
+				if ((((FinalX - RadarCenter.x) * (FinalX - RadarCenter.x) + (FinalY - RadarCenter.y) * (FinalY - RadarCenter.y)) < ((scale / 2) * (scale / 2))) || !round)
+				{
+					if (i != cgGame->clientNum && (cg_entitiesArray[i].pose.eType == ET_ACTOR && cg_entitiesArray[i].pose.eType != ET_ACTOR_CORPSE))
+						renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Red);
+					else if (cg_entitiesArray[i].pose.eType == ET_PLAYER)
+						renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Green);
+				}
+				else
+					if (cg_entitiesArray[i].pose.eType == 16 && cg_entitiesArray[i].nextState.Alive > 0)
+						renderArrow(CircleX - dif.x, CircleY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Red);
+			}
+	}
 	void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y) {
 
 		if (options.Scoreboard.state) {
@@ -77,6 +191,7 @@ namespace BO2
 	void SetupVariables()
 	{
 		int numFonts = 5;
+		int NumBones = sizeof(Bones);
 
 		options.menuOpen = false;
 		options.isInSubMenu = false;
@@ -90,9 +205,13 @@ namespace BO2
 
 		SetupInt(&options.menuX, 500, 5, 1280, 0, 1);
 		SetupInt(&options.menuY, 205, 205, 500, 0);
+		SetupInt(&options.SnapPos, options.SnapPos.current, 205, 500, 0);
 		SetupInt(&options.menuBorder, 4, 4, 20, 1);
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
+		SetupInt(&options.MenuAimTargetIndex, 0, 4, NumBones, 0);
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
+		SetupSubMenu(&options.EspMenu, EspMenu, 8, 8);
+		SetupSubMenu(&options.HostOnly, HostOnly, 8, 8);
 
 		SetupBool(&options.testing, false);
 		SetupBool(&options.BoolRank, false);
@@ -100,20 +219,29 @@ namespace BO2
 		SetupBool(&options.Tracer, false);
 		SetupBool(&options.HostTab, false);
 		SetupBool(&options.XboGodmode, false);
+		SetupBool(&options.Healthbar, false);
 
 		SetupBool(&options.NoRecoil, false);
+		SetupBool(&options.NoSway, false);
+		SetupBool(&options.NoFlinch, false);
 		SetupBool(&options.ChangeView, false);
 		SetupBool(&options.AimbotToggle, false);
+		SetupBool(&options.SilentAim, false);
 		SetupBool(&options.NoSpread, false);
 		SetupBool(&options.AimRequired, false);
 
 		SetupBool(&options.EspBoxToggle, false);
 		SetupBool(&options.EspDrawBones, false);
 		SetupBool(&options.EspDrawLine, false);
+		SetupBool(&options.Radar, false);
+		SetupBool(&options.CircleRadar, false);
+		SetupBool(&options.ChangeView, false);
 		SetupBool(&options.EspFrogChan, false);
+		SetupBool(&options.EndGame, false);
 		SetupBool(&options.Scoreboard, false);
 		SetupBool(&options.DrawItem, false);
 		SetupBool(&options.Laser, false);
+		SetupBool(&options.AntiBetty, false);
 		SetupBool(&options.Wallhack, false);
 		SetupBool(&options.AutoShoot, false);
 
@@ -126,18 +254,9 @@ namespace BO2
 		int textShaderW = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
 		DrawText("Shake", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
-
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == MAIN)
 			DrawShader(options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
-
-		/*if (options.HostTab.state) {
-			DrawText("Host Only", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
-			if (options.menuPageIndex == HostOnly)
-				DrawShader(options.menuX.current + options.menuBorder.current + 10 + textShaderW, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
-			textWidth += R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
-			textShaderW += R_TextWidth(0, "Host Only", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
-		}*/
 
 		DrawText("Aimbot", options.menuX.current + options.menuBorder.current + 10 + textWidth + 6, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == AIMBOT)
@@ -171,7 +290,10 @@ namespace BO2
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue);
 
 		//ScrollBar
+		if(options.menuScroll <= 7)
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
+		else
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current) - 2, 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
 
 		//Footer
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 50 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 30, black);
@@ -231,6 +353,20 @@ namespace BO2
 
 		value->scrollIndex = options.menuOptionIndex;
 		AddIntMenuOptionToList(value);
+		options.menuOptionIndex++;
+	}
+
+	void DrawSubMenu(const char* text, SubMenuMenuOption* option) {
+
+		options.menuMaxScroll++;
+		
+		int textWidth = R_TextWidth(0, text, 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
+		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
+
+		DrawText(text, 5 + options.menuX.current + 5, options.menuY.current + 38 + textHeight + (options.menuOptionIndex * textHeight), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+
+		option->scrollIndex = options.menuOptionIndex;
+		OpenSubMenu(option);
 		options.menuOptionIndex++;
 	}
 

@@ -16,7 +16,7 @@ public:
 	vec3_t start3D;
 	int startTime;
 };
-struct BulletTrace_t 
+struct BulletTrace_t
 {
 	int        MaxEntNum;
 	int        EntitieNum;
@@ -99,9 +99,17 @@ enum entityType_t
 	ET_ZBARRIER,
 	ET_EVENTS,
 };
+
+
 namespace BO2
 {
-	
+	struct GfxColor {
+		byte a;
+		byte r;
+		byte g;
+		byte b;
+	};
+
 	struct UIContext
 	{
 		int contextIndex; //0x0000
@@ -182,6 +190,15 @@ namespace BO2
 		dvar_s* next;                               //0x68
 	}; //Size = 0x6C
 
+	struct trajectory_t
+	{
+		unsigned char trType; //0x015C 
+		char _0x015D[3];
+		__int32 trTime; //0x0160 
+		__int32 trDuration; //0x0164 
+		vec3_t NewOrigin; //0x0168 
+		vec3_t trDelta; //0x0174 
+	};
 
 	struct cpose_t
 	{
@@ -192,16 +209,6 @@ namespace BO2
 		vec3_t Origin; //0x002C 
 		vec3_t viewAngles; //0x0038
 		char _0x0044[272];
-	};
-
-	struct trajectory_t
-	{
-		unsigned char trType; //0x015C 
-		char _0x015D[3];
-		__int32 trTime; //0x0160 
-		__int32 trDuration; //0x0164 
-		vec3_t NewOrigin; //0x0168 
-		vec3_t trDelta; //0x0174 
 	};
 
 	struct LerpEntityState
@@ -478,6 +485,8 @@ namespace BO2
 		char pad_0158[452]; //0x0158
 	}; //Size: 0x031C
 
+
+
 	static char* Bones[] = {
 		"j_helmet", "j_head", "j_neck",
 		"j_shoulder_le", "j_elbow_le", "j_wrist_le", "j_elbow_le", "j_shoulder_le", "j_neck",
@@ -602,7 +611,7 @@ namespace BO3
 		char rMove; //0x29
 		char _0x30[0x13]; //0x17
 	};//0x40
-	
+
 
 	static char* Bones[] = {
 		"j_helmet", "j_head", "j_neck",

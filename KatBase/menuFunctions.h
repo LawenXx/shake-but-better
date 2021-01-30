@@ -22,25 +22,35 @@ namespace BO2
 
 		IntMenuOption menuX;
 		IntMenuOption menuY;
+		IntMenuOption SnapPos;
 		IntMenuOption menuBorder;
 		IntMenuOption menuFontIndex;
+		IntMenuOption MenuAimTargetIndex;
 		FloatMenuOption menuFontSize;
 		BoolMenuOption AimbotToggle;
+		BoolMenuOption SilentAim;
 		BoolMenuOption NoSpread;
 		BoolMenuOption NoRecoil;
+		BoolMenuOption NoFlinch;
+		BoolMenuOption NoSway;
 		BoolMenuOption ChangeView;
 
 		BoolMenuOption AimRequired;
 		BoolMenuOption AutoShoot;
 		BoolMenuOption Fire;
-
+		BoolMenuOption Healthbar;
+		BoolMenuOption Radar;
+		BoolMenuOption CircleRadar;
+		
 		BoolMenuOption EspBoxToggle;
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
 		BoolMenuOption EspFrogChan;
+		BoolMenuOption EndGame;
 		BoolMenuOption DrawItem;
 		BoolMenuOption Wallhack;
 		BoolMenuOption Laser;
+		BoolMenuOption AntiBetty;
 
 		BoolMenuOption HostTab;
 		BoolMenuOption XboGodmode;
@@ -50,6 +60,9 @@ namespace BO2
 		BoolMenuOption testing;
 		BoolMenuOption BoolRank;
 		BoolMenuOption Scoreboard;
+
+		SubMenuMenuOption EspMenu;
+		SubMenuMenuOption HostOnly;
 	};
 	extern Options_t options;
 	enum menus
@@ -58,17 +71,22 @@ namespace BO2
 		AIMBOT,
 		VISUALS,
 		PLAYERS,
-		SETTINGS//,
-		//HostOnly
+		SETTINGS,
+		HostOnly, 
+		EspMenu
 	};
+
 
 	extern void SetupVariables();
 	extern void DrawMenuTabs();
 	extern void DrawMenuShader();
 
+	extern const char* AimTag(int index);
+	extern void renderRadar(float x, float y, float scale = 200, float icoSize = 20, float zoom = 0.08, bool round = true);
 	extern void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y);
 
 	//Menu DrawOptions 
+	extern void DrawSubMenu(const char* text, SubMenuMenuOption* option);
 	extern void DrawButton(const char* text);
 	extern void DrawTextInBox(const char* text, int x, int y, int w, int h);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
