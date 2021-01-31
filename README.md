@@ -1,6 +1,8 @@
 
-# shake-but-better
-it's shakepackage but way better
+# shake
+
+#Note: This is not hvh ready and wont be for a while
+
 # Todo:
 - [x] Finish menu visuals
 - [ ] Add Autowall
