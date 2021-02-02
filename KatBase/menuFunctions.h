@@ -64,7 +64,9 @@ namespace BO2
 		SubMenuMenuOption EspMenu;
 		SubMenuMenuOption HostOnly;
 	};
+
 	extern Options_t options;
+
 	enum menus
 	{
 		MAIN,
@@ -86,11 +88,12 @@ namespace BO2
 	extern void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y);
 
 	//Menu DrawOptions 
-	extern void DrawSubMenu(const char* text, SubMenuMenuOption* option);
+	extern void DrawSubMenu(const char* text, SubMenuMenuOption* option, int newMenu, bool enabled = true);
 	extern void DrawButton(const char* text);
 	extern void DrawTextInBox(const char* text, int x, int y, int w, int h);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
 	extern void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt);
+	void DrawFloatSlider(const char* text, FloatMenuOption* value, const char* fmt);
 	extern void DrawStringSlider(const char* text, IntMenuOption* value, const char* string);
 }
 

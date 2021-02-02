@@ -4,8 +4,6 @@
 namespace BO2
 {
 	Options_t options;
-
-
 	const char* FontForIndex(int index)
 	{
 		if (index == 0)
@@ -23,10 +21,11 @@ namespace BO2
 		else
 			return "fonts/720/smallFont";
 	}
-	const char* AimTag(int index) 
+	const char* AimTag(int index)
 	{
 		return Bones[index];
 	}
+
 	int R_TextHeight(Font* font)
 	{
 		return font->pixelHeight;
@@ -112,12 +111,7 @@ namespace BO2
 		y += scale;
 		angle = (3.14f / 180) * (angle - 27);
 
-		DrawLine(vec2_t(x - (cos(angle) * scale), y - (sin(angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
-		DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
-		//	DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
-			//DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(x - (cos(M_PI * 0.66667 + angle) * scale), y - (sin(M_PI * 0.66667 + angle) * scale)), color, scale);
-		DrawLine(vec2_t(x - (cos(angle) * scale), y - (sin(angle) * scale)), vec2_t(x - (cos(angle) * scale / 80.76667), y - (sin(angle) * scale / 80.76667)), color, scale);
-		//	DrawLine(vec2_t(x - (cos(M_PI * 1.33333 + angle) * scale), y - (sin(M_PI * 1.33333 + angle) * scale)), vec2_t(y - (sin(M_PI * 1.33333 + angle) * scale), x - (cos(angle) * scale / 80.76667), y - (sin(angle) * scale / 80.76667)), color, scale);
+		drawCircle(x, y - (sin(angle) * scale), 5, 5, scale, color);
 	}
 	void renderRadar(float x, float y, float scale, float icoSize, float zoom, bool round)
 	{
@@ -125,14 +119,11 @@ namespace BO2
 		vec2_t RadarCenter = vec2_t(scale, scale);
 		vec2_t dif = vec2_t(((RadarCenter.x - (scale / 2)) - x), ((RadarCenter.y - (scale / 2)) - y));
 		float angle, FinalA, CircleX, CircleY;
-		//DrawShader(x, y, scale + icoSize, scale + icoSize,black);
-	//	BoundingBox(x, y, scale + icoSize, scale + icoSize, blue, 1);
-		//DrawLine1(vec2_t(x + (menuModInfo::showRadarSpread ? (structures::cg->weaponSpread / 5) : 0), y), vec2_t(x + (scale / 2) + (icoSize / 2), y + (scale / 2) + (icoSize / 2)), menuColors::menuColor[3]);
-		//DrawLine1(vec2_t(x + scale + icoSize - (menuModInfo::showRadarSpread ? (structures::cg->weaponSpread / 5) : 0), y), vec2_t(x + (scale / 2) + (icoSize / 2), y + (scale / 2) + (icoSize / 2)), menuColors::menuColor[3]);
+		BoundingBox(x, y, scale + icoSize, scale + icoSize, black, 1);
 		DrawShader(x, y + (scale / 2) + (icoSize / 2), scale + icoSize, 1, black);
 		DrawShader(x + (scale / 2) + (icoSize / 2), y, 1, scale + icoSize, black);
 		if (round)
-			drawCircle(x, y, scale + icoSize, scale + icoSize, 1, blue);
+			drawCircle(x, y, scale + icoSize, scale + icoSize, 1, black);
 		for (int i = 0; i < 1024; i++)
 			if (cg_entitiesArray[i].nextState.Alive > 0)
 			{
@@ -166,8 +157,12 @@ namespace BO2
 				{
 					if (i != cgGame->clientNum && (cg_entitiesArray[i].pose.eType == ET_ACTOR && cg_entitiesArray[i].pose.eType != ET_ACTOR_CORPSE))
 						renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Red);
-					else if (cg_entitiesArray[i].pose.eType == ET_PLAYER)
-						renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Green);
+					else if (cg_entitiesArray[i].pose.eType == ET_PLAYER) {
+						if (!isTeam(&cg_entitiesArray[i]))
+							renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Red);
+						else
+							renderArrow(FinalX - dif.x, FinalY - dif.y, icoSize, (cg_entitiesArray[cgGame->clientNum].pose.viewAngles.y - cg_entitiesArray[i].pose.viewAngles.y), Green);
+					}
 				}
 				else
 					if (cg_entitiesArray[i].pose.eType == 16 && cg_entitiesArray[i].nextState.Alive > 0)
@@ -205,7 +200,7 @@ namespace BO2
 
 		SetupInt(&options.menuX, 500, 5, 1280, 0, 1);
 		SetupInt(&options.menuY, 205, 205, 500, 0);
-		SetupInt(&options.SnapPos, options.SnapPos.current, 205, 500, 0);
+		SetupInt(&options.SnapPos, 720, 215, 720, 0);
 		SetupInt(&options.menuBorder, 4, 4, 20, 1);
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
 		SetupInt(&options.MenuAimTargetIndex, 0, 4, NumBones, 0);
@@ -290,10 +285,10 @@ namespace BO2
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue);
 
 		//ScrollBar
-		if(options.menuScroll <= 7)
-		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
+		if (options.menuScroll <= 7)
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
 		else
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current) - 2, 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current + 38 + (options.menuScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current) - 2.2, 310, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current + 1, black);
 
 		//Footer
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 50 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 30, black);
@@ -335,6 +330,25 @@ namespace BO2
 		AddBoolMenuOptionToList(value);
 		options.menuOptionIndex++;
 	}
+	void DrawFloatSlider(const char* text, FloatMenuOption* value, const char* fmt)
+	{
+		options.menuMaxScroll++;
+
+		int textWidth = R_TextWidthIW(text, 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
+		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
+
+		DrawText(text, 5 + options.menuX.current + 5, options.menuY.current + 38 + textHeight + (options.menuOptionIndex * textHeight), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+
+		DrawShader(options.menuX.current + options.menuWidth - options.menuBorder.current - 75 - 5 + 2 + 25, options.menuY.current + 70 + (options.menuOptionIndex * textHeight) + ((textHeight - 75) / 2) + 2, 75 - 4, 5 - 4 + 8, black);
+		DrawShader(options.menuX.current + options.menuWidth - options.menuBorder.current - 75 - 5 + 1 + 25, options.menuY.current + 70 + (options.menuOptionIndex * textHeight) + ((textHeight - 75) / 2) + 1, ((75 - 2) / (float)value->max) * value->current, 5 - 2 + 8, blue);
+		BoundingBox(options.menuX.current + options.menuWidth - options.menuBorder.current - 75 - 5 + 2 + 25, options.menuY.current + 70 + (options.menuOptionIndex * textHeight) + ((textHeight - 75) / 2) + 2, 75 - 4, 5 - 4 + 8, white, 1);
+
+		DrawText(va(fmt, value->current), 5 + options.menuX.current + 222, options.menuY.current + 38 + textHeight + (options.menuOptionIndex * textHeight), FontForIndex(options.menuFontIndex.current), 0.5, white, align_right);
+
+		value->scrollIndex = options.menuOptionIndex;
+		AddFloat_List(*(int*)value);
+		options.menuOptionIndex++;
+	}
 
 	void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt)
 	{
@@ -356,17 +370,19 @@ namespace BO2
 		options.menuOptionIndex++;
 	}
 
-	void DrawSubMenu(const char* text, SubMenuMenuOption* option) {
+	void DrawSubMenu(const char* text, SubMenuMenuOption* option, int newMenu, bool enabled) {
 
 		options.menuMaxScroll++;
-		
+
 		int textWidth = R_TextWidth(0, text, 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
 
-		DrawText(text, 5 + options.menuX.current + 5, options.menuY.current + 38 + textHeight + (options.menuOptionIndex * textHeight), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+		DrawText(text, options.menuX.current + options.menuBorder.current + 5, options.menuY.current + textHeight + options.menuTabHeight + (options.menuOptionIndex * textHeight) + (options.menuBorder.current * 2), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, option->enabled ? white : black);
+		DrawText("->>", options.menuX.current + options.menuWidth - options.menuBorder.current - R_TextWidth(0, "->>", 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current - 6, options.menuY.current + textHeight + options.menuTabHeight + (options.menuOptionIndex * textHeight) + (options.menuBorder.current * 2), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, option->enabled ? white : black);
 
+		SetupSubMenu(option, newMenu, options.menuPageIndex, options.menuOptionIndex, enabled);
 		option->scrollIndex = options.menuOptionIndex;
-		OpenSubMenu(option);
+		AddSubMenuMenuOptionToList(option);
 		options.menuOptionIndex++;
 	}
 

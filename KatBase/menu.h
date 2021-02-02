@@ -71,7 +71,7 @@ extern std::vector<FloatMenuOption*> FloatMenuOption_List;
 void StartMenuPage();
 
 void SwitchToSubMenu_List(int menuScroll, int& menuPageIndex, bool& isInSubMenu, int& scroll, int& previousPageIndex, int& previousScroll);
-void AddSubMenuMenuOptionToList(int scroll);
+void AddSubMenuMenuOptionToList(SubMenuMenuOption* option);
 void AddBoolMenuOptionToList(BoolMenuOption* option);
 void ToggleBool_List(int menuScroll);
 

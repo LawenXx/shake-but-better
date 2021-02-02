@@ -8,6 +8,13 @@ struct Font
 	const char* name;
 	int pixelHeight;
 };
+struct GfxColor {
+	byte a;
+	byte r;
+	byte g;
+	byte b;
+};
+
 
 class cTracer
 {
@@ -475,16 +482,82 @@ namespace BO2
 
 	struct gentity_t
 	{
-		char pad_0000[340]; //0x0000
-		struct
-		{
-			char _0x00[0x5558];
-			int rank;
-			int prestige;
-		}*pClient;
-		char pad_0158[452]; //0x0158
+		std::int32_t commandTime; //0x0000
+		std::int32_t pm_type; //0x0004
+		std::int32_t bobCycle; //0x0008
+		std::int32_t pm_flags; //0x000C
+		std::int32_t weapFlags; //0x0010
+		std::int32_t otherFlags; //0x0014
+		std::int32_t pm_time; //0x0018
+		std::int32_t loopSoundId; //0x001C
+		std::int32_t loopSoundFade; //0x0020
+		char pad_0024[4]; //0x0024
+		vec3_t origin; //0x0028
+		vec3_t velocity; //0x0034
+		char pad_0040[12]; //0x0040
+		std::int32_t weaponTime; //0x004C
+		std::int32_t weaponDelay; //0x0050
+		std::int32_t weaponTimeLeft; //0x0054
+		std::int32_t weaponDelayLeft; //0x0058
+		std::int32_t weaponIdleTime; //0x005C
+		std::int32_t grenadeTimeLeft; //0x0060
+		std::int32_t throwBackGrenadeOwner; //0x0064
+		char pad_0068[36]; //0x0068
+		std::int32_t gravity; //0x008C
+		float leanf; //0x0090
+		std::int32_t delta_angles; //0x0094
+		std::int32_t groundEntityNum; //0x00A4
+		std::int32_t groundType; //0x00A8
+		char pad_00AC[332]; //0x00AC
+		vec3_t viewangles; //0x01F8
+		std::int32_t viewHeightTarget; //0x0204
+		float viewHeightCurrent; //0x0208
+		char pad_020C[21288]; //0x020C
+		char name[32]; //0x5534
+		char pad_5554[4]; //0x5554
+		std::int32_t rank; //0x5558
+		std::int32_t prestige; //0x555C
+		char pad_5560[4]; //0x5560
 	}; //Size: 0x031C
 
+	struct BulletFireParams_t
+	{
+		int weaponEntIndex;//0x0
+		int ignoreEntIndex;//0x4
+		float damageMultiplier;//0x8
+		int methodOfDeath;//0xc
+		vec3_t origStart;//0x10
+		vec3_t start;//0x1c
+		vec3_t end;//0x28
+		vec3_t dir;//0x34
+	}; // 0x40
+	struct trace_t
+	{
+		float normal[3];//0x00
+		char unk0[0x04];//0x0C
+		float fraction;//0x10
+		int surfaceFlags;//0x14
+		int contents;//0x18
+		int hitType;//0x1C
+		short hitId;//0x20
+		short modelIndex;//0x22
+		short partName;//0x24
+		short boneIndex;//0x26
+		short partGroup;//0x28
+		bool allsolid;//0x2A
+		bool startsolid;//0x2B
+		bool walkable;//0x2C
+		char gayMcSwag[0xB];//0x2D
+	}; // 0x38
+	struct BulletTraceResults_t
+	{
+		trace_t trace;//0x0
+		char unk[8];//0x34
+		int hitEnt; //0x38
+		float hitPos[3];//0x3c
+		int ignoreHitEnt;//0x48
+		int surfaceType;//0x4c
+	}; // 0x50
 
 
 	static char* Bones[] = {
@@ -495,7 +568,9 @@ namespace BO2
 		"j_hip_le", "j_spinelower", "j_hip_ri", "j_knee_ri", "j_ankle_ri"
 	};
 
-	extern Usercmd_t* UserCmd;
+	extern BulletTraceResults_t BulletTraceResults;
+	extern BulletFireParams_t BulletFireParams;
+	extern Usercmd_t UserCmd;
 	extern playerstate_s* playerstate;
 	extern UIContext* cgDC;
 	extern cg_s* cgGame;

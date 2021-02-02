@@ -27,6 +27,8 @@ CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
 Cbuf_AddText_t Cbuf_AddText;
 BG_srand_t BG_srand;
 BG_random_t BG_random;
+CL_AddReliableCommand_t CL_AddReliableCommand;
+cg_simulatebulletfire_t cg_simulatebulletfire;
 
 float white[] = { 1,1,1,1 };
 float black[] = { 0.07, 0.15, 0.22,1 };
@@ -45,7 +47,11 @@ namespace BO2
 	centity_tBo2* cg_entitiesArray;
 	ClientActive_t* ClientActive;
 	gentity_t* g_entitiesArray;
-	Usercmd_t* UserCmd;
+	Usercmd_t UserCmd;
+
+	 BulletTraceResults_t BulletTraceResults;
+	 BulletFireParams_t BulletFireParams;
+
 	void InitAddress()
 	{
 		Material_RegisterHandle = Material_RegisterHandle_t(MP_Material_RegisterHandle);
@@ -69,6 +75,8 @@ namespace BO2
 		Cbuf_AddText = Cbuf_AddText_t(0x824015E0);
 		BG_srand = BG_srand_t(0x82697FC0);
 		BG_random = BG_random_t(0x82696250);
+		CL_AddReliableCommand = CL_AddReliableCommand_t(0x822786E0);
+		cg_simulatebulletfire = cg_simulatebulletfire_t(0x82258840);
 	}
 
 	void readStructs()
@@ -83,12 +91,12 @@ namespace BO2
 
 	void PlayerCmd_SetRank(int rank, int index)
 	{
-		g_entitiesArray[index].pClient->rank = rank;
+		g_entitiesArray[index].rank = rank;
 	}
 
 	void PlayerCmd_SetPrestige(int prestige, int index)
 	{
-		g_entitiesArray[index].pClient->prestige = prestige;
+		g_entitiesArray[index].prestige = prestige;
 	}
 
 	void SpoofLevel() {
@@ -101,31 +109,40 @@ namespace BO2
 	void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna)
 	{
 		MinHook[2].Stub(xnc, pXna);
+
 		if (options.IpSpoof.state)
 		{
 			BYTE IP[] = { 0x2, 0x2, 0x33, 0x3 };
 			pXna->inaOnline.S_un.S_addr = *(DWORD*)&IP;
 		}
 	}
+#define LocalName 0x8486EFF0
 
-	void RandomBulletDir(unsigned int* randSeed, float* x, float* y)
+	DWORD WINAPI ChangeName(LPVOID)
 	{
-		float r; // [esp+4h] [ebp-14h]
-		float theta; // [esp+10h] [ebp-8h]
-		float thetaa; // [esp+10h] [ebp-8h]
-		float sinT; // [esp+14h] [ebp-4h]
-		float cosT; // [esp+20h] [ebp+8h]
+		char* text = (char*)LocalName;
+		wchar_t wtext[31];
+		mbstowcs(wtext, text, strlen(text) + 1);
+		LPWSTR old = wtext;
 
-		theta = BG_random(randSeed) * 360.0;
-		BG_srand(randSeed);
-		r = BG_random(randSeed);
-		thetaa = theta * 0.017453292;
-		cosT = cos(thetaa);
-		sinT = sin(thetaa);
-		*x = cosT * r;
-		*y = r * sinT;
+		XOVERLAPPED Overlapped;
+		WCHAR wValue[0x200];
+		char buffer[31];
+		ZeroMemory(&Overlapped, sizeof(Overlapped));
+
+		XShowKeyboardUI(0, VKBD_DEFAULT, old, L"Edit A Player Name", L"Enter A New Name", wValue, 31, &Overlapped);
+
+		while (!XHasOverlappedIoCompleted(&Overlapped));
+		Sleep(100);
+		wcstombs(buffer, wValue, 100);
+
+		if (!strcmp(buffer, ""))
+			return 0;
+
+		memcpy((void*)LocalName, buffer, 31);
+		CL_AddReliableCommand(0, va("userinfo \"\\name\\%s\"", buffer));
+		return 0;
 	}
-	
 	vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag)
 	{
 		vec3_t _Pos;

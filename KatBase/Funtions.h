@@ -14,6 +14,8 @@ extern float blue[];
 extern float Red[];
 extern float Yellow[4];
 extern float Green[4];
+
+extern int SnapPos;
 //Black Ops 2
 
 typedef Material* (*Material_RegisterHandle_t)(const char* shaderName, int imgTrack);
@@ -29,14 +31,19 @@ typedef bool(*CG_IsEntityFriendlyNotEnemy_t)(int local, BO2::centity_tBo2* cent)
 typedef bool(*AimTarget_IsTargetVisible_t)(int local, BO2::centity_tBo2* cen);
 typedef void(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
 typedef const char* (*BG_GetFactionForTeam_t)(int team, const char* mapName);
-typedef void(*BG_seedRandWithGameTime_t)(unsigned int* pHoldrand);
+typedef void(*BG_seedRandWithGameTime_t)(int pHoldrand);
 typedef void(*G_GetSpreadForWeapon_t)(BO2::playerstate_s *ps, int weapon, float* minSpread, float* maxSpread);
 typedef void(*AngleVectors_t)(vec3_t* angles, vec3_t* forward, vec3_t* right, vec3_t* up);
 typedef BO2::playerstate_s* (*CG_GetPredictedPlayerState_t)(int localClientNum);
 typedef void(* Cbuf_AddText_t)(int localClientNum, const char* text);
 typedef float(*BG_srand_t)(unsigned int* rand);
 typedef float(*BG_random_t)(unsigned int* rand);
+typedef void(*CL_AddReliableCommand_t)(int localClientNum, const char* cmd);
+typedef void(*AngleVectors_t)(vec3_t* angles, vec3_t* forward, vec3_t* right, vec3_t* up);
+typedef void (*cg_simulatebulletfire_t)(int localclient, BO2::BulletFireParams_t* bulletFireParams, int weapon, BO2::centity_tBo2* attacker, vec3_t* start, bool drawTracer, bool isPlayer, BO2::BulletTraceResults_t* br, bool traceHit);
 
+extern cg_simulatebulletfire_t cg_simulatebulletfire;
+extern CL_AddReliableCommand_t CL_AddReliableCommand;
 extern BG_srand_t BG_srand;
 extern BG_random_t BG_random;
 extern Cbuf_AddText_t Cbuf_AddText;
@@ -102,7 +109,7 @@ namespace BO2
 	extern void drawHeart(float x, float y, float w, float h, float* outline, float* fill);
 	extern void SpoofLevel();
 	extern void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna);
-	extern void RandomBulletDir(unsigned int* randSeed, float* x, float* y);
+	extern DWORD WINAPI ChangeName(LPVOID);
 }
 
 namespace BO3

@@ -134,13 +134,10 @@ void StartMenuPage()
 
 // Sub Menu
 
-void AddSubMenuMenuOptionToList(int scroll)
+
+void AddSubMenuMenuOptionToList(SubMenuMenuOption* option)
 {
-	for each (SubMenuMenuOption * option in SubMenuMenuOption_List)
-	{
-		if (option->scrollIndex == scroll);
-		SwitchToSubMenu(option, scroll);
-	}
+	SubMenuMenuOption_List.push_back(option);
 }
 
 void SwitchToSubMenu_List(int menuScroll, int& menuPageIndex, bool& isInSubMenu, int& scroll, int& previousPageIndex, int& previousScroll)

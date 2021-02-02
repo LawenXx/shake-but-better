@@ -17,17 +17,20 @@ namespace BO2
 		case MAIN:
 			DrawToggle("No Recoil", &options.NoRecoil);
 			DrawToggle("No Sway", &options.NoSway);
-			DrawToggle("No Flinch", &options.NoFlinch);
+			//	DrawToggle("No Flinch", &options.NoFlinch);
 			DrawToggle("No Spread", &options.NoSpread);
 			DrawToggle("Laser", &options.Laser);
 			DrawToggle("IP Spoof", &options.IpSpoof);
 			DrawToggle("End Round", &options.EndGame);
-			DrawToggle("Teabag Lethal", &options.AntiBetty);
+			DrawToggle("Crouch On Lethal", &options.AntiBetty);
 			DrawToggle("External Radar", &options.Radar);
 			DrawToggle("External Circle Radar", &options.CircleRadar);
 			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
-			if(cgGame->clientNum == 0)
-				DrawSubMenu("Host Only >>", &options.EspMenu);
+
+			DrawToggle("Test", &options.NoFlinch);
+
+			if (cgGame->clientNum == 0)
+				DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
 			break;
 		case HostOnly:
 			DrawToggle("Spoof Rank", &options.BoolRank);
@@ -47,13 +50,11 @@ namespace BO2
 			DrawToggle("Esp Heart", &options.EspFrogChan);
 			DrawToggle("Esp SnapLines", &options.EspDrawLine);
 			DrawToggle("Esp Item", &options.DrawItem);
-			DrawSubMenu("Esp Menu >>", &options.EspMenu);
+			DrawSubMenu("Esp Menu", &options.EspMenu, EspMenu);
+
 			break;
 		case EspMenu:
 			DrawIntSlider("SnapLine Position", &options.SnapPos, "%i");
-			DrawButton("IM A BUTTON");
-			DrawButton("IM A BUTTON");
-			DrawButton("IM A BUTTON");
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
@@ -75,12 +76,17 @@ namespace BO2
 
 	void ServerInfo() {
 		readStructs();
-
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host:%s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+
+
+		if (options.menuOpen)
+			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu..", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		else
+			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.tedRr", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 	}
 
 	void DrawMenu()
@@ -92,10 +98,96 @@ namespace BO2
 		DrawMenuText();
 	}
 
+	double __cdecl BG_random(int* pHoldrand)
+	{
+		unsigned int temp;
+
+		temp = 214013 * *pHoldrand + 2531011;
+		*pHoldrand = temp;
+		return (double)(temp >> 17) * 0.000030517578;
+	}
+
+	void TransformSeed(int* seed)
+	{
+		*seed = 214013 * (214013 * (214013 * (214013 * *seed + 2531011) + 2531011) + 2531011) + 2531011;
+	}
+
+	void BG_seedRandWithGameTime(int Holdrand)
+	{
+		Holdrand ^= *(BYTE*)Holdrand << 8;
+		Holdrand = Holdrand ^ ((*(BYTE*)Holdrand << 8) << 8) ^ ((*(BYTE*)Holdrand << 8) << 16);
+	}
+	void RandomBulletDir(int seed, float* x, float* y)
+	{
+		BG_seedRandWithGameTime(seed);
+
+		float randX = BG_random(&seed) * XM_2PI;
+
+		TransformSeed(&seed);
+
+		float randY = BG_random(&seed);
+
+		*x = cosf(randX) * randY;
+		*y = sinf(randX) * randY;
+	}
+
+	void NoSpread(Usercmd_t* cmd, Usercmd_t* oldCmd)
+	{
+	
+		float minSpread = 0.0f, maxSpread = 0.0f, totalSpread = 0.0f;
+
+	G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
+
+		totalSpread = (minSpread + ((maxSpread - minSpread) * (cgGame->weaponSpreadScale * 0.00399956862f)));
+
+		vec2_t Spread = vec2_t();
+
+		RandomBulletDir(cmd->serverTime, &Spread.x, &Spread.y);
+
+		oldCmd->viewAngles[0] += ANGLE2SHORT(Spread.x * totalSpread);
+		oldCmd->viewAngles[1] += ANGLE2SHORT(Spread.y * totalSpread);
+	}
+
+
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
 	const char* Tag;
+
+	bool isClientWallbangable(int client, const char* tag)
+	{
+		vec3_t End;
+		End = AimTarget_GetTagPos(&cg_entitiesArray[client], tag);
+
+		BulletTraceResults_t bulletTraceResults;
+		BulletFireParams_t bulletFireParams;
+		memset(&bulletFireParams, 0x00, sizeof(bulletFireParams));
+
+		bulletFireParams.weaponEntIndex = 1022;
+		bulletFireParams.ignoreEntIndex = cgGame->clientNum;
+		bulletFireParams.damageMultiplier = 2.0f;
+		bulletFireParams.methodOfDeath = 1;
+
+		memcpy(&bulletFireParams.origStart, &cgGame->refdef.viewOrigin, 0xC);
+		memcpy(&bulletFireParams.start, &cgGame->refdef.viewOrigin, 0xC);
+		memcpy(&bulletFireParams.end, &End, 0xC);
+
+		vec3_t EndDir;
+		End - cgGame->refdef.viewOrigin;
+		VecToAngels(End, EndDir);
+		AngleVectors(&EndDir, &bulletFireParams.dir, NULL, NULL);
+
+		cg_simulatebulletfire(0, &bulletFireParams, cgGame->ps.primaryWeapon, &cg_entitiesArray[cgGame->clientNum], &cgGame->refdef.viewOrigin, false, false, &bulletTraceResults, false);
+
+		if (bulletTraceResults.trace.hitType != 1) {
+			return true;
+		}
+		return false;
+	}
+
+	bool EntityWallbangable(int i, const char* tag) {
+		return AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag);
+	}
 
 	int GetNearestPlayer(int client)
 	{
@@ -107,13 +199,13 @@ namespace BO2
 				continue;
 			if (cg_entitiesArray[i].pose.eType != ET_PLAYER)
 				continue;
-
+			if (!cg_entitiesArray[i].nextState.State & 0x40000000 && cg_entitiesArray[i].nextState.Alive)
+				continue;
 			if (isTeam(&cg_entitiesArray[i]))
 				continue;
 
 			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
-			if (AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]))
-			{
+			if (EntityWallbangable(i, AimTag(options.MenuAimTargetIndex.current)) && cg_entitiesArray[i].nextState.Alive) {
 				if (Distance < nearestDistance)
 				{
 					nearestDistance = Distance;
@@ -122,9 +214,12 @@ namespace BO2
 					options.Fire.state = true;
 				}
 			}
+
 		}
 		return nearestClient;
 	}
+
+	vec3_t newAngles;
 
 	void doAimbot()
 	{
@@ -136,40 +231,55 @@ namespace BO2
 				return;
 
 			int nearestClient = GetNearestPlayer(cgGame->clientNum);
+			if (nearestClient == -1)
+				newAngles = ClientActive->baseAngle;
+
 			if (playerReady && nearestClient != -1)
 			{
+
 				if (cg_entitiesArray[nearestClient].WeaponID == 89)
 					Tag = "j_ankle_ri";
 				else
 					Tag = AimTag(options.MenuAimTargetIndex.current);
+
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
 				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
+
 				VecToAngels(Angles, anglesOut);
-				if (nearestClient != cgGame->clientNum)
-					ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+
+				if (nearestClient != cgGame->clientNum) {
+					if (options.SilentAim.state)
+						newAngles = anglesOut - ClientActive->baseAngle;
+					else
+						ClientActive->viewAngle = anglesOut - ClientActive->baseAngle;
+				}
 			}
 			playerReady = false;
 
 		}
 
+
 	}
 	void Esp() {
 		for (int i = 0; i < 18; i++)
 		{
+
 			if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
 				continue;
-			if (!(cg_entitiesArray[i].nextState.ClientNumber != 0))
+			if (!(cg_entitiesArray[i].nextState.ClientNumber != cgGame->clientNum))
 				continue;
 			if (!(cg_entitiesArray[i].nextState.Alive))
 				continue;
 			if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
 				continue;
+			if (cgGame->ps.health < 1)
+				return;
 
 			vec2_t Pos = vec2_t();
 			vec2_t head = vec2_t();
 			vec3_t origin = cg_entitiesArray[i].pose.Origin;
 
-			vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_helmet");
+			vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_head");
 			headPos.z += 10;
 			origin.z -= 5;
 
@@ -186,7 +296,7 @@ namespace BO2
 			if (options.EspDrawBones.state)
 				drawBones(&cg_entitiesArray[i], blue);
 			if (options.EspDrawLine.state)
-				DrawLine(vec2_t(cgDC->screenWidth / 2,options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
+				DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
 			if (options.EspFrogChan.state)
 				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
 		}
@@ -194,9 +304,7 @@ namespace BO2
 			if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
 				continue;
 
-			if (!(cg_entitiesArray[j].nextState.Alive))
-				continue;
-			if (!cg_entitiesArray[j].nextState.State &0x40000000);
+			if ((cg_entitiesArray[j].nextState.pickupId < 0))
 				continue;
 
 			vec3_t origin = cg_entitiesArray[j].pose.Origin;
@@ -209,26 +317,9 @@ namespace BO2
 				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
 
 		}
-
 	}
-	void NoSpread(Usercmd_t* Cmd, Usercmd_t* OldCmd) {
 
-		unsigned int CmdTimeSeed = cgGame->ps.commandTime;
-		float minSpread = 0.0f, maxSpread = 0.0f;
 
-		BG_seedRandWithGameTime(&CmdTimeSeed);
-		G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
-
-		float spread = minSpread + ((maxSpread - minSpread) * cgGame->weaponSpreadScale * 0.0039215689f);
-
-		vec2_t Spread = vec2_t();
-
-		RandomBulletDir((unsigned int*)Cmd->serverTime, &Spread.x, &Spread.y);
-
-		OldCmd->viewAngles[0] += ANGLE2SHORT(Spread.y * spread);
-		OldCmd->viewAngles[1] += ANGLE2SHORT(Spread.x * spread);
-
-	}
 	bool round = false;
 	void EndRound() {
 		round = true;
@@ -242,8 +333,44 @@ namespace BO2
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
-		readStructs();
 
+		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
+		if (options.menuOpen)
+			DrawMenu();
+
+		ServerInfo();
+	}
+	XOVERLAPPED Overlapped_LSC;
+	XOVERLAPPED Overlapped2_LSC;
+	WCHAR Username_LSC[512];
+	WCHAR Username2_LSC[15];
+	WCHAR Username3_LSC[15];
+	WCHAR Username4_LSC[14];
+
+
+	void CMDSender()
+	{
+		XOVERLAPPED Overlapped;
+		WCHAR CMDText[512];
+		char CMDBuffer[512];
+		char CMD[512];
+		ZeroMemory(&Overlapped, sizeof(Overlapped));
+		XShowKeyboardUI(0, VKBD_DEFAULT, L"", L"Dvar Sender", L"Please Enter Your Custom Dvar.", CMDText, 512, &Overlapped);
+
+		while (!XHasOverlappedIoCompleted(&Overlapped))
+			Sleep(100);
+
+		wcstombs(CMDBuffer, CMDText, 512);
+		sprintf(CMD, "s \"%s\"", CMDBuffer);
+	}
+
+	HRESULT RenderScene(DWORD a1) {
+		MinHook[4].Stub(a1);
+
+		if (options.NoFlinch.state)
+			CMDSender();
+
+		readStructs();
 		if (Dvar_GetBool("cl_ingame"))
 		{
 			Esp();
@@ -258,22 +385,19 @@ namespace BO2
 			if (options.Healthbar.state)
 				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
 			if (options.CircleRadar.state)
-				renderRadar(cgDC->screenWidth - 250, cgDC->screenHeight - cgDC->screenHeight + 5, 180, 10, 0.5, true);
+				renderRadar(cgDC->screenWidth - 200, cgDC->screenHeight - cgDC->screenHeight + 5, 190, 20, 0.08, true);
 			if (options.Radar.state)
-				renderRadar(cgDC->screenWidth - 250, cgDC->screenHeight - cgDC->screenHeight + 5, 180, 10, 0.5, false);
+				renderRadar(cgDC->screenWidth - 200, cgDC->screenHeight - cgDC->screenHeight + 5, 190, 20, 0.08, false);
 
 			if (options.EndGame.state)
 				EndRound();
 
 			SpoofLevel();
 		}
-		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-		if (options.menuOpen)
-			DrawMenu();
 
-		ServerInfo();
+		return S_OK;
 	}
-	int silentAngles[3];
+
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
 		readStructs();
@@ -290,17 +414,9 @@ namespace BO2
 			memcpy(newCmd, Cmd, sizeof(Usercmd_t));
 
 			oldCmd->serverTime -= 1;
-			newCmd->serverTime += 1;
-
-			if (options.NoSpread.state)
-				NoSpread(Cmd, oldCmd);
+			newCmd->serverTime += 2;
 
 
-			if (options.SilentAim.state) {
-				oldCmd->serverTime += 2;
-				oldCmd->viewAngles[1] += ANGLE2SHORT(silentAngles[1]);
-				oldCmd->viewAngles[0] += ANGLE2SHORT(silentAngles[0]);
-			}
 			if (options.AutoShoot.state) {
 				if (options.Fire.state) {
 					oldCmd->buttons &= ~0x80000000;
@@ -309,6 +425,10 @@ namespace BO2
 				}
 
 			}
+
+			if (options.NoSpread.state)
+				NoSpread(Cmd, oldCmd);
+
 			bool betty = false;
 			for (int i = 0; i < 2048; i++) {
 				float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
@@ -319,10 +439,10 @@ namespace BO2
 					if (Distance < 5) {
 						betty = true;
 						if (betty) {
-							oldCmd->buttons &= ~0x400000;
+							oldCmd->buttons |= 0x400000;
 							//newCmd->buttons |= 0x800000;
 							betty = false;
-							options.AntiBetty.state = false;
+
 						}
 
 					}
