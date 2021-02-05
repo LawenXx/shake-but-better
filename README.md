@@ -21,6 +21,6 @@ Note: This is not hvh ready and wont be for a while
 ***Kat person who makes and breaks things<br />***
 
 # Click on picture to see preview
-[![Watch the video](https://i.imgur.com/09uaXVL.png)](https://youtu.be/4qRFJ52xMkE)
+[![Watch the video](https://i.imgur.com/09uaXVL.png)](https://youtu.be/4a3tks7sfoM)
 
 
