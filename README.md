@@ -5,7 +5,7 @@ Note: This is not hvh ready and wont be for a while
 
 # Todo:
 - [x] Finish menu visuals
-- [ ] Add Autowall
+- [x] Add Autowall
 - [x] Add NoSpread
 - [x] Add ESP things
 - [ ] Fix Issues
