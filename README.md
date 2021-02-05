@@ -12,7 +12,7 @@ Note: This is not hvh ready and wont be for a while
 
 # Known Issues:
 - [x] Crashing when player joins late (caused by esp)
-- [ ] Aimbot not seeing people behind
+- [x] Aimbot not seeing people behind
 - [x] Menu not resiszing for host tab
 
 # Contributers
