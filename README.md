@@ -14,6 +14,7 @@ Note: This is not hvh ready and wont be for a while
 - [x] Crashing when player joins late (caused by esp)
 - [x] Aimbot not seeing people behind
 - [x] Menu not resiszing for host tab
+- [ ] Error synchronizing game details bo3
 
 # Contributers
 ***Birb project manager<br />***
