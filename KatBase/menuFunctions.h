@@ -23,38 +23,48 @@ namespace BO2
 		IntMenuOption menuX;
 		IntMenuOption menuY;
 		IntMenuOption SnapPos;
+		IntMenuOption Fov;
 		IntMenuOption menuBorder;
 		IntMenuOption menuFontIndex;
 		IntMenuOption MenuAimTargetIndex;
+		IntMenuOption ShaderIndex;
+		IntMenuOption ShaderRed;
+		IntMenuOption ShaderGreen;
+		IntMenuOption ShaderBlue;
+
 		FloatMenuOption menuFontSize;
+
 		BoolMenuOption AimbotToggle;
+		BoolMenuOption AutoWall;
 		BoolMenuOption SilentAim;
 		BoolMenuOption NoSpread;
 		BoolMenuOption NoRecoil;
 		BoolMenuOption NoFlinch;
 		BoolMenuOption NoSway;
 		BoolMenuOption ChangeView;
-
 		BoolMenuOption AimRequired;
 		BoolMenuOption AutoShoot;
 		BoolMenuOption Fire;
 		BoolMenuOption Healthbar;
 		BoolMenuOption Radar;
 		BoolMenuOption CircleRadar;
-		
 		BoolMenuOption EspBoxToggle;
 		BoolMenuOption EspDrawLine;
 		BoolMenuOption EspDrawBones;
 		BoolMenuOption EspFrogChan;
+		BoolMenuOption EspNames;
 		BoolMenuOption EndGame;
 		BoolMenuOption DrawItem;
 		BoolMenuOption Wallhack;
+		BoolMenuOption RGB;
+
 		BoolMenuOption Laser;
 		BoolMenuOption AntiBetty;
-
 		BoolMenuOption HostTab;
+		BoolMenuOption EspFilled;
 		BoolMenuOption XboGodmode;
-
+		BoolMenuOption AntiFreeze;
+		BoolMenuOption Gradient;
 		BoolMenuOption Tracer;
 		BoolMenuOption IpSpoof;
 		BoolMenuOption testing;
@@ -63,6 +73,8 @@ namespace BO2
 
 		SubMenuMenuOption EspMenu;
 		SubMenuMenuOption HostOnly;
+		SubMenuMenuOption MiscView;
+		SubMenuMenuOption SubPlayers;
 	};
 
 	extern Options_t options;
@@ -74,8 +86,10 @@ namespace BO2
 		VISUALS,
 		PLAYERS,
 		SETTINGS,
-		HostOnly, 
-		EspMenu
+		HostOnly,
+		EspMenu,
+		MiscVisuals,
+		Playersub
 	};
 
 
@@ -84,13 +98,15 @@ namespace BO2
 	extern void DrawMenuShader();
 
 	extern const char* AimTag(int index);
+	extern const char* Shader(int index);
 	extern void renderRadar(float x, float y, float scale = 200, float icoSize = 20, float zoom = 0.08, bool round = true);
 	extern void ScoreBoard_Draw(std::vector<clientInfo_t> v, int team, float x, float y);
+	extern void BoundingBoxFilled(float x, float y, float width, float height, float* color, float thickness);
 
 	//Menu DrawOptions 
 	extern void DrawSubMenu(const char* text, SubMenuMenuOption* option, int newMenu, bool enabled = true);
 	extern void DrawButton(const char* text);
-	extern void DrawTextInBox(const char* text, int x, int y, int w, int h);
+	extern void DrawTextInBox(const char* text, int x, int y, int w, int h, alignment allign = align_left);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
 	extern void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt);
 	void DrawFloatSlider(const char* text, FloatMenuOption* value, const char* fmt);
@@ -122,6 +138,12 @@ namespace BO3
 		IntMenuOption menuY;
 		IntMenuOption menuBorder;
 		IntMenuOption menuFontIndex;
+		IntMenuOption ShaderRed;
+		IntMenuOption ShaderGreen;
+		IntMenuOption ShaderBlue;
+		IntMenuOption MenuAimTargetIndex;
+		IntMenuOption Fov;
+
 		FloatMenuOption menuFontSize;
 
 		BoolMenuOption OverHeadNames;
@@ -131,16 +153,22 @@ namespace BO3
 
 		BoolMenuOption EspSnap;
 		BoolMenuOption EspBox;
+		BoolMenuOption EndGame;
 		BoolMenuOption EspHeart;
 		BoolMenuOption EspBones;
 		BoolMenuOption EspNames;
+		BoolMenuOption EspFilled;
 		BoolMenuOption EspHealth;
 
 
 		BoolMenuOption AutoShoot;
+		BoolMenuOption Healthbar;
 		BoolMenuOption Fire;
 		BoolMenuOption Aimbot;
 		BoolMenuOption testing;
+
+		SubMenuMenuOption TracerSub;
+
 	};
 	extern Options_t options;
 
@@ -150,7 +178,8 @@ namespace BO3
 		AIMBOT,
 		VISUALS,
 		PLAYERS,
-		SETTINGS
+		SETTINGS, 
+		Tracers
 	};
 
 	extern void SetupVariables();
@@ -160,13 +189,19 @@ namespace BO3
 	extern void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align = align_left);
 	extern void DrawShader(float x, float y, float width, float height, const float* color, const char* shader = "white");
 	extern void BoundingBox(float x, float y, float width, float height, float* color, float thickness);
-	extern const char* FontForIndex(int index);
+	extern void BoundingBoxFilled(float x, float y, float width, float height, float* color, float thickness);
+	extern void DrawTextInBox(const char* text, int x, int y, int w, int h);
+	extern void HealthBar(float x, float y, float w);
+	extern const char* AimTag(int index);
 
 	//Menu DrawOptions 
 	extern void DrawButton(const char* text);
 	extern void DrawToggle(const char* text, BoolMenuOption* value);
 	extern void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt);
 	extern void DrawStringSlider(const char* text, IntMenuOption* value, const char* string);
+	extern void DrawSubMenu(const char* text, SubMenuMenuOption* option, int newMenu, bool enabled = true);
+	extern void DrawToggleWithDescription(const char* text, BoolMenuOption* value, const char* Desc);
+	extern const char* FontForIndex(int index);
 }
 
 namespace Ghost {

@@ -46,13 +46,7 @@ void checkTitleId(std::uintptr_t id)
 
 		BO2::InitAddress();
 		BO2::SetupVariables();
-
-		//CG_ShouldSimulateBulletFire
-		*(DWORD*)(0x82258D60) = 0x60000000;
-		*(DWORD*)(0x82258D68) = 0x60000000;
-		*(DWORD*)(0x82258D64) = 0x60000000;
-		*(DWORD*)(0x82258D6C) = 0x60000000;
-
+		ReadImage();
 		//cg_hitevent
 		*(DWORD*)(0x822585F8) = 0x60000000;
 
@@ -65,6 +59,9 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[2] = MinHook_t(0x8293E5C4, (std::uint64_t)BO2::NetDll_XNetGetTitleXnAddrHook, true);
 		MinHook[3] = MinHook_t(0x8226C9C8, (std::uint64_t)BO2::Cl_WritePacket, true);
 		MinHook[4] = MinHook_t(0x828AF5A0, (std::uint64_t)BO2::RenderScene, true);
+		MinHook[5] = MinHook_t(0x828BA040, (std::uint64_t)BO2::Quad_Hook, true);
+		MinHook[6] = MinHook_t(0x82267520, (std::uint64_t)BO2::CL_ConsolePrintHook, true);
+		MinHook[7] = MinHook_t(0x82278A00, (std::uint64_t)BO2::CL_Disconnect_Hook, true);
 		break;
 	case COD_BLACK_OPS_3:
 		while (*(int*)0x82A92094 == 0)
@@ -113,7 +110,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			if (!firstDash)
 			{
-				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nThis wouldnt be possible without the help from:\nReeko\nSmokey xKoVx", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
+				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nYoutube/kat xkovx\nThis wouldnt be possible without the help from:\nReeko for making the base\nSmokey xKoVx for wallhack and laser\nSoul for radar", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
 
 				firstDash = true;
 			}

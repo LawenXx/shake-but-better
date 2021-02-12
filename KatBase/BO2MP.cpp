@@ -21,14 +21,13 @@ namespace BO2
 			DrawToggle("No Spread", &options.NoSpread);
 			DrawToggle("Laser", &options.Laser);
 			DrawToggle("IP Spoof", &options.IpSpoof);
-			DrawToggle("End Round", &options.EndGame);
+			//DrawToggle("End Round", &options.EndGame);
 			DrawToggle("Crouch On Lethal", &options.AntiBetty);
 			DrawToggle("External Radar", &options.Radar);
 			DrawToggle("External Circle Radar", &options.CircleRadar);
 			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
-
-			DrawToggle("Test", &options.NoFlinch);
-
+			DrawToggle("AntiFreeze", &options.AntiFreeze);
+			//DrawToggle("Test", &options.NoFlinch);
 			if (cgGame->clientNum == 0)
 				DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
 			break;
@@ -40,34 +39,50 @@ namespace BO2
 			DrawToggle("Silent Aim", &options.SilentAim);
 			DrawStringSlider("AimTag", &options.MenuAimTargetIndex, AimTag(options.MenuAimTargetIndex.current));
 			DrawToggle("AutoShoot", &options.AutoShoot);
+			DrawToggle("AutoWall", &options.AutoWall);
 			//	DrawToggle("Aim Required", &options.AimRequired);
 			break;
 		case VISUALS:
 			DrawToggle("Healthbar", &options.Healthbar);
-			DrawToggle("Wallhack", &options.Wallhack);
-			DrawToggle("Esp Box", &options.EspBoxToggle);
-			DrawToggle("Esp Bones", &options.EspDrawBones);
-			DrawToggle("Esp Heart", &options.EspFrogChan);
-			DrawToggle("Esp SnapLines", &options.EspDrawLine);
-			DrawToggle("Esp Item", &options.DrawItem);
 			DrawSubMenu("Esp Menu", &options.EspMenu, EspMenu);
-
+			DrawSubMenu("Misc Visuals", &options.MiscView, MiscVisuals);
 			break;
 		case EspMenu:
+			DrawToggle("Esp Box", &options.EspBoxToggle);
+			DrawToggle("Esp Box Filled", &options.EspFilled);
+			DrawToggle("Esp Bones", &options.EspDrawBones);
+			DrawToggle("Esp Heart", &options.EspFrogChan);
+			DrawToggle("Esp Names", &options.EspNames);
+			DrawToggle("Esp SnapLines", &options.EspDrawLine);
 			DrawIntSlider("SnapLine Position", &options.SnapPos, "%i");
+			DrawToggle("Esp Item", &options.DrawItem);
+			break;
+		case MiscVisuals:
+			DrawToggle("Wallhack", &options.Wallhack);
+			DrawIntSlider("Fov", &options.Fov, "%i");
+			DrawStringSlider("Shader", &options.ShaderIndex, Shader(options.ShaderIndex.current));
+			DrawIntSlider("Shader Red", &options.ShaderRed, "%i");
+			DrawIntSlider("Shader Green", &options.ShaderGreen, "%i");
+			DrawIntSlider("Shader Blue", &options.ShaderBlue, "%i");
+			DrawToggle("RGB", &options.RGB);
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
-				if (!strcmp(cgGame->clientInfo[i].name, ""))
-					DrawButton("N/A");
+				if (!strcmp(cgGame->clientInfo[i].name, "")) {}
+				//DrawButton("N/A");
 				else
-					DrawButton(va("[%i] %s [%s]", i, cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"));
+					DrawSubMenu(va("[%i] %s [%s]", i, cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"), &options.SubPlayers, Playersub);
 			}
 			break;
-
+		case Playersub:
+			DrawButton("WIP");
+			DrawButton("WIP");
+			DrawButton("WIP");
+			break;
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
+			DrawToggle("Gradient Menu", &options.Gradient);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 
@@ -75,19 +90,19 @@ namespace BO2
 	}
 
 	void ServerInfo() {
-		readStructs();
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host:%s", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 26, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 40, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 28, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-
+		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g.", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 
 		if (options.menuOpen)
-			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu..", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimated^ To ^2Open ^7The Menu", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		else
-			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.tedRr", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR To ^2Open ^7The Menu", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 	}
+
+
 
 	void DrawMenu()
 	{
@@ -98,57 +113,6 @@ namespace BO2
 		DrawMenuText();
 	}
 
-	double __cdecl BG_random(int* pHoldrand)
-	{
-		unsigned int temp;
-
-		temp = 214013 * *pHoldrand + 2531011;
-		*pHoldrand = temp;
-		return (double)(temp >> 17) * 0.000030517578;
-	}
-
-	void TransformSeed(int* seed)
-	{
-		*seed = 214013 * (214013 * (214013 * (214013 * *seed + 2531011) + 2531011) + 2531011) + 2531011;
-	}
-
-	void BG_seedRandWithGameTime(int Holdrand)
-	{
-		Holdrand ^= *(BYTE*)Holdrand << 8;
-		Holdrand = Holdrand ^ ((*(BYTE*)Holdrand << 8) << 8) ^ ((*(BYTE*)Holdrand << 8) << 16);
-	}
-	void RandomBulletDir(int seed, float* x, float* y)
-	{
-		BG_seedRandWithGameTime(seed);
-
-		float randX = BG_random(&seed) * XM_2PI;
-
-		TransformSeed(&seed);
-
-		float randY = BG_random(&seed);
-
-		*x = cosf(randX) * randY;
-		*y = sinf(randX) * randY;
-	}
-
-	void NoSpread(Usercmd_t* cmd, Usercmd_t* oldCmd)
-	{
-	
-		float minSpread = 0.0f, maxSpread = 0.0f, totalSpread = 0.0f;
-
-	G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
-
-		totalSpread = (minSpread + ((maxSpread - minSpread) * (cgGame->weaponSpreadScale * 0.00399956862f)));
-
-		vec2_t Spread = vec2_t();
-
-		RandomBulletDir(cmd->serverTime, &Spread.x, &Spread.y);
-
-		oldCmd->viewAngles[0] += ANGLE2SHORT(Spread.x * totalSpread);
-		oldCmd->viewAngles[1] += ANGLE2SHORT(Spread.y * totalSpread);
-	}
-
-
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
@@ -156,6 +120,11 @@ namespace BO2
 
 	bool isClientWallbangable(int client, const char* tag)
 	{
+		*(DWORD*)(0x82258D60) = 0x60000000;
+		*(DWORD*)(0x82258D68) = 0x60000000;
+		*(DWORD*)(0x82258D64) = 0x60000000;
+		*(DWORD*)(0x82258D6C) = 0x60000000;
+
 		vec3_t End;
 		End = AimTarget_GetTagPos(&cg_entitiesArray[client], tag);
 
@@ -167,10 +136,9 @@ namespace BO2
 		bulletFireParams.ignoreEntIndex = cgGame->clientNum;
 		bulletFireParams.damageMultiplier = 2.0f;
 		bulletFireParams.methodOfDeath = 1;
-
-		memcpy(&bulletFireParams.origStart, &cgGame->refdef.viewOrigin, 0xC);
-		memcpy(&bulletFireParams.start, &cgGame->refdef.viewOrigin, 0xC);
-		memcpy(&bulletFireParams.end, &End, 0xC);
+		bulletFireParams.origStart = cgGame->refdef.viewOrigin;
+		bulletFireParams.start = cgGame->refdef.viewOrigin;
+		bulletFireParams.end = End;
 
 		vec3_t EndDir;
 		End - cgGame->refdef.viewOrigin;
@@ -182,11 +150,12 @@ namespace BO2
 		if (bulletTraceResults.trace.hitType != 1) {
 			return true;
 		}
+
 		return false;
 	}
-
-	bool EntityWallbangable(int i, const char* tag) {
-		return AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag);
+	bool CanShootThroughWall(int i, const char* tag) {
+		if (cg_entitiesArray[i].nextState.Alive)
+			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
 	}
 
 	int GetNearestPlayer(int client)
@@ -199,22 +168,20 @@ namespace BO2
 				continue;
 			if (cg_entitiesArray[i].pose.eType != ET_PLAYER)
 				continue;
-			if (!cg_entitiesArray[i].nextState.State & 0x40000000 && cg_entitiesArray[i].nextState.Alive)
+			if (!cg_entitiesArray[i].nextState.Alive)
 				continue;
 			if (isTeam(&cg_entitiesArray[i]))
 				continue;
 
 			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
-			if (EntityWallbangable(i, AimTag(options.MenuAimTargetIndex.current)) && cg_entitiesArray[i].nextState.Alive) {
-				if (Distance < nearestDistance)
-				{
-					nearestDistance = Distance;
-					nearestClient = i;
-					playerReady = true;
-					options.Fire.state = true;
-				}
-			}
 
+			if (CanShootThroughWall(i, "j_neck") && Distance < nearestDistance)
+			{
+				nearestDistance = Distance;
+				nearestClient = i;
+				playerReady = true;
+				options.Fire.state = true;
+			}
 		}
 		return nearestClient;
 	}
@@ -230,9 +197,11 @@ namespace BO2
 			if (cgGame->ps.health < 1)
 				return;
 
+
 			int nearestClient = GetNearestPlayer(cgGame->clientNum);
 			if (nearestClient == -1)
 				newAngles = ClientActive->baseAngle;
+
 
 			if (playerReady && nearestClient != -1)
 			{
@@ -243,9 +212,10 @@ namespace BO2
 					Tag = AimTag(options.MenuAimTargetIndex.current);
 
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
+				Difference.z -= 5;
 				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
-
 				VecToAngels(Angles, anglesOut);
+
 
 				if (nearestClient != cgGame->clientNum) {
 					if (options.SilentAim.state)
@@ -255,10 +225,7 @@ namespace BO2
 				}
 			}
 			playerReady = false;
-
 		}
-
-
 	}
 	void Esp() {
 		for (int i = 0; i < 18; i++)
@@ -299,6 +266,10 @@ namespace BO2
 				DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
 			if (options.EspFrogChan.state)
 				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
+			if (options.EspNames.state)
+				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, white);
+			if (options.EspFilled.state)
+				BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 		}
 		for (int j = 0; j < 2048; j++) {
 			if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
@@ -319,62 +290,48 @@ namespace BO2
 		}
 	}
 
+	void TargetDetails() {
+		int nearest = GetNearestPlayer(cgGame->clientNum);
+		DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox(va("%s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - R_TextWidth(0, va("%s", cgGame->clientInfo->name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 
-	bool round = false;
-	void EndRound() {
-		round = true;
-		if (round) {
-			Cbuf_AddText(0, va("cmd mr %i 3 endround", *(int*)0x82c15758));
-			round = false;
-			options.EndGame.state = false;
+	}
+
+	void CL_ConsolePrintHook(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags) {
+		MinHook[6].Stub(localClientNum, channel, txt, duration, pixelWidth, color, flags);
+
+		if (options.AntiFreeze.state) {
+			if (strstr(txt, "[{+}]") || strstr(txt, "KEY_UNBOUND")
+				|| strstr(txt, "^H") || strstr(txt, "KEYUNBOUND")) {
+
+				//^H crash location
+				*(uint32_t*)0x82717D48 = 0x60000000;
+				//CG_GameMessage
+				*(uint32_t*)0x8222E27C = 0x60000000;
+				*(uint32_t*)0x8222A754 = 0x60000000;
+
+				txt = "Shake Crash Blocked";
+				return;
+			}
 		}
 	}
-	//TODO: move over to dof hook
+
+	void CL_Disconnect_Hook(int r3, bool r4)
+	{
+		*(int*)0x82717D48 = 0x91370000;
+		*(uint32_t*)0x8222E27C = 0x4BFB829D;
+		*(uint32_t*)0x8222A754 = 0x4BFBBDC5;
+		MinHook[7].Stub(r3, r4);
+	}
+
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
+		ReadStructs();
 
-		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
-		if (options.menuOpen)
-			DrawMenu();
-
-		ServerInfo();
-	}
-	XOVERLAPPED Overlapped_LSC;
-	XOVERLAPPED Overlapped2_LSC;
-	WCHAR Username_LSC[512];
-	WCHAR Username2_LSC[15];
-	WCHAR Username3_LSC[15];
-	WCHAR Username4_LSC[14];
-
-
-	void CMDSender()
-	{
-		XOVERLAPPED Overlapped;
-		WCHAR CMDText[512];
-		char CMDBuffer[512];
-		char CMD[512];
-		ZeroMemory(&Overlapped, sizeof(Overlapped));
-		XShowKeyboardUI(0, VKBD_DEFAULT, L"", L"Dvar Sender", L"Please Enter Your Custom Dvar.", CMDText, 512, &Overlapped);
-
-		while (!XHasOverlappedIoCompleted(&Overlapped))
-			Sleep(100);
-
-		wcstombs(CMDBuffer, CMDText, 512);
-		sprintf(CMD, "s \"%s\"", CMDBuffer);
-	}
-
-	HRESULT RenderScene(DWORD a1) {
-		MinHook[4].Stub(a1);
-
-		if (options.NoFlinch.state)
-			CMDSender();
-
-		readStructs();
 		if (Dvar_GetBool("cl_ingame"))
 		{
 			Esp();
-
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
 			*(uint32_t*)0x826C6E6C = options.NoSway.state ? 0x60000000 : 0x4BFFE975;
@@ -389,18 +346,71 @@ namespace BO2
 			if (options.Radar.state)
 				renderRadar(cgDC->screenWidth - 200, cgDC->screenHeight - cgDC->screenHeight + 5, 190, 20, 0.08, false);
 
-			if (options.EndGame.state)
-				EndRound();
-
+			FovSlider(options.Fov.current);
 			SpoofLevel();
+			TargetDetails();
 		}
 
-		return S_OK;
+		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
+		if (options.menuOpen)
+			DrawMenu();
+
+		ServerInfo();
 	}
+	void Keyboard() {
+		XOVERLAPPED Overlapped;
+		WCHAR CMDText[512];
+		char CMDBuffer[512];
+		char CMD[512];
+
+		if (options.NoFlinch.state) {
+
+			ZeroMemory(&Overlapped, sizeof(Overlapped));
+			XShowKeyboardUI(0, VKBD_DEFAULT, L"", L"Text", L"Enter text here", CMDText, 512, &Overlapped);
+
+			wcstombs(CMDBuffer, CMDText, 512);
+			sprintf(CMD, "s \"%s\"", CMDBuffer);
+
+			DrawTextInBox(va(CMD, "s \"%s\"", CMDBuffer), cgDC->CenterX(), cgDC->CenterY(), 100, 20);
+
+			options.NoFlinch.state = false;
+		}
+	}
+	HRESULT RenderScene(DWORD a1) {
+		MinHook[4].Stub(a1);
+		if (options.EndGame.state)
+
+			return S_OK;
+	}
+	void Rgb() {
+		if (options.RGB.state) {
+
+
+		}
+	}
+	void Quad_Hook(Material* r3, short t, vec3_t* x, vec2_t* xx, GfxColor* Col, int c) {
+		const char* Material = r3->name;
+
+		/*	if (strstr(Material, "menu_mp") || strstr(Material, "globe")
+				|| strstr(Material, "fonts/") || strstr(Material, "compass_map"))*/
+		if (strstr(Material, Shader(options.ShaderIndex.current)))
+		{
+			Rgb();
+			byte r = options.ShaderRed.current;
+			byte g = options.ShaderGreen.current;
+			byte b = options.ShaderBlue.current;
+			Col->r = r;
+			Col->g = g;
+			Col->b = b;
+			Col->a = 255;
+		}
+		MinHook[5].Stub(r3, t, x, xx, Col, c);
+	}
+
 
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
-		readStructs();
+		ReadStructs();
 
 		if (Dvar_GetBool("cl_ingame")) {
 			doAimbot();
@@ -419,11 +429,12 @@ namespace BO2
 
 			if (options.AutoShoot.state) {
 				if (options.Fire.state) {
-					oldCmd->buttons &= ~0x80000000;
-					newCmd->buttons |= 0x80000000;
-					options.Fire.state = false;
+					if (cg_entitiesArray[cgGame->clientNum].WeaponID != 89) {
+						oldCmd->buttons &= ~0x80000000;
+						newCmd->buttons |= 0x80000000;
+						options.Fire.state = false;
+					}
 				}
-
 			}
 
 			if (options.NoSpread.state)
@@ -442,9 +453,7 @@ namespace BO2
 							oldCmd->buttons |= 0x400000;
 							//newCmd->buttons |= 0x800000;
 							betty = false;
-
 						}
-
 					}
 
 				}
@@ -519,11 +528,6 @@ namespace BO2
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)
 					options.menuPageIndex = 4;
-			}
-
-			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_A))
-			{
-				SwitchToSubMenu(&options.EspMenu, options.menuPageIndex);
 			}
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_X))

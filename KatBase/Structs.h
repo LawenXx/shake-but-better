@@ -36,6 +36,7 @@ struct BulletTrace_t
 	vec3_t    viewAngle;
 };
 extern BulletTrace_t* bulletTrace;
+
 enum XASSET
 {
 	XASSET_PHYSPRESET,
@@ -560,14 +561,99 @@ namespace BO2
 	}; // 0x50
 
 
-	static char* Bones[] = {
+	union C8C573B57ACA1D7542AD56C4163862EC
+	{
+		unsigned __int16* localBoneNames;
+		unsigned __int16* boneNames;
+	};
+	union CB213585254F53F8EF5B6A00F1025158
+	{
+		char* localParentList;
+		char* parentList;
+	};
+	union BF9640C0B3AB5E078C286DD9616EC22F
+	{
+		__int16* localQuats;
+		__int16* quats;
+	};
+	union E1CD6A013C1D28F2956F4983A8D1052C
+	{
+		float* localTrans;
+		float* trans;
+	};
+	struct DObjAnimMatBo2
+	{
+		vec4_t quat;
+		vec3_t trans;
+		float transWeight;
+	};
+	struct XModelLodInfoBo2
+	{
+		float dist;
+		unsigned __int16 numsurfs;
+		unsigned __int16 surfIndex;
+		int partBits[5];
+	};
+	union C44470544659A51610FBBFEAF9734665
+	{
+		void* localBoneInfo;
+		void* boneInfo;
+	};
+	struct XModelLodInfo
+	{
+		float dist;
+		unsigned __int16 numsurfs;
+		unsigned __int16 surfIndex;
+		int partBits[5];
+	};
+	struct XModel_t
+	{
+		char* name; //0x0000
+		int8_t numBones; //0x0004
+		int8_t numRootBones; //0x0005
+		int8_t numsurfs; //0x0006
+		int8_t lodRampType; //0x0007
+		C8C573B57ACA1D7542AD56C4163862EC ___u5; //0x0008
+		CB213585254F53F8EF5B6A00F1025158 ___u6; //0x000C
+		BF9640C0B3AB5E078C286DD9616EC22F ___u7; //0x0010
+		E1CD6A013C1D28F2956F4983A8D1052C ___u8; //0x0014
+		void* partClassification; //0x0018
+		DObjAnimMatBo2* baseMat; //0x001C
+		void* surfs; //0x0020
+		void* materialHandles; //0x0024
+		XModelLodInfo lodInfo[4]; //0x0028
+		void* collSurfs; //0x00A0
+		int32_t numCollSurfs; //0x00A4
+		int32_t contents; //0x00A8
+		C44470544659A51610FBBFEAF9734665 ___u17; //0x00AC
+		float radius; //0x00B0
+		vec3_t mins; //0x00B4
+		vec3_t maxs; //0x00C0
+		int16_t numLods; //0x00CC
+		int16_t collLod; //0x00CE
+		void* himipInvSqRadii; //0x00D0
+		int32_t memUsage; //0x00D4
+		int32_t flags; //0x00D8
+		char pad_00DC[56]; //0x00DC
+		void* collmaps; //0x0114
+		void* physConstraints; //0x0118
+		vec3_t lightingOriginOffset; //0x011C
+		char pad_0128[203]; //0x0128
+
+	};
+
+	static char* Bones[26] = {
 		"j_helmet", "j_head", "j_neck",
 		"j_shoulder_le", "j_elbow_le", "j_wrist_le", "j_elbow_le", "j_shoulder_le", "j_neck",
 		"j_shoulder_ri", "j_elbow_ri", "j_wrist_ri", "j_elbow_ri", "j_shoulder_ri", "j_neck",
 		"j_spineupper", "j_spinelower", "j_hip_le", "j_knee_le", "j_ankle_le", "j_knee_le",
 		"j_hip_le", "j_spinelower", "j_hip_ri", "j_knee_ri", "j_ankle_ri"
 	};
-
+	static char* ShaderList[13] = {
+		"menu_mp", "globe", "fonts/", "compass_map", "lui_soldier", "loadscreen_mp", "hud_medals", 
+		"emblem_", "em_shape", "camo_", "white","~-gcamo_diamond_alt_col", "ui_holotable_"
+	};
+	extern XModel_t* xModel;
 	extern BulletTraceResults_t BulletTraceResults;
 	extern BulletFireParams_t BulletFireParams;
 	extern Usercmd_t UserCmd;
