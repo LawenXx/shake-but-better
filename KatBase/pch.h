@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <string>
 #include <cstdio>
-
+#include <fstream>
 
 //Source Headers
 #include "utilites.h"
@@ -42,6 +42,7 @@
 #include "menu.h"
 #include "Funtions.h"
 #include "menuFunctions.h"
+#include "Image.h"
 #include "BO2MP.h"
 #include "BO3MP.h"
 #include "Minecraft.h"

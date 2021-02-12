@@ -18,6 +18,8 @@ namespace BO2
 			return "fonts/720/normalFont";
 		if (index == 5)
 			return "fonts/720/boldFont";
+		if (index == 6)
+			return "fonts/720/gamefonts_xenon";
 		else
 			return "fonts/720/smallFont";
 	}
@@ -25,7 +27,10 @@ namespace BO2
 	{
 		return Bones[index];
 	}
-
+	const char* Shader(int index)
+	{
+		return ShaderList[index];
+	}
 	int R_TextHeight(Font* font)
 	{
 		return font->pixelHeight;
@@ -57,10 +62,18 @@ namespace BO2
 		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
-	void DrawTextInBox(const char* text, int x, int y, int w, int h) {
-		DrawShader(x, y, w, h, black);
-		BoundingBox(x, y, w, h, blue, 1);
-		DrawText(text, x + 5, y + h - 5, "fonts/720/normalfont", 0.65, white);
+	void BoundingBoxFilled(float x, float y, float width, float height, float* color, float thickness)
+	{
+		DrawShader(x - thickness, y - thickness, width + (thickness * 2), thickness, color); // Top
+		DrawShader(x - thickness, y + height, width + (thickness * 2), thickness, color); // Bottom
+		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
+		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
+		DrawShader(x - thickness, y - thickness, width, height + (thickness * 2), white2); // Filled
+	}
+	void DrawTextInBox(const char* text, int x, int y, int w, int h, alignment allign) {
+		DrawShader(x + allign, y, w + R_TextWidth(0, text, MAXCHAR, R_RegisterFont("fonts/720/normalfont",0))/8, h, black);
+		BoundingBox(x + allign, y, w + R_TextWidth(0, text, MAXCHAR, R_RegisterFont("fonts/720/normalfont", 0))/8, h, blue, 1);
+		DrawText(text, x + 5, y + h - 5, "fonts/720/normalfont", 0.63, white, allign);
 	}
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
 	{
@@ -187,7 +200,7 @@ namespace BO2
 	{
 		int numFonts = 5;
 		int NumBones = sizeof(Bones);
-
+		int NumShader = sizeof(ShaderList);
 		options.menuOpen = false;
 		options.isInSubMenu = false;
 		options.menuMaxScroll = 0;
@@ -200,19 +213,29 @@ namespace BO2
 
 		SetupInt(&options.menuX, 500, 5, 1280, 0, 1);
 		SetupInt(&options.menuY, 205, 205, 500, 0);
+		SetupInt(&options.Fov, 65, 65, 150, 0);
 		SetupInt(&options.SnapPos, 720, 215, 720, 0);
+		SetupInt(&options.ShaderBlue, 255, 215, 255, 0);
+		SetupInt(&options.ShaderGreen, 0, 215, 255, 0);
+		SetupInt(&options.ShaderRed, 255, 215, 255, 0);
 		SetupInt(&options.menuBorder, 4, 4, 20, 1);
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
 		SetupInt(&options.MenuAimTargetIndex, 0, 4, NumBones, 0);
+		SetupInt(&options.ShaderIndex, 0, 4, NumShader, 0);
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 		SetupSubMenu(&options.EspMenu, EspMenu, 8, 8);
 		SetupSubMenu(&options.HostOnly, HostOnly, 8, 8);
+		SetupSubMenu(&options.MiscView, MiscVisuals, 8, 8);
+		SetupSubMenu(&options.SubPlayers, Playersub, 8, 8);
 
 		SetupBool(&options.testing, false);
 		SetupBool(&options.BoolRank, false);
 		SetupBool(&options.IpSpoof, false);
+		SetupBool(&options.AntiFreeze, false);
+		SetupBool(&options.Gradient, false);
 		SetupBool(&options.Tracer, false);
 		SetupBool(&options.HostTab, false);
+		SetupBool(&options.EspFilled, false);
 		SetupBool(&options.XboGodmode, false);
 		SetupBool(&options.Healthbar, false);
 
@@ -221,6 +244,7 @@ namespace BO2
 		SetupBool(&options.NoFlinch, false);
 		SetupBool(&options.ChangeView, false);
 		SetupBool(&options.AimbotToggle, false);
+		SetupBool(&options.AutoWall, false);
 		SetupBool(&options.SilentAim, false);
 		SetupBool(&options.NoSpread, false);
 		SetupBool(&options.AimRequired, false);
@@ -231,6 +255,7 @@ namespace BO2
 		SetupBool(&options.Radar, false);
 		SetupBool(&options.CircleRadar, false);
 		SetupBool(&options.ChangeView, false);
+		SetupBool(&options.EspNames, false);
 		SetupBool(&options.EspFrogChan, false);
 		SetupBool(&options.EndGame, false);
 		SetupBool(&options.Scoreboard, false);
@@ -238,6 +263,7 @@ namespace BO2
 		SetupBool(&options.Laser, false);
 		SetupBool(&options.AntiBetty, false);
 		SetupBool(&options.Wallhack, false);
+		SetupBool(&options.RGB, false);
 		SetupBool(&options.AutoShoot, false);
 
 	}
@@ -280,9 +306,10 @@ namespace BO2
 
 	void DrawMenuShader()
 	{
-		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), blue);
+		
+		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), blue, options.Gradient.state ? "gradient_fadein" : "white");
 		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, black);
-		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue);
+		DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue, options.Gradient.state ? "gradient_fadein" : "white");
 
 		//ScrollBar
 		if (options.menuScroll <= 7)
@@ -425,6 +452,11 @@ namespace BO3
 			return "fonts/smallFont";
 	}
 
+	const char* AimTag(int index)
+	{
+		return Bones[index];
+	}
+
 	int R_TextHeight(Font* font)
 	{
 		return font->pixelHeight;
@@ -442,7 +474,7 @@ namespace BO3
 		if (align == align_center)
 			x = x - (fontA / 2);
 
-		R_AddCmdDrawText_test(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, color, 0);
+		R_AddCmdDrawText_Bo3_Version(text, strlen(text), R_RegisterFont(font), x, y, fontSize, fontSize, color, 0);
 	}
 
 
@@ -458,11 +490,33 @@ namespace BO3
 		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
 		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
 	}
+	void BoundingBoxFilled(float x, float y, float width, float height, float* color, float thickness)
+	{
+		DrawShader(x - thickness, y - thickness, width + (thickness * 2), thickness, color); // Top
+		DrawShader(x - thickness, y + height, width + (thickness * 2), thickness, color); // Bottom
+		DrawShader(x - thickness, y - thickness, thickness, height + thickness, color); // Left
+		DrawShader(x + width, y - thickness, thickness, height + (thickness * 2), color); // Right
+		DrawShader(x - thickness, y - thickness, width, height + (thickness * 2), white2); // Filled
+	}
+	void DrawTextInBox(const char* text, int x, int y, int w, int h) {
+		DrawShader(x, y, w, h, black);
+		BoundingBox(x, y, w, h, blue, 1);
+		DrawText(text, x + 5, y + h - 5, "fonts/normalfont", 0.65, white);
+	}
 
+	void HealthBar(float x, float y, float w) {
+		std::uint8_t health = Cinfo[cgGame->MyClientNum].Health;
+		std::uint8_t maxHealth = 100;
+		float* healthColor = (health < 30) ? Red : (health < 70) ? Yellow : Green;
+
+		//R_AddCmdDrawText_Bo3_Version(va("Health: %i/%i", Cinfo->Health, Cinfo->Health), strlen(va("Health: %i/%i", Cinfo->Health, Cinfo->Health)), R_RegisterFont("fonts/normalfont"), x, y - 40, 0.6, 0.6, black, 0);
+		DrawShader(x - w, y - health * 1.75 / 2, w, health * 1.75, healthColor);
+	}
 
 	void SetupVariables()
 	{
 		int numFonts = 5;
+		int NumBones = sizeof(Bones);
 
 		options.menuOpen = false;
 		options.isInSubMenu = false;
@@ -477,15 +531,24 @@ namespace BO3
 		SetupInt(&options.menuX, 500, 5, 1280, 0, 1);
 		SetupInt(&options.menuY, 205, 205, 500, 0);
 		SetupInt(&options.menuBorder, 4, 4, 20, 1);
+		SetupInt(&options.ShaderBlue, 255, 215, 255, 0);
+		SetupInt(&options.ShaderGreen, 0, 215, 255, 0);
+		SetupInt(&options.ShaderRed, 255, 215, 255, 0);
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
+		SetupInt(&options.MenuAimTargetIndex, 0, 4, NumBones, 0);
+		SetupInt(&options.Fov, 65, 65, 150, 0);
+
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 
 		SetupBool(&options.EspBones, false);
+		SetupBool(&options.Healthbar, false);
+		SetupBool(&options.EndGame, false);
 		SetupBool(&options.EspHeart, false);
+		SetupBool(&options.EspBox, false);
 		SetupBool(&options.EspHealth, false);
 		SetupBool(&options.EspNames, false);
+		SetupBool(&options.EspFilled, false);
 		SetupBool(&options.EspSnap, false);
-
 		SetupBool(&options.NoRecoil, false);
 		SetupBool(&options.NoSway, false);
 		SetupBool(&options.OverHeadNames, false);
@@ -501,7 +564,7 @@ namespace BO3
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current;
 		int textWidth = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
 		int textShaderW = Textwidth("Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.6 + 20;
-		DrawText("Shake BO3", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
+		DrawText("Shake", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == MAIN)
@@ -582,7 +645,31 @@ namespace BO3
 		AddBoolMenuOptionToList(value);
 		options.menuOptionIndex++;
 	}
+	void DrawToggleWithDescription(const char* text, BoolMenuOption* value, const char* Desc)
+	{
+		options.menuMaxScroll++;
 
+		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current;
+
+		DrawText(text, 5 + options.menuX.current + 5, options.menuY.current + 38 + textHeight + (options.menuOptionIndex * textHeight), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+		DrawText(Desc, 5 + options.menuX.current + 5, options.menuY.current - 12 + 50 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, white);
+
+		DrawShader(options.menuX.current + options.menuWidth - options.menuBorder.current - 12 - 2 + 25, options.menuY.current + 31 + (options.menuOptionIndex * textHeight) + ((textHeight - 12) / 2) + (options.menuBorder.current * 2), 12, 12, black);
+		DrawShader(options.menuX.current + options.menuWidth - options.menuBorder.current - 10 - 3 + 25, options.menuY.current + 31 + (options.menuOptionIndex * textHeight) + ((textHeight - 10) / 2) + (options.menuBorder.current * 2), 10, 10, value->state ? white : black);
+		BoundingBox(options.menuX.current + options.menuWidth - options.menuBorder.current - 12 - 2 + 25, options.menuY.current + 31 + (options.menuOptionIndex * textHeight) + ((textHeight - 12) / 2) + (options.menuBorder.current * 2), 12, 12, white, 1);
+
+		if (!value->state)
+		{
+			value->scrollIndex = options.menuOptionIndex;
+			AddBoolMenuOptionToList(value);
+			options.menuOptionIndex++;
+			return;
+		}
+
+		value->scrollIndex = options.menuOptionIndex;
+		AddBoolMenuOptionToList(value);
+		options.menuOptionIndex++;
+	}
 	void DrawIntSlider(const char* text, IntMenuOption* value, const char* fmt)
 	{
 		options.menuMaxScroll++;
@@ -602,7 +689,21 @@ namespace BO3
 		AddIntMenuOptionToList(value);
 		options.menuOptionIndex++;
 	}
+	void DrawSubMenu(const char* text, SubMenuMenuOption* option, int newMenu, bool enabled) {
 
+		options.menuMaxScroll++;
+
+		int textWidth = Textwidth(text, 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current)),0) * options.menuFontSize.current;
+		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current;
+
+		DrawText(text, options.menuX.current + options.menuBorder.current + 5, options.menuY.current + textHeight + options.menuTabHeight + (options.menuOptionIndex * textHeight) + (options.menuBorder.current * 2), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, option->enabled ? white : black);
+		DrawText("->>", options.menuX.current + options.menuWidth - options.menuBorder.current - Textwidth("->>", 0x7FFFFFFF, R_RegisterFont(FontForIndex(options.menuFontIndex.current)),0) * options.menuFontSize.current - 6, options.menuY.current + textHeight + options.menuTabHeight + (options.menuOptionIndex * textHeight) + (options.menuBorder.current * 2), FontForIndex(options.menuFontIndex.current), options.menuFontSize.current, option->enabled ? white : black);
+
+		SetupSubMenu(option, newMenu, options.menuPageIndex, options.menuOptionIndex, enabled);
+		option->scrollIndex = options.menuOptionIndex;
+		AddSubMenuMenuOptionToList(option);
+		options.menuOptionIndex++;
+	}
 	void DrawStringSlider(const char* text, IntMenuOption* value, const char* string)
 	{
 		options.menuMaxScroll++;

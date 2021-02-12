@@ -56,6 +56,9 @@
     <ClCompile Include="Ghost.cpp">
       <Filter>ghost</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>BO2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -101,6 +104,9 @@
       <Filter>ghost</Filter>
     </ClInclude>
     <ClInclude Include="Models.h">
+      <Filter>BO2</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
       <Filter>BO2</Filter>
     </ClInclude>
   </ItemGroup>
