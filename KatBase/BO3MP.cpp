@@ -40,8 +40,7 @@ namespace BO3
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
-				if (!strcmp(Cinfo[i].Name, ""))
-					DrawButton("N/A");
+				if (!strcmp(Cinfo[i].Name, "")) {}
 				else
 					DrawButton(va("[%i] %s [%s]", i, Cinfo[i].Name, isTeam(i) ? "^2Friendly^7" : "^1Enemy^7"));
 			}
@@ -167,7 +166,7 @@ namespace BO3
 	}
 
 	void ServerInfo() {
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		DrawTextInBox("Shake Beta v1.0.1", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Resolution: %i x %i", cgDC->screenWidth, cgDC->screenHeight), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, Textwidth(va("Resolution:%i : %i", cgDC->screenWidth, cgDC->screenHeight), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 2, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 71, Textwidth(va("Fps: %.f", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 10, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Ping: %ims", cgGame->Ping), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 104, Textwidth(va("Ping: %ims.", cgGame->Ping), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
@@ -186,106 +185,114 @@ namespace BO3
 			options.EndGame.state = false;
 		}
 	}
-	void R_RenderScene()
-	{
-		MinHook[1].Stub();
-		readStructs();
+
+	void Esp() {
+
 		vec2_t BoxPos, BoxPos2, Screen, Screen2, Spine;
 		vec2_t head = vec2_t();
 
 		const char* Tag = "j_head";
 
-		if (inGame) {
-			for (int i = 0; i < 18; i++) {
+		for (int i = 0; i < 18; i++) {
 
-				if (!(cg_entitiesArray[i].EType == 1))
-					continue;
+			if (!(cg_entitiesArray[i].EType == 1))
+				continue;
 
-				if (!(cg_entitiesArray[i].ClientNum != 0))
-					continue;
+			if (!(cg_entitiesArray[i].ClientNum != cgGame->MyClientNum))
+				continue;
 
-				if (Cinfo[i].Health < 1)
-					continue;
+			if (Cinfo[i].Health < 1)
+				continue;
 
-				if (!WorldToScreen(0, cg_entitiesArray[i].Origin, &BoxPos))
-					continue;
+			if (!WorldToScreen(0, cg_entitiesArray[i].Origin, &BoxPos))
+				continue;
 
-				if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
-					continue;
+			if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
+				continue;
 
-				if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
-					continue;
+			if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
+				continue;
 
-				vec3_t headPos = AimTarget_GetTagPos(i, Tag);
-				vec3_t origin = cg_entitiesArray[i].Origin;
+			vec3_t headPos = AimTarget_GetTagPos(i, Tag);
+			vec3_t origin = cg_entitiesArray[i].Origin;
 
-				headPos.z += 10;
-				origin.z -= 5;
+			headPos.z += 10;
+			origin.z -= 5;
 
-				if (!WorldToScreen(0, headPos, &head))
-					continue;
+			if (!WorldToScreen(0, headPos, &head))
+				continue;
 
-				float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
-				float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
+			float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
+			float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
 
-				float playerHeight = fabsf(head.y - BoxPos.y);
-				float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
+			float playerHeight = fabsf(head.y - BoxPos.y);
+			float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
 
-				//SoulsAmazingStar Esp
-				/*if (options.EspStar.state)
-					SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
+			//SoulsAmazingStar Esp
+			/*if (options.EspStar.state)
+				SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
 
-					//Souls amazing heart esp
-				if (options.EspHeart.state)
-					drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
-				//Esp box
-				if (options.EspBox.state)
-					BoundingBox(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
-				//Esp Name
-				if (options.EspNames.state)
-					DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, FontForIndex(options.menuFontIndex.current), 0.6, white, align_center);
-				//Esp Health
-				if (options.EspHealth.state)
-					ESP_ClientHealth(i);
+				//Souls amazing heart esp
+			if (options.EspHeart.state)
+				drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
+			//Esp box
+			if (options.EspBox.state)
+				BoundingBox(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
+			//Esp Name
+			if (options.EspNames.state)
+				DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, FontForIndex(options.menuFontIndex.current), 0.6, white, align_center);
+			//Esp Health
+			if (options.EspHealth.state)
+				ESP_ClientHealth(i);
 
-				//SnapLines
-				if (options.EspSnap.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, isTeam(i) ? Green : Red, 2);
-				if (options.EspFilled.state)
-					BoundingBoxFilled(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
-				//Bones
-				for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
-					if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
-						if (options.EspBones.state)
-							DrawLine(vec2_t(Screen.x, Screen.y), vec2_t(Screen2.x, Screen2.y), white, 2);
-					}
+			//SnapLines
+			if (options.EspSnap.state)
+				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, isTeam(i) ? Green : Red, 2);
+			if (options.EspFilled.state)
+				BoundingBoxFilled(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
+			//Bones
+			for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
+				if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
+					if (options.EspBones.state)
+						DrawLine(vec2_t(Screen.x, Screen.y), vec2_t(Screen2.x, Screen2.y), blue, 2);
 				}
 			}
-
-			*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
-			//No recoil
-			*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
-			//No Sway
-			*(uint32_t*)0x82201008 = options.NoSway.state ? 0x60000000 : 0x4BFFE659;
-
-			if (options.Healthbar.state)
-				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
-			if (options.EndGame.state)
-				EndRound();
-
-			FovSlider(options.Fov.current);
-			ServerInfo();
-			DrawTracer();
 		}
+
+
+	}
+
+	void Menu_PaintAll()
+	{
+		MinHook[3].Stub();
+		readStructs();
+
+		if (inGame)
+			Esp();
 
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
+
+		*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
+		//No recoil
+		*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
+		//No Sway
+		*(uint32_t*)0x82201008 = options.NoSway.state ? 0x60000000 : 0x4BFFE659;
+
+		if (options.Healthbar.state)
+			HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
+		if (options.EndGame.state)
+			EndRound();
+
+		FovSlider(options.Fov.current);
+		DrawTracer();
+			ServerInfo();
 	}
 
 
 	void CL_ReadyToSendPacket(int local) {
-		MinHook[2].Stub(local);
+		MinHook[1].Stub(local);
 		readStructs();
 		doAimbot();
 
@@ -309,7 +316,7 @@ namespace BO3
 
 	void CG_BulletHitEvent(int localClientNum, int sourceEntityNum, int targetEntityNum, int weapon, vec3_t* startPos, vec3_t* position, vec3_t* normal, vec3_t* seeThruDecalNormal, int surfType, int event, int eventParam, int hitContents, char boneIndex)
 	{
-		MinHook[3].Stub(localClientNum, sourceEntityNum, targetEntityNum, weapon, startPos, position, normal, seeThruDecalNormal, surfType, event, eventParam, hitContents, boneIndex);
+		MinHook[2].Stub(localClientNum, sourceEntityNum, targetEntityNum, weapon, startPos, position, normal, seeThruDecalNormal, surfType, event, eventParam, hitContents, boneIndex);
 		readStructs();
 
 		if (sourceEntityNum == cgGame->MyClientNum) {

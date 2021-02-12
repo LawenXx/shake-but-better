@@ -25,7 +25,7 @@ DWORD CheckUnload()
 	return 0;
 }
 void checkTitleId(std::uintptr_t id)
-{	
+{
 	CurrentId = id;
 
 	switch (id)
@@ -73,10 +73,13 @@ void checkTitleId(std::uintptr_t id)
 		BO3::InitAddress();
 		BO3::SetupVariables();
 
+		*(int*)0x826B818C = 0x60000000;
+		*(int*)0x826B81D0 = 0x60000000;
+
 		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
-		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
-		MinHook[2] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
-		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
+		MinHook[1] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
+		MinHook[2] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
+		MinHook[3] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::Menu_PaintAll, true);
 		break;
 	case COD_GHOSTS:
 		while (*(int*)Ghost::XamInputGetKeyState == 0)
@@ -84,7 +87,7 @@ void checkTitleId(std::uintptr_t id)
 			Sleep(100);
 		}
 		XNotify("Shake [Ghost] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
-		
+
 		Ghost::InitAddress();
 		Ghost::SetupVariables();
 

@@ -246,7 +246,7 @@ namespace BO2
 		}
 	}
 	void FovSlider(int fov) {
-		Cbuf_AddText(0, va("cg_fov %i", fov));
+		Cbuf_AddText(cgGame->clientNum, va("cg_fov %i", fov));
 	}
 }
 
@@ -350,7 +350,7 @@ namespace BO3
 		}
 	}
 	void FovSlider(int fov) {
-		Cbuf_AddText(0, va("cg_fov %i", fov));
+		Cbuf_AddText(cgGame->MyClientNum, va("cg_fov %i", fov));
 	}
 	int Com_ClientDObj(int ClientNum, int LocalPlayer)
 	{

@@ -90,7 +90,7 @@ namespace BO2
 	}
 
 	void ServerInfo() {
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox("Shake Beta v1.0.1", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
@@ -154,8 +154,10 @@ namespace BO2
 		return false;
 	}
 	bool CanShootThroughWall(int i, const char* tag) {
-		if (cg_entitiesArray[i].nextState.Alive)
-			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
+		if (Dvar_GetBool("cl_ingame")) {
+			if (cg_entitiesArray[i].nextState.Alive)
+				return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
+		}
 	}
 
 	int GetNearestPlayer(int client)
@@ -318,9 +320,11 @@ namespace BO2
 
 	void CL_Disconnect_Hook(int r3, bool r4)
 	{
-		*(int*)0x82717D48 = 0x91370000;
-		*(uint32_t*)0x8222E27C = 0x4BFB829D;
-		*(uint32_t*)0x8222A754 = 0x4BFBBDC5;
+		if (options.AntiFreeze.state) {
+			*(int*)0x82717D48 = 0x91370000;
+			*(uint32_t*)0x8222E27C = 0x4BFB829D;
+			*(uint32_t*)0x8222A754 = 0x4BFBBDC5;
+		}
 		MinHook[7].Stub(r3, r4);
 	}
 
