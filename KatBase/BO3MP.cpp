@@ -17,17 +17,23 @@ namespace BO3
 		case MAIN:
 			DrawToggle("No Recoil", &options.NoRecoil);
 			DrawToggle("No Sway", &options.NoSway);
-			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
+			DrawToggle("End Game", &options.EndGame);
 			break;
 		case AIMBOT:
 			DrawToggle("Aimbot", &options.Aimbot);
+			//	DrawToggleWithDescription("Aimbot", &options.Aimbot, "Bullets go pew pew");
+			DrawStringSlider("AimTag", &options.MenuAimTargetIndex, AimTag(options.MenuAimTargetIndex.current));
 			DrawToggle("AutoShoot", &options.AutoShoot);
 			break;
 		case VISUALS:
-			DrawToggle("Esp BoxFrog", &options.EspHeart);
+			DrawToggle("Healthbar", &options.Healthbar);
+			DrawIntSlider("Fov", &options.Fov, "%i");
+			DrawToggle("Esp Box", &options.EspBox);
+			DrawToggle("Esp Box Filled", &options.EspFilled);
 			DrawToggle("Esp Bones", &options.EspBones);
 			DrawToggle("Esp Snaplines", &options.EspSnap);
 			DrawToggle("Esp Names", &options.EspNames);
+			DrawToggle("Esp Heart", &options.EspHeart);
 			DrawToggle("Esp Healthbar", &options.EspHealth);
 			DrawToggle("OverHeadNames", &options.OverHeadNames);
 			DrawToggle("Tracer Rounds", &options.Tracers);
@@ -43,6 +49,7 @@ namespace BO3
 		case SETTINGS:
 			DrawIntSlider("MenuX", &options.menuX, "%i");
 			DrawIntSlider("MenuY", &options.menuY, "%i");
+			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		}
 	}
@@ -65,6 +72,15 @@ namespace BO3
 		CG_DrawRotatedPicPhysical(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
 	}
 
+	void DrawLineGFX(vec2_t start, vec2_t end, GfxColor* color, float size)
+	{
+		vec2_t  delta = start - end;
+		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
+		vec_t length = delta.Length();
+		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
+		CG_DrawRotatedPicPhysical_GFX(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
+	}
+
 	void drawBones(Centity* entity, float* color)
 	{
 		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
@@ -75,12 +91,13 @@ namespace BO3
 
 		}
 	}
-	std::vector<cTracer> GlobalTrace;
 
 	float deltaFade(int ms, int tracerTime)
 	{
 		return float(1 - (cgGame->CmdTime - tracerTime) / ms);
 	}
+
+	std::vector<cTracer> GlobalTrace;
 	void DrawTracer() {
 		if (options.Tracers.state) {
 			auto it = GlobalTrace.begin();
@@ -90,8 +107,8 @@ namespace BO3
 				vec2_t Start2D = vec2_t();
 				WorldToScreen(0, it->hit3D, &Hit2D);
 				WorldToScreen(0, it->start3D, &Start2D);
-
-				DrawLine(Hit2D, Start2D, blue, 2);
+				//DrawLineGFX(Hit2D, Start2D, Col, 2);
+				DrawLine(Hit2D, Start2D, blue, 1.7);
 				//SoulStar(Hit2D.x, Hit2D.y, 40, 40, 2, Black2);
 				if (deltaFade(2000, it->startTime) <= 0)
 					it = GlobalTrace.erase(it);
@@ -114,7 +131,7 @@ namespace BO3
 			if (i != cgGame->MyClientNum) {
 				if (!isTeam(i)) {
 					if (Cinfo[i].Health > 0) {
-						if (AimTarget_IsVisible(AimTarget_GetTagPos(i, "j_neck"), i)) {
+						if (AimTarget_IsVisible(AimTarget_GetTagPos(i, AimTag(options.MenuAimTargetIndex.current)), i)) {
 							float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
 
 							if (Distance < max)
@@ -138,7 +155,7 @@ namespace BO3
 			int Nearest = GetNearestPlayer();
 			if (Cinfo[Nearest].Health > 0) {
 				if (Nearest != -1) {
-					vec3_t Bone = AimTarget_GetTagPos(Nearest, "j_neck");
+					vec3_t Bone = AimTarget_GetTagPos(Nearest, AimTag(options.MenuAimTargetIndex.current));
 					vec3_t Angle = Bone - Ref->ViewOrigin;
 					VecToAngels(Angle, anglesOut);
 					ClientActive->ViewAngles = anglesOut - ClientActive->SpawnAngles;
@@ -149,11 +166,32 @@ namespace BO3
 		}
 	}
 
+	void ServerInfo() {
+		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		DrawTextInBox(va("Resolution: %i x %i", cgDC->screenWidth, cgDC->screenHeight), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, Textwidth(va("Resolution:%i : %i", cgDC->screenWidth, cgDC->screenHeight), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 2, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 71, Textwidth(va("Fps: %.f", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 10, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		DrawTextInBox(va("Ping: %ims", cgGame->Ping), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 104, Textwidth(va("Ping: %ims.", cgGame->Ping), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+
+		if (options.menuOpen)
+			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, Textwidth("Press ^BXENONButtonB^ To ^1Close ^7The Menu..", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		else
+			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, Textwidth("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu.", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+	}
+	bool round = false;
+	void EndRound() {
+		round = true;
+		if (round) {
+			Cbuf_AddText(0, va("cmd mr %i 3 endround", *(int*)0x83067AE0));
+			round = false;
+			options.EndGame.state = false;
+		}
+	}
 	void R_RenderScene()
 	{
 		MinHook[1].Stub();
 		readStructs();
 		vec2_t BoxPos, BoxPos2, Screen, Screen2, Spine;
+		vec2_t head = vec2_t();
 
 		const char* Tag = "j_head";
 
@@ -174,29 +212,47 @@ namespace BO3
 
 				if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
 					continue;
+
 				if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
+					continue;
+
+				vec3_t headPos = AimTarget_GetTagPos(i, Tag);
+				vec3_t origin = cg_entitiesArray[i].Origin;
+
+				headPos.z += 10;
+				origin.z -= 5;
+
+				if (!WorldToScreen(0, headPos, &head))
 					continue;
 
 				float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
 				float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
 
+				float playerHeight = fabsf(head.y - BoxPos.y);
+				float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
+
 				//SoulsAmazingStar Esp
 				/*if (options.EspStar.state)
 					SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
-				//Souls amazing heart esp
+
+					//Souls amazing heart esp
 				if (options.EspHeart.state)
-					drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, Red, Red);
+					drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
+				//Esp box
+				if (options.EspBox.state)
+					BoundingBox(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
 				//Esp Name
 				if (options.EspNames.state)
-					DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, "fonts/normalfont", 0.6, black, align_center);
+					DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, FontForIndex(options.menuFontIndex.current), 0.6, white, align_center);
 				//Esp Health
 				if (options.EspHealth.state)
 					ESP_ClientHealth(i);
 
 				//SnapLines
 				if (options.EspSnap.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, Red, 2);
-
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, isTeam(i) ? Green : Red, 2);
+				if (options.EspFilled.state)
+					BoundingBoxFilled(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
 				//Bones
 				for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
 					if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
@@ -205,14 +261,20 @@ namespace BO3
 					}
 				}
 			}
-		*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
-		//No recoil
-		*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
-		//No Sway
-		*(uint32_t*)0x82201008 = options.NoSway.state ? 0x60000000 : 0x4BFFE659;
 
-		
-			doAimbot();
+			*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
+			//No recoil
+			*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
+			//No Sway
+			*(uint32_t*)0x82201008 = options.NoSway.state ? 0x60000000 : 0x4BFFE659;
+
+			if (options.Healthbar.state)
+				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
+			if (options.EndGame.state)
+				EndRound();
+
+			FovSlider(options.Fov.current);
+			ServerInfo();
 			DrawTracer();
 		}
 
@@ -221,9 +283,12 @@ namespace BO3
 			DrawMenu();
 	}
 
+
 	void CL_ReadyToSendPacket(int local) {
 		MinHook[2].Stub(local);
 		readStructs();
+		doAimbot();
+
 		userCmd_t* curCmd = &UserCmd[ClientActive->cmdnumber & 0x7F];
 		userCmd_t* oldCmd = &UserCmd[(ClientActive->cmdnumber - 1) & 0x7F];
 
@@ -309,6 +374,8 @@ namespace BO3
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
+				options.menuScroll = 0;
+
 				if (options.menuPageIndex < 5)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
@@ -317,6 +384,7 @@ namespace BO3
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_LEFT_SHOULDER))
 			{
+				options.menuScroll = 0;
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)

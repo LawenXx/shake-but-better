@@ -1,13 +1,3 @@
-﻿  pch.cpp
-  BO2MP.cpp
-  BO3MP.cpp
-  DllMain.cpp
-  Funtions.cpp
-  Ghost.cpp
-  Minecraft.cpp
-  menu.cpp
-  menuFunctions.cpp
-  utilites.cpp
-  vector.cpp
+﻿  DllMain.cpp
   Generating code
   Finished generating code

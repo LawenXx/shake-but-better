@@ -238,6 +238,7 @@
     <ClInclude Include="BO3MP.h" />
     <ClInclude Include="Funtions.h" />
     <ClInclude Include="Ghost.h" />
+    <ClInclude Include="Image.h" />
     <ClInclude Include="kernel.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="menuFunctions.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Funtions.cpp" />
     <ClCompile Include="Ghost.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="menuFunctions.cpp" />
     <ClCompile Include="Minecraft.cpp" />
