@@ -167,7 +167,7 @@ namespace BO3
 	}
 
 	void ServerInfo() {
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Resolution: %i x %i", cgDC->screenWidth, cgDC->screenHeight), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, Textwidth(va("Resolution:%i : %i", cgDC->screenWidth, cgDC->screenHeight), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 2, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 71, Textwidth(va("Fps: %.f", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 10, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 		DrawTextInBox(va("Ping: %ims", cgGame->Ping), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 104, Textwidth(va("Ping: %ims.", cgGame->Ping), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
@@ -186,7 +186,7 @@ namespace BO3
 			options.EndGame.state = false;
 		}
 	}
-	void R_RenderScene()
+	HRESULT R_RenderScene()
 	{
 		MinHook[1].Stub();
 		readStructs();
@@ -281,6 +281,8 @@ namespace BO3
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
+
+		return S_OK;
 	}
 
 

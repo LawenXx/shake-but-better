@@ -2,6 +2,7 @@
 
 namespace BO2
 {
+	HANDLE Thread;
 	void DrawMenuText()
 	{
 		options.menuMaxScroll = 0;
@@ -27,7 +28,7 @@ namespace BO2
 			DrawToggle("External Circle Radar", &options.CircleRadar);
 			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
 			DrawToggle("AntiFreeze", &options.AntiFreeze);
-			//DrawToggle("Test", &options.NoFlinch);
+			DrawToggle("Test", &options.NoFlinch);
 			if (cgGame->clientNum == 0)
 				DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
 			break;
@@ -90,7 +91,7 @@ namespace BO2
 	}
 
 	void ServerInfo() {
-		DrawTextInBox("Shake Beta v1.0.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
@@ -154,7 +155,6 @@ namespace BO2
 		return false;
 	}
 	bool CanShootThroughWall(int i, const char* tag) {
-		if (cg_entitiesArray[i].nextState.Alive)
 			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
 	}
 
@@ -292,9 +292,8 @@ namespace BO2
 
 	void TargetDetails() {
 		int nearest = GetNearestPlayer(cgGame->clientNum);
-		DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("%s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - R_TextWidth(0, va("%s", cgGame->clientInfo->name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-
+				DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+				DrawTextInBox(va("%s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - R_TextWidth(0, va("%s", cgGame->clientInfo->name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 	}
 
 	void CL_ConsolePrintHook(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags) {
@@ -302,7 +301,7 @@ namespace BO2
 
 		if (options.AntiFreeze.state) {
 			if (strstr(txt, "[{+}]") || strstr(txt, "KEY_UNBOUND")
-				|| strstr(txt, "^H") || strstr(txt, "KEYUNBOUND")) {
+				|| strstr(txt, "^H") || strstr(txt, "KEYUNBOUND") || strstr(txt, "^B{}")) {
 
 				//^H crash location
 				*(uint32_t*)0x82717D48 = 0x60000000;
@@ -324,11 +323,41 @@ namespace BO2
 		MinHook[7].Stub(r3, r4);
 	}
 
+	const char* Keyboard(LPCWSTR DefaultText, LPCWSTR TitleText, LPCWSTR DescriptionText, DWORD Length) {
+		XOVERLAPPED Overlapped;
+		WCHAR KeyboardText[0x200];
+		char Return[0x100];
+		ZeroMemory(&Overlapped, sizeof(Overlapped));
+		XShowKeyboardUI(0, 0, DefaultText, TitleText, DescriptionText, KeyboardText, Length, &Overlapped);
+
+		while (!XHasOverlappedIoCompleted(&Overlapped))
+			Sleep(50);
+		wcstombs(Return, KeyboardText, Length);
+		strcpy((char*)0x841E1B30, Return);
+		strcpy((char*)0x82C55D60, Return);
+		return Return;
+	}
+	void keyboard_hook() {
+		int error;
+		const char* cmd = Keyboard(L"", L"Custom Command", L"Enter a command", 0x20);
+
+		if (error == 0) {
+			printf("%s\n", cmd);
+			strcpy((char*)0x841E1B30, cmd);
+			strcpy((char*)0x82C55D60, cmd);
+		}
+	}
+	void keyboard_thread(HANDLE) {
+		ExCreateThread(&Thread, 0, 0, 0, (LPTHREAD_START_ROUTINE)keyboard_hook, 0, 0);
+		XSetThreadProcessor(Thread, 4);
+		ResumeThread(Thread);
+	}
+
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
 		ReadStructs();
-
+	
 		if (Dvar_GetBool("cl_ingame"))
 		{
 			Esp();
@@ -338,6 +367,7 @@ namespace BO2
 			*(uint32_t*)0x826C7A7C = options.NoSway.state ? 0x60000000 : 0x4BFFFA857F;
 			*(uint32_t*)0x821fc04c = options.Wallhack.state ? 0x38C0FFFF : 0x7FA6EB78;
 			*(uint32_t*)0x83c56038 = options.Wallhack.state ? 0xF51F0000DF : 0x3F800000;
+			*(uint32_t*)0x826BB50C = options.NoSpread.state ? 0x39600002 : 0x817B01EC;
 
 			if (options.Healthbar.state)
 				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
@@ -350,36 +380,21 @@ namespace BO2
 			SpoofLevel();
 			TargetDetails();
 		}
-
+		if (options.NoFlinch.state) {
+			keyboard_thread(Thread);
+			CloseHandle(Thread);
+			options.NoFlinch.state = false;
+		}
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
-
 		ServerInfo();
 	}
-	void Keyboard() {
-		XOVERLAPPED Overlapped;
-		WCHAR CMDText[512];
-		char CMDBuffer[512];
-		char CMD[512];
-
-		if (options.NoFlinch.state) {
-
-			ZeroMemory(&Overlapped, sizeof(Overlapped));
-			XShowKeyboardUI(0, VKBD_DEFAULT, L"", L"Text", L"Enter text here", CMDText, 512, &Overlapped);
-
-			wcstombs(CMDBuffer, CMDText, 512);
-			sprintf(CMD, "s \"%s\"", CMDBuffer);
-
-			DrawTextInBox(va(CMD, "s \"%s\"", CMDBuffer), cgDC->CenterX(), cgDC->CenterY(), 100, 20);
-
-			options.NoFlinch.state = false;
-		}
-	}
+	
 	HRESULT RenderScene(DWORD a1) {
 		MinHook[4].Stub(a1);
-		if (options.EndGame.state)
 
+		
 			return S_OK;
 	}
 	void Rgb() {
@@ -437,8 +452,8 @@ namespace BO2
 				}
 			}
 
-			if (options.NoSpread.state)
-				NoSpread(Cmd, oldCmd);
+			if (options.NoSpread.state) 
+				NoSpread(Cmd, oldCmd);			
 
 			bool betty = false;
 			for (int i = 0; i < 2048; i++) {
