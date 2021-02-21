@@ -6,6 +6,8 @@ namespace Minecraft {
 		if (yes > 0) {
 			printf("Fuck Off Davide");
 			printf("Fuck Off Zone");
+			printf("Fuck Off Kontrol");
+			printf("Why you looking here lol");
 		}
 	}
 

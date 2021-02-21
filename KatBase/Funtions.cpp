@@ -20,7 +20,7 @@ CG_LocationTrace_t CG_LocationTrace;
 R_TextWidth_fookinreeko Textwidth;
 BG_GetFactionForTeam_t BG_GetFactionForTeam;
 BG_seedRandWithGameTime_t BG_seedRandWithGameTime;
-G_GetSpreadForWeapon_t G_GetSpreadForWeapon;
+BG_GetSpreadForWeapon_t BG_GetSpreadForWeapon;
 AngleVectors_t AngleVectors;
 R_TextWidth_iw R_TextWidthIW;
 CG_GetPredictedPlayerState_t CG_GetPredictedPlayerState;
@@ -34,6 +34,7 @@ R_RegisterModel_t R_RegisterModel;
 Hunk_SetDataForFile_t Hunk_SetDataForFile;
 CL_ConsolePrint_t CL_ConsolePrint;
 CG_DrawRotatedPicPhysical_GFX_t CG_DrawRotatedPicPhysical_GFX;
+AimTarget_GetTagPos_Ghost_t AimTarget_GetTagPos_Ghost;
 
 float white[] = { 1,1,1,1 };
 float white2[] = { 1,1,1,0.3 };
@@ -50,7 +51,7 @@ namespace BO2
 	UIContext* cgDC;
 	cg_s* cgGame;
 	Cgs_t* cgServer;
-	centity_tBo2* cg_entitiesArray;
+	Centity* cg_entitiesArray;
 	ClientActive_t* ClientActive;
 	gentity_t* g_entitiesArray;
 	Usercmd_t UserCmd;
@@ -75,7 +76,7 @@ namespace BO2
 		VecToAngels = vectoAngles_t(0x8248A470);
 		BG_GetFactionForTeam = BG_GetFactionForTeam_t(0x821A6AA8);
 	//	BG_seedRandWithGameTime = BG_seedRandWithGameTime_t(0x826961B8);
-		G_GetSpreadForWeapon = G_GetSpreadForWeapon_t(0x826BB4E0);
+		BG_GetSpreadForWeapon = BG_GetSpreadForWeapon_t(0x826BB4E0);
 		AngleVectors = AngleVectors_t(0x8248E408);
 		CG_GetPredictedPlayerState = CG_GetPredictedPlayerState_t(0x821E64E0);
 		Cbuf_AddText = Cbuf_AddText_t(0x824015E0);
@@ -92,7 +93,7 @@ namespace BO2
 	{
 		cgDC = (UIContext*)MP_UIContext;
 		cgGame = *(cg_s**)MP_CG;
-		cg_entitiesArray = *(centity_tBo2**)MP_Centitiy;
+		cg_entitiesArray = *(Centity**)MP_Centitiy;
 		ClientActive = *(ClientActive_t**)0x82C70F4C;
 		g_entitiesArray = (gentity_t*)0x833D0640;
 		cgServer = *(Cgs_t**)0x82BBAE44;
@@ -146,7 +147,7 @@ namespace BO2
 	{
 		float minSpread = 0.0f, maxSpread = 0.0f, totalSpread = 0.0f;
 
-		G_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
+		BG_GetSpreadForWeapon(CG_GetPredictedPlayerState(0), cg_entitiesArray[cgGame->clientNum].WeaponID, &minSpread, &maxSpread);
 
 		totalSpread = (minSpread + ((maxSpread - minSpread) * (cgGame->weaponSpreadScale * 0.00399956862f)));
 
@@ -169,6 +170,109 @@ namespace BO2
 		}
 	}
 
+	const char* GetWeaponName(int id)
+	{
+		int ids = (int)id;
+		switch (ids)
+		{
+		case 2:
+			return "MP7";
+		case 4:
+			return "PDW-57";
+		case 6:
+			return "Vector K10";
+		case 8:
+			return "MSMC";
+		case 10:
+			return "Chicom CQB";
+		case 12:
+			return "Skorpion EVO";
+		case 14:
+			return "Peacekeeper";
+		case 16:
+			return "MTAR";
+		case 20:
+			return "Type 25";
+		case 24:
+			return "SWAT-556";
+		case 28:
+			return "FAL OSW";
+		case 32:
+			return "M27";
+		case 36:
+			return "SCAR-H";
+		case 40:
+			return "SMR";
+		case 44:
+			return "M8A1";
+		case 48:
+			return "AN-94";
+		case 52:
+			return "R870 MCS";
+		case 53:
+			return "S12";
+		case 54:
+			return "KSG";
+		case 55:
+			return "M1216";
+		case 56:
+			return "MK 48";
+		case 58:
+			return "QBB LSW";
+		case 60:
+			return "LSAT";
+		case 62:
+			return "HAMR";
+		case 64:
+			return "SVU-AS";
+		case 65:
+			return "DSR 50";
+		case 66:
+			return "Ballista";
+		case 67:
+			return "XPR50";
+		case 68:
+			return "KAP-40";
+		case 70:
+			return "Tac-45";
+		case 72:
+			return "Five Seven";
+		case 74:
+			return "Executor";
+		case 76:
+			return "B93R";
+		case 78:
+			return "Five Seven";
+		case 79:
+			return "Tac-45";
+		case 80:
+			return "B93R";
+		case 81:
+			return "Executor";
+		case 82:
+			return "Kard";
+		case 83:
+			return "M32";
+		case 84:
+			return "SMAW";
+		case 85:
+			return "FHJ-18 AA";
+		case 86:
+			return "RPG-7";
+		case 87:
+			return "Knife";
+		case 88:
+			return "Minigun";
+		case 89:
+			return "Riot Shield";
+		case 90:
+			return "Crossbow";
+		case 91:
+			return "Knife Ballist.";
+		default:
+			return "N/A";
+		}
+	}
 
 	DWORD WINAPI ChangeName(LPVOID)
 	{
@@ -195,14 +299,14 @@ namespace BO2
 		CL_AddReliableCommand(0, va("userinfo \"\\name\\%s\"", buffer));
 		return 0;
 	}
-	vec3_t AimTarget_GetTagPos(centity_tBo2* client, const char* tag)
+	vec3_t AimTarget_GetTagPos(Centity* client, const char* tag)
 	{
 		vec3_t _Pos;
 		AimTarget_GetTagPos_0(client, SL_GetString(tag, 0), _Pos);
 		return _Pos;
 	}
 
-	void drawBones(centity_tBo2* entity, float* color)
+	void drawBones(Centity* entity, float* color)
 	{
 		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
 		{
@@ -219,14 +323,14 @@ namespace BO2
 			return false;
 		return dvar_t->current.enabled;
 	}
-	bool isTeam(centity_tBo2* cen)
+	bool isTeam(Centity* cen)
 	{
 		if (CG_IsEntityFriendlyNotEnemy(0, cen))
 			return true;
 		else
 			return false;
 	}
-	bool isDead(centity_tBo2* cen)
+	bool isDead(Centity* cen)
 	{
 		if (!cen->pose.eType == ET_PLAYER_CORPSE)
 			return true;
@@ -273,6 +377,7 @@ namespace BO3
 		Textwidth = (R_TextWidth_fookinreeko)0x824A1000;
 		CG_DrawRotatedPicPhysical_GFX = (CG_DrawRotatedPicPhysical_GFX_t)0x82210468;
 		Cbuf_AddText = (Cbuf_AddText_t)0x8263A6A0;
+		BG_GetSpreadForWeapon = (BG_GetSpreadForWeapon_t)0x821EF330;
 	}
 
 	void readStructs()
@@ -349,6 +454,49 @@ namespace BO3
 			}
 		}
 	}
+	void NoSpreadThread(userCmd_t* cmd) {
+		float SpreadX, SpreadY, MinSpread, MaxSpread;
+	/*	int weapon = cg_entitiesArray[cgGame->MyClientNum].weapon;
+		BG_GetSpreadForWeapon(&cgGame., weapon, &MinSpread, &MaxSpread);
+		float SpreadScale = (cgGame->aimSpreadScale / 255.0f);
+		float SpreadAmount = (MinSpread + ((MaxSpread - MinSpread) * SpreadScale));
+		cmd->viewAngles[0] -= ANGLE2SHORT(SpreadAmount);
+		cmd->viewAngles[1] -= ANGLE2SHORT(SpreadAmount);*/
+	}
+	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
+	{
+		vec2_t  delta = start - end;
+		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
+		vec_t length = delta.Length();
+		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
+		CG_DrawRotatedPicPhysical(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
+	}
+
+	void DrawLineGFX(vec2_t start, vec2_t end, GfxColor* color, float size)
+	{
+		vec2_t  delta = start - end;
+		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
+		vec_t length = delta.Length();
+		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
+		CG_DrawRotatedPicPhysical_GFX(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
+	}
+
+	void drawBones(Centity* entity, float* color)
+	{
+		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
+		{
+			vec2_t Screen, Screen2;
+			if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[i]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[i + 1]), &Screen2))
+				DrawLine(Screen, Screen2, color, 1);
+
+		}
+	}
+
+	float deltaFade(int ms, int tracerTime)
+	{
+		return float(1 - (cgGame->CmdTime - tracerTime) / ms);
+	}
+	
 	void FovSlider(int fov) {
 		Cbuf_AddText(0, va("cg_fov %i", fov));
 	}
@@ -396,6 +544,7 @@ namespace BO3
 namespace Ghost {	
 	CgsArray* CgServer;
 	RefDef* Ref;
+	Centity* cg_entitiesarray;
 
 	void InitAddress() {
 		
@@ -405,12 +554,43 @@ namespace Ghost {
 		R_RegisterFont = R_RegisterFont_t(0x8264DBF0);
 		Material_RegisterHandle = Material_RegisterHandle_t(0x8265A470);
 		R_TextWidthIW = (R_TextWidth_iw)0x8264DC78;
+		SL_GetString = (SL_GetString_t)0x824934A8;
+		AimTarget_GetTagPos_Ghost = (AimTarget_GetTagPos_Ghost_t)0x821379E0;
 	}
 	void ReadStructs() {
 		CgServer = *(CgsArray**)0x82AD56F8;
 		Ref = *(RefDef**)0x82ACCCE8;
-
+		cg_entitiesarray = *(Centity**)0x82AD11AC;
 	}
 	
+	vec3_t AimTarget_GetTagPos(Centity* client, const char* tag)
+	{
+		vec3_t _Pos;
+		AimTarget_GetTagPos_Ghost(client, SL_GetString(tag, 0), _Pos);
+		return _Pos;
+	}
 	
+	bool WorldToScreen(vec3_t point, vec2_t* world)
+	{
+		vec3_t trans;
+		vec_t xc, yc;
+		vec_t px, py;
+		vec_t z;
+
+		px = tan(Ref->FovX * M_PI / 360.0);
+		py = tan(Ref->FovY * M_PI / 360.0);
+
+		trans = point - Ref->Origin;
+
+		xc = Ref->ScreenWidth / 2.0;
+		yc = Ref->ScreenHeight / 2.0;
+
+		z = trans.DotProduct(Ref->ViewAxis[0]);
+		if (z <= 0.001)
+			return false;
+
+		world->x = xc - trans.DotProduct(Ref->ViewAxis[1]) * xc / (z * px);
+		world->y = yc - trans.DotProduct(Ref->ViewAxis[2]) * yc / (z * py);
+		return true;
+	}
 }

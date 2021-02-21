@@ -46,13 +46,14 @@ void checkTitleId(std::uintptr_t id)
 
 		BO2::InitAddress();
 		BO2::SetupVariables();
-		ReadImage();
+		//ReadImage();
 		//cg_hitevent
 		*(DWORD*)(0x822585F8) = 0x60000000;
 
 		//R_EndFrame
 		*(DWORD*)(0x828B9F64) = 0x60000000;
 		*(DWORD*)(0x828B9F68) = 0x60000000;
+		*(int*)0x826A5FBC = 0x60000000;
 
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
@@ -62,6 +63,7 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[5] = MinHook_t(0x828BA040, (std::uint64_t)BO2::Quad_Hook, true);
 		MinHook[6] = MinHook_t(0x82267520, (std::uint64_t)BO2::CL_ConsolePrintHook, true);
 		MinHook[7] = MinHook_t(0x82278A00, (std::uint64_t)BO2::CL_Disconnect_Hook, true);
+		MinHook[8] = MinHook_t(0x825C5330, (std::uint64_t)BO2::LiveStats_Probation_GiveProbation, true);
 		break;
 	case COD_BLACK_OPS_3:
 		while (*(int*)0x82A92094 == 0)
@@ -73,10 +75,14 @@ void checkTitleId(std::uintptr_t id)
 		BO3::InitAddress();
 		BO3::SetupVariables();
 
+		//Nullsub
+		*(DWORD*)(0x82AB0F90) = 0x60000000;
+
 		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
 		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
 		MinHook[2] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
 		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
+		MinHook[4] = MinHook_t(0x822FA708, (std::uint64_t)BO3::PaintAllHook, true);
 		break;
 	case COD_GHOSTS:
 		while (*(int*)Ghost::XamInputGetKeyState == 0)
@@ -88,9 +94,9 @@ void checkTitleId(std::uintptr_t id)
 		Ghost::InitAddress();
 		Ghost::SetupVariables();
 
-		/*MinHook[0] = MinHook_t(Ghost::Menu_PaintAll_MP, (std::uint64_t)Ghost::Menu_Paint_All, true);
+		MinHook[0] = MinHook_t(Ghost::Menu_PaintAll_MP, (std::uint64_t)Ghost::Menu_Paint_All, true);
 		MinHook[1] = MinHook_t(Ghost::XamInputGetKeyState, (std::uint64_t)Ghost::XamInputGetState, false);
-		MinHook[2] = MinHook_t(Ghost::Cl_WritePacket_MP, (std::uint64_t)Ghost::Cl_WritePacket, true);*/
+		MinHook[2] = MinHook_t(Ghost::Cl_WritePacket_MP, (std::uint64_t)Ghost::Cl_WritePacket, true);
 		break;
 	case MINECRAFT:
 		while (*(int*)Minecraft::XamInputGetKeyState == 0)
@@ -110,7 +116,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			if (!firstDash)
 			{
-				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nYoutube/kat xkovx\nThis wouldnt be possible without the help from:\nReeko for making the base\nSmokey xKoVx for wallhack and laser\nSoul for radar", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
+				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nYoutube/kat xkovx\n\nThis wouldnt be possible without the help from:\nReeko for making the base\nSmokey xKoVx for wallhack and laser\nSoul for radar", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
 
 				firstDash = true;
 			}

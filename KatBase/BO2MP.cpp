@@ -18,17 +18,16 @@ namespace BO2
 		case MAIN:
 			DrawToggle("No Recoil", &options.NoRecoil);
 			DrawToggle("No Sway", &options.NoSway);
-			//	DrawToggle("No Flinch", &options.NoFlinch);
 			DrawToggle("No Spread", &options.NoSpread);
 			DrawToggle("Laser", &options.Laser);
-			DrawToggle("IP Spoof", &options.IpSpoof);
 			//DrawToggle("End Round", &options.EndGame);
 			DrawToggle("Crouch On Lethal", &options.AntiBetty);
+			DrawToggle("Change Name", &options.NoFlinch);
+			DrawToggle("IP Spoof", &options.IpSpoof);
+			DrawToggle("AntiFreeze", &options.AntiFreeze);
+			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
 			DrawToggle("External Radar", &options.Radar);
 			DrawToggle("External Circle Radar", &options.CircleRadar);
-			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
-			DrawToggle("AntiFreeze", &options.AntiFreeze);
-			DrawToggle("Test", &options.NoFlinch);
 			if (cgGame->clientNum == 0)
 				DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
 			break;
@@ -72,7 +71,7 @@ namespace BO2
 				if (!strcmp(cgGame->clientInfo[i].name, "")) {}
 				//DrawButton("N/A");
 				else
-					DrawSubMenu(va("[%i] %s [%s]", i, cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"), &options.SubPlayers, Playersub);
+					DrawSubMenu(va("%s [%s]", cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"), &options.SubPlayers, Playersub);
 			}
 			break;
 		case Playersub:
@@ -83,24 +82,39 @@ namespace BO2
 		case SETTINGS:
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
-			DrawToggle("Gradient Menu", &options.Gradient);
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
+			DrawToggle("Gradient Menu", &options.Gradient);
+			DrawSubMenu("Debug Info", &options.Debug, Debug);
+			break;
+		case Debug:
+			DrawToggle("Host", &options.DHost);
+			DrawToggle("Map", &options.DMap);
+			DrawToggle("Gametype", &options.DGame);
+			DrawToggle("Fps", &options.DFps);
+			DrawToggle("Target Details", &options.DTarget);
 			break;
 
 		}
 	}
 
 	void ServerInfo() {
-		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.0.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Map: %s", cgServer->MapName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", cgServer->MapName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("GameType: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g.", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		std::string strMap = cgServer->MapName;
+		strMap.erase(0, 3);
+		const char* map = strMap.c_str();
+		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		if (options.DHost.state)
+			DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		if (options.DMap.state)
+			DrawTextInBox(va("Map: %s", map), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 67, R_TextWidth(0, va("Map: %s .", map), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		if (options.DGame.state)
+			DrawTextInBox(va("Gametype: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		if (options.DFps.state)
+			DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g.", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 
 		if (options.menuOpen)
-			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimated^ To ^2Open ^7The Menu", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtonB^ To ^1Close ^7The Menu.", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		else
-			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR To ^2Open ^7The Menu", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox("Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR^ To ^2Open ^7The Menu", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtontrigL^ ^BXENONButtonStickAnimatedR To ^2Open ^7The Menu..", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65 + 14, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 	}
 
 
@@ -155,13 +169,14 @@ namespace BO2
 		return false;
 	}
 	bool CanShootThroughWall(int i, const char* tag) {
-			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
+		return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
 	}
 
 	int GetNearestPlayer(int client)
 	{
 		nearestClient = -1;
 		float nearestDistance = FLT_MAX;
+
 		for (int i = 0; i < 18; ++i)
 		{
 			if (cgGame->clientNum == i)
@@ -212,7 +227,7 @@ namespace BO2
 					Tag = AimTag(options.MenuAimTargetIndex.current);
 
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
-				Difference.z -= 5;
+				//Difference.z -= 5;
 				vec3_t Angles = Difference - cgGame->refdef.viewOrigin;
 				VecToAngels(Angles, anglesOut);
 
@@ -267,7 +282,7 @@ namespace BO2
 			if (options.EspFrogChan.state)
 				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
 			if (options.EspNames.state)
-				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, white);
+				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, white, align_center);
 			if (options.EspFilled.state)
 				BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 		}
@@ -292,8 +307,13 @@ namespace BO2
 
 	void TargetDetails() {
 		int nearest = GetNearestPlayer(cgGame->clientNum);
-				DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-				DrawTextInBox(va("%s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - R_TextWidth(0, va("%s", cgGame->clientInfo->name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[nearest].pose.Origin);
+		if (options.DTarget.state) {
+			DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox(va("Name: %s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - 5 - R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox(va("Distance: %.fm", Distance), cgDC->screenWidth + 15 - R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 64, R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			DrawTextInBox(va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), cgDC->screenWidth + 15 - R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 96, R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		}
 	}
 
 	void CL_ConsolePrintHook(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags) {
@@ -333,18 +353,16 @@ namespace BO2
 		while (!XHasOverlappedIoCompleted(&Overlapped))
 			Sleep(50);
 		wcstombs(Return, KeyboardText, Length);
-		strcpy((char*)0x841E1B30, Return);
-		strcpy((char*)0x82C55D60, Return);
 		return Return;
 	}
 	void keyboard_hook() {
-		int error;
-		const char* cmd = Keyboard(L"", L"Custom Command", L"Enter a command", 0x20);
+		int error = 0;
+		char* cmd = (char*)Keyboard(L"", L"Custom Command", L"Enter a command", 0x20);
 
 		if (error == 0) {
 			printf("%s\n", cmd);
-			strcpy((char*)0x841E1B30, cmd);
-			strcpy((char*)0x82C55D60, cmd);
+			*(char*)0x82C55D60 = *cmd;
+			*(char*)0x841E1B30 = *cmd;
 		}
 	}
 	void keyboard_thread(HANDLE) {
@@ -357,7 +375,7 @@ namespace BO2
 	{
 		MinHook[0].Stub(a, b);
 		ReadStructs();
-	
+
 		if (Dvar_GetBool("cl_ingame"))
 		{
 			Esp();
@@ -390,12 +408,12 @@ namespace BO2
 			DrawMenu();
 		ServerInfo();
 	}
-	
+
 	HRESULT RenderScene(DWORD a1) {
 		MinHook[4].Stub(a1);
 
-		
-			return S_OK;
+
+		return S_OK;
 	}
 	void Rgb() {
 		if (options.RGB.state) {
@@ -422,6 +440,12 @@ namespace BO2
 		MinHook[5].Stub(r3, t, x, xx, Col, c);
 	}
 
+	void LiveStats_Probation_GiveProbation(int controllerIndex, int gamemode, float time)
+	{
+		time = 0;
+		XNotify("Probation Bypassed!");
+		MinHook[8].Stub(controllerIndex, gamemode, time);
+	}
 
 	void Cl_WritePacket(int a) {
 		MinHook[3].Stub(a);
@@ -439,7 +463,7 @@ namespace BO2
 			memcpy(newCmd, Cmd, sizeof(Usercmd_t));
 
 			oldCmd->serverTime -= 1;
-			newCmd->serverTime += 2;
+			newCmd->serverTime += 1;
 
 
 			if (options.AutoShoot.state) {
@@ -452,8 +476,8 @@ namespace BO2
 				}
 			}
 
-			if (options.NoSpread.state) 
-				NoSpread(Cmd, oldCmd);			
+			if (options.NoSpread.state)
+				NoSpread(Cmd, oldCmd);
 
 			bool betty = false;
 			for (int i = 0; i < 2048; i++) {

@@ -97,6 +97,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">
     <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     <RemoteRoot>HDD:\</RemoteRoot>
+    <ImageXexOutput>$(OutDir)Shake.xex</ImageXexOutput>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">
     <ClCompile>

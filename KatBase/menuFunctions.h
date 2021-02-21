@@ -58,6 +58,12 @@ namespace BO2
 		BoolMenuOption Wallhack;
 		BoolMenuOption RGB;
 
+		BoolMenuOption DHost;
+		BoolMenuOption DMap;
+		BoolMenuOption DGame;
+		BoolMenuOption DFps;
+		BoolMenuOption DTarget;
+
 		BoolMenuOption Laser;
 		BoolMenuOption AntiBetty;
 		BoolMenuOption HostTab;
@@ -74,6 +80,7 @@ namespace BO2
 		SubMenuMenuOption EspMenu;
 		SubMenuMenuOption HostOnly;
 		SubMenuMenuOption MiscView;
+		SubMenuMenuOption Debug;
 		SubMenuMenuOption SubPlayers;
 	};
 
@@ -89,7 +96,8 @@ namespace BO2
 		HostOnly,
 		EspMenu,
 		MiscVisuals,
-		Playersub
+		Playersub, 
+		Debug
 	};
 
 
@@ -143,6 +151,7 @@ namespace BO3
 		IntMenuOption ShaderBlue;
 		IntMenuOption MenuAimTargetIndex;
 		IntMenuOption Fov;
+		IntMenuOption SnapPos;
 
 		FloatMenuOption menuFontSize;
 
@@ -162,12 +171,18 @@ namespace BO3
 
 
 		BoolMenuOption AutoShoot;
+		BoolMenuOption Gradient;
 		BoolMenuOption Healthbar;
 		BoolMenuOption Fire;
 		BoolMenuOption Aimbot;
 		BoolMenuOption testing;
 
 		SubMenuMenuOption TracerSub;
+		SubMenuMenuOption EspView;
+		SubMenuMenuOption EspOptions;
+		SubMenuMenuOption Misc;
+		SubMenuMenuOption MenuSettings;
+		SubMenuMenuOption MenuVisuals;
 
 	};
 	extern Options_t options;
@@ -179,7 +194,11 @@ namespace BO3
 		VISUALS,
 		PLAYERS,
 		SETTINGS, 
-		Tracers
+		EspMenu,
+		MiscVisuals,
+		MenuSettings,
+		MenuVisuals,
+		EspOptions
 	};
 
 	extern void SetupVariables();
@@ -273,7 +292,7 @@ namespace Ghost {
 	extern void DrawFloatSlider(const char* text, FloatMenuOption* value, const char* fmt);
 
 	extern const char* FontForIndex(int index);
-
+	extern void BoundingBox(float x, float y, float width, float height, float* color, float thickness);
 	extern void DrawShader(float x, float y, float width, float height, const float* color, const char* shader);
 	extern void DrawText(const char* text, float x, float y, const char* font, float fontSize, float* color, alignment align);
 }

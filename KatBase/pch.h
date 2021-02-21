@@ -32,6 +32,7 @@
 #include <string>
 #include <cstdio>
 #include <fstream>
+#include <cassert>
 
 //Source Headers
 #include "utilites.h"

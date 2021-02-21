@@ -27,7 +27,15 @@ namespace BO3
 			break;
 		case VISUALS:
 			DrawToggle("Healthbar", &options.Healthbar);
+			DrawSubMenu("Esp Menu", &options.EspView, EspMenu);
+			DrawSubMenu("Esp Options", &options.EspOptions, EspOptions);
+			DrawSubMenu("Misc Visuals", &options.Misc, MiscVisuals);
+			break;
+		case MiscVisuals:
 			DrawIntSlider("Fov", &options.Fov, "%i");
+			DrawToggle("Tracer Rounds", &options.Tracers);
+			break;
+		case EspMenu:
 			DrawToggle("Esp Box", &options.EspBox);
 			DrawToggle("Esp Box Filled", &options.EspFilled);
 			DrawToggle("Esp Bones", &options.EspBones);
@@ -36,20 +44,30 @@ namespace BO3
 			DrawToggle("Esp Heart", &options.EspHeart);
 			DrawToggle("Esp Healthbar", &options.EspHealth);
 			DrawToggle("OverHeadNames", &options.OverHeadNames);
-			DrawToggle("Tracer Rounds", &options.Tracers);
+			break;
+		case EspOptions:
+			DrawIntSlider("SnapLine Position", &options.SnapPos, "%i");
+
 			break;
 		case PLAYERS:
 			for (int i = 0; i < 18; i++) {
-				if (!strcmp(Cinfo[i].Name, ""))
-					DrawButton("N/A");
+				if (!strcmp(Cinfo[i].Name, "")) {}
 				else
-					DrawButton(va("[%i] %s [%s]", i, Cinfo[i].Name, isTeam(i) ? "^2Friendly^7" : "^1Enemy^7"));
+					DrawSubMenu(va("%s [%s]", Cinfo[i].Name, isTeam(i) ? "^2Friendly^7" : "^1Enemy^7"), &options.TracerSub, i);
 			}
 			break;
 		case SETTINGS:
+			DrawSubMenu("Menu Settings", &options.MenuSettings, MenuSettings);
+			DrawSubMenu("Menu Visuals", &options.MenuVisuals, MenuVisuals);
+			break;
+		case MenuSettings:
 			DrawIntSlider("MenuX", &options.menuX, "%i");
 			DrawIntSlider("MenuY", &options.menuY, "%i");
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
+			break;
+		case MenuVisuals:
+			DrawToggle("Gradient Menu", &options.Gradient);
+
 			break;
 		}
 	}
@@ -63,60 +81,7 @@ namespace BO3
 		DrawMenuText();
 	}
 
-	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
-	{
-		vec2_t  delta = start - end;
-		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
-		vec_t length = delta.Length();
-		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
-		CG_DrawRotatedPicPhysical(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
-	}
-
-	void DrawLineGFX(vec2_t start, vec2_t end, GfxColor* color, float size)
-	{
-		vec2_t  delta = start - end;
-		vec_t angle = atan2(delta.y, delta.x) * (180 / 3.141592654f);
-		vec_t length = delta.Length();
-		vec2_t  coords(end.x + ((delta.x - length) / 2), end.y + (delta.y / 2));
-		CG_DrawRotatedPicPhysical_GFX(0x83088EC0, coords.x, coords.y, length, size, angle, color, Material_RegisterHandle("white"));
-	}
-
-	void drawBones(Centity* entity, float* color)
-	{
-		for (int i = 0; i < ARRAYSIZE(Bones) - 1; i++)
-		{
-			vec2_t Screen, Screen2;
-			if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[i]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[i + 1]), &Screen2))
-				DrawLine(Screen, Screen2, color, 1);
-
-		}
-	}
-
-	float deltaFade(int ms, int tracerTime)
-	{
-		return float(1 - (cgGame->CmdTime - tracerTime) / ms);
-	}
-
-	std::vector<cTracer> GlobalTrace;
-	void DrawTracer() {
-		if (options.Tracers.state) {
-			auto it = GlobalTrace.begin();
-			while (it != GlobalTrace.end())
-			{
-				vec2_t Hit2D = vec2_t();
-				vec2_t Start2D = vec2_t();
-				WorldToScreen(0, it->hit3D, &Hit2D);
-				WorldToScreen(0, it->start3D, &Start2D);
-				//DrawLineGFX(Hit2D, Start2D, Col, 2);
-				DrawLine(Hit2D, Start2D, blue, 1.7);
-				//SoulStar(Hit2D.x, Hit2D.y, 40, 40, 2, Black2);
-				if (deltaFade(2000, it->startTime) <= 0)
-					it = GlobalTrace.erase(it);
-				else
-					++it;
-			}
-		}
-	}
+	
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
@@ -186,82 +151,86 @@ namespace BO3
 			options.EndGame.state = false;
 		}
 	}
-	HRESULT R_RenderScene()
-	{
-		MinHook[1].Stub();
-		readStructs();
+	void Esp() {
 		vec2_t BoxPos, BoxPos2, Screen, Screen2, Spine;
 		vec2_t head = vec2_t();
 
 		const char* Tag = "j_head";
 
-		if (inGame) {
-			for (int i = 0; i < 18; i++) {
+		for (int i = 0; i < 18; i++) {
 
-				if (!(cg_entitiesArray[i].EType == 1))
-					continue;
+			if (!(cg_entitiesArray[i].EType == 1))
+				continue;
 
-				if (!(cg_entitiesArray[i].ClientNum != 0))
-					continue;
+			if (!(cg_entitiesArray[i].ClientNum != cgGame->MyClientNum))
+				continue;
 
-				if (Cinfo[i].Health < 1)
-					continue;
+			if (Cinfo[i].Health < 1)
+				continue;
 
-				if (!WorldToScreen(0, cg_entitiesArray[i].Origin, &BoxPos))
-					continue;
+			if (!WorldToScreen(0, cg_entitiesArray[i].Origin, &BoxPos))
+				continue;
 
-				if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
-					continue;
+			if (!WorldToScreen(0, AimTarget_GetTagPos(i, Tag), &BoxPos2))
+				continue;
 
-				if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
-					continue;
+			if (!WorldToScreen(0, AimTarget_GetTagPos(i, "j_spinelower"), &Spine))
+				continue;
 
-				vec3_t headPos = AimTarget_GetTagPos(i, Tag);
-				vec3_t origin = cg_entitiesArray[i].Origin;
+			vec3_t headPos = AimTarget_GetTagPos(i, Tag);
+			vec3_t origin = cg_entitiesArray[i].Origin;
 
-				headPos.z += 10;
-				origin.z -= 5;
+			headPos.z += 10;
+			origin.z -= 5;
 
-				if (!WorldToScreen(0, headPos, &head))
-					continue;
+			if (!WorldToScreen(0, headPos, &head))
+				continue;
 
-				float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
-				float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
+			float Width = (fabsf(BoxPos2.y - BoxPos.y) * 0.65f), Height = fabsf(BoxPos2.y - BoxPos.y);
+			float Distance = cg_entitiesArray[i].Origin.GetDistance(cg_entitiesArray[cgGame->MyClientNum].Origin);
 
-				float playerHeight = fabsf(head.y - BoxPos.y);
-				float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
+			float playerHeight = fabsf(head.y - BoxPos.y);
+			float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
 
-				//SoulsAmazingStar Esp
-				/*if (options.EspStar.state)
-					SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
+			//SoulsAmazingStar Esp
+			/*if (options.EspStar.state)
+				SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
 
-					//Souls amazing heart esp
-				if (options.EspHeart.state)
-					drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
-				//Esp box
-				if (options.EspBox.state)
-					BoundingBox(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
-				//Esp Name
-				if (options.EspNames.state)
-					DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, FontForIndex(options.menuFontIndex.current), 0.6, white, align_center);
-				//Esp Health
-				if (options.EspHealth.state)
-					ESP_ClientHealth(i);
+				//Souls amazing heart esp
+			if (options.EspHeart.state)
+				drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
+			//Esp box
+			if (options.EspBox.state)
+				BoundingBox(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
+			//Esp Name
+			if (options.EspNames.state)
+				DrawText(va("%s", Cinfo[i].Name), BoxPos.x, BoxPos2.y, FontForIndex(options.menuFontIndex.current), 0.6, white, align_center);
+			//Esp Health
+			if (options.EspHealth.state)
+				ESP_ClientHealth(i);
 
-				//SnapLines
-				if (options.EspSnap.state)
-					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight), Spine, isTeam(i) ? Green : Red, 2);
-				if (options.EspFilled.state)
-					BoundingBoxFilled(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
-				//Bones
-				for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
-					if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
-						if (options.EspBones.state)
-							DrawLine(vec2_t(Screen.x, Screen.y), vec2_t(Screen2.x, Screen2.y), white, 2);
-					}
+			//SnapLines
+			if (options.EspSnap.state)
+				DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Spine, isTeam(i) ? Green : Red, 2);
+			if (options.EspFilled.state)
+				BoundingBoxFilled(BoxPos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(i) ? Green : Red, 1.f);
+			//Bones
+			for (int j = 0; j < ARRAYSIZE(Bones) - 1; j++) {
+				if (WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j]), &Screen) && WorldToScreen(0, AimTarget_GetTagPos(i, Bones[j + 1]), &Screen2)) {
+					if (options.EspBones.state)
+						DrawLine(vec2_t(Screen.x, Screen.y), vec2_t(Screen2.x, Screen2.y), blue, 2);
 				}
 			}
+		}
 
+	}
+	HRESULT R_RenderScene()
+	{
+		MinHook[1].Stub();
+		readStructs();
+		
+		if (inGame) {
+			Esp();
 			*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
 			//No recoil
 			*(uint32_t*)0x82279CB8 = options.NoRecoil.state ? 0x60000000 : 0x4BF79239;
@@ -274,9 +243,9 @@ namespace BO3
 				EndRound();
 
 			FovSlider(options.Fov.current);
-			ServerInfo();
-			DrawTracer();
 		}
+		DrawTracer();
+		ServerInfo();
 
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
@@ -285,6 +254,11 @@ namespace BO3
 		return S_OK;
 	}
 
+	void PaintAllHook(int r3) {
+		MinHook[4].Stub(r3);
+		readStructs();
+		//Crashes when calling anything in it	
+	}
 
 	void CL_ReadyToSendPacket(int local) {
 		MinHook[2].Stub(local);
@@ -308,7 +282,26 @@ namespace BO3
 		}
 
 	}
-
+	std::vector<cTracer> GlobalTrace;
+	void DrawTracer() {
+		if (options.Tracers.state) {
+			auto it = GlobalTrace.begin();
+			while (it != GlobalTrace.end())
+			{
+				vec2_t Hit2D = vec2_t();
+				vec2_t Start2D = vec2_t();
+				WorldToScreen(0, it->hit3D, &Hit2D);
+				WorldToScreen(0, it->start3D, &Start2D);
+				//DrawLineGFX(Hit2D, Start2D, Col, 2);
+				DrawLine(Hit2D, Start2D, blue, 1.7);
+				//SoulStar(Hit2D.x, Hit2D.y, 40, 40, 2, Black2);
+				if (deltaFade(2000, it->startTime) <= 0)
+					it = GlobalTrace.erase(it);
+				else
+					++it;
+			}
+		}
+	}
 	void CG_BulletHitEvent(int localClientNum, int sourceEntityNum, int targetEntityNum, int weapon, vec3_t* startPos, vec3_t* position, vec3_t* normal, vec3_t* seeThruDecalNormal, int surfType, int event, int eventParam, int hitContents, char boneIndex)
 	{
 		MinHook[3].Stub(localClientNum, sourceEntityNum, targetEntityNum, weapon, startPos, position, normal, seeThruDecalNormal, surfType, event, eventParam, hitContents, boneIndex);

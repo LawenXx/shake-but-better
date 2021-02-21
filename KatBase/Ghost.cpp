@@ -16,7 +16,6 @@ namespace Ghost {
 		{
 		case MAIN:
 			DrawButton("Test");
-			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		case AIMBOT:
 			DrawButton("Test");
@@ -43,6 +42,7 @@ namespace Ghost {
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
 			DrawFloatSlider("Font Size", &options.menuFontSize, "%f");
+			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
 			break;
 		}
 	}
@@ -55,13 +55,57 @@ namespace Ghost {
 		DrawMenuText();
 	}
 
+	void Esp() {
+		for (int i = 0; i < 18; i++)
+		{
+
+			/*if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+				continue;
+			if (!(cg_entitiesArray[i].nextState.ClientNumber != 0))
+				continue;
+			if (!(cg_entitiesArray[i].nextState.Alive))
+				continue;
+			if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
+				continue;
+			if (cgGame->ps.health < 1)
+				return;*/
+			if (!(cg_entitiesarray[i].eType == ET_PLAYER && (cg_entitiesarray[i].eType != ET_PLAYER_CORPSE)))
+				continue;
+		/*	if (!cg_entitiesarray[i].state & (1 << 6) != 0)
+				continue;*/
+
+			vec2_t Pos = vec2_t();
+			vec2_t head = vec2_t();
+			vec3_t origin = cg_entitiesarray[i].Origin;
+
+			vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesarray[i], "j_head");
+			headPos.z += 10;
+			origin.z -= 5;
+
+			if (!WorldToScreen(origin, &Pos))
+				continue;
+			if (!WorldToScreen(headPos, &head))
+				continue;
+
+			float playerHeight = fabsf(head.y - Pos.y);
+			float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+
+			//if (options.EspBoxToggle.state)
+				BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, Red, 1.f);
+			
+		}
+	}
+
+
 	void Menu_Paint_All(int b) {
 		MinHook[0].Stub(b);
+		ReadStructs();
 
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
 			DrawMenu();
 
+		Esp();
 	}
 	void Cl_WritePacket(int a) {
 		MinHook[2].Stub(a);
@@ -120,6 +164,7 @@ namespace Ghost {
 			}
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 			{
+				options.menuScroll = 0;
 				if (options.menuPageIndex < 5)
 					options.menuPageIndex++;
 				if (options.menuPageIndex > 4)
@@ -128,7 +173,7 @@ namespace Ghost {
 
 			if (KeyIsDown(Buttons, XINPUT_GAMEPAD_LEFT_SHOULDER))
 			{
-
+				options.menuScroll = 0;
 				if (options.menuPageIndex > -1)
 					options.menuPageIndex--;
 				if (options.menuPageIndex == -1)

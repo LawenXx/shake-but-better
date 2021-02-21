@@ -12,5 +12,5 @@ namespace BO2
 	extern void Quad_Hook(Material* r3, short t, vec3_t* x, vec2_t* xx, GfxColor* rain, int c);
 	extern void CL_ConsolePrintHook(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags);
 	extern void CL_Disconnect_Hook(int r3, bool r4);
-
+	extern void LiveStats_Probation_GiveProbation(int controllerIndex, int gamemode, float time);
 }
