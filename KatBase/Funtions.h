@@ -130,6 +130,9 @@ namespace BO2
 	extern void RandomBulletDir(int seed, float* x, float* y);
 	extern void FovSlider(int fov);
 	extern const char* GetWeaponName(int iD);
+	extern bool CanShootThroughWall(int i, const char* tag);
+	extern const char* AutoBone(int client);
+	extern float deltaFade(int ms, int tracerTime);
 }
 
 namespace BO3

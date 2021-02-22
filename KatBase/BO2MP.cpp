@@ -40,7 +40,8 @@ namespace BO2
 			DrawStringSlider("AimTag", &options.MenuAimTargetIndex, AimTag(options.MenuAimTargetIndex.current));
 			DrawToggle("AutoShoot", &options.AutoShoot);
 			DrawToggle("AutoWall", &options.AutoWall);
-			//	DrawToggle("Aim Required", &options.AimRequired);
+			//	DrawToggle("AutoBone", &options.Autobone);
+				//	DrawToggle("Aim Required", &options.AimRequired);
 			break;
 		case VISUALS:
 			DrawToggle("Healthbar", &options.Healthbar);
@@ -59,6 +60,7 @@ namespace BO2
 			break;
 		case MiscVisuals:
 			DrawToggle("Wallhack", &options.Wallhack);
+			DrawToggle("Tracers", &options.Tracer);
 			DrawIntSlider("Fov", &options.Fov, "%i");
 			DrawStringSlider("Shader", &options.ShaderIndex, Shader(options.ShaderIndex.current));
 			DrawIntSlider("Shader Red", &options.ShaderRed, "%i");
@@ -220,11 +222,14 @@ namespace BO2
 
 			if (playerReady && nearestClient != -1)
 			{
+				//if (options.Autobone.state)
+					//Tag = AutoBone(nearestClient);
 
 				if (cg_entitiesArray[nearestClient].WeaponID == 89)
 					Tag = "j_ankle_ri";
 				else
 					Tag = AimTag(options.MenuAimTargetIndex.current);
+
 
 				vec3_t Difference = AimTarget_GetTagPos(&cg_entitiesArray[nearestClient], Tag);
 				//Difference.z -= 5;
@@ -233,6 +238,7 @@ namespace BO2
 
 
 				if (nearestClient != cgGame->clientNum) {
+
 					if (options.SilentAim.state)
 						newAngles = anglesOut - ClientActive->baseAngle;
 					else
@@ -281,8 +287,10 @@ namespace BO2
 				DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
 			if (options.EspFrogChan.state)
 				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
-			if (options.EspNames.state)
-				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, white, align_center);
+			if (options.EspNames.state) {
+				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, Red, align_center);
+			
+			}
 			if (options.EspFilled.state)
 				BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 		}
@@ -357,12 +365,13 @@ namespace BO2
 	}
 	void keyboard_hook() {
 		int error = 0;
-		char* cmd = (char*)Keyboard(L"", L"Custom Command", L"Enter a command", 0x20);
+		const char* cmd = Keyboard(L"", L"Custom Name", L"Enter A Name", 0x20);
 
 		if (error == 0) {
 			printf("%s\n", cmd);
-			*(char*)0x82C55D60 = *cmd;
-			*(char*)0x841E1B30 = *cmd;
+			strcpy((char*)0x841E1B30, cmd);
+			strcpy((char*)0x82C55D60, cmd);
+			Cbuf_AddText(0, va(";cmd userinfo \"\\clanAbbrev\\%s\\name\\%s\"", "^1", cmd));
 		}
 	}
 	void keyboard_thread(HANDLE) {
@@ -370,7 +379,27 @@ namespace BO2
 		XSetThreadProcessor(Thread, 4);
 		ResumeThread(Thread);
 	}
-
+	std::vector<cTracer> GlobalTrace;
+	float testcol[] = { options.ShaderRed.current * 255, options.ShaderGreen.current * 255 ,options.ShaderBlue.current * 255, 1 };
+	void DrawTracer() {
+		if (options.Tracer.state) {
+			auto it = GlobalTrace.begin();
+			while (it != GlobalTrace.end())
+			{
+				vec2_t Hit2D = vec2_t();
+				vec2_t Start2D = vec2_t();
+				WorldToScreen(0, it->hit3D, &Hit2D);
+				WorldToScreen(0, it->start3D, &Start2D);
+				//DrawLineGFX(Hit2D, Start2D, Col, 2);
+				DrawLine(Hit2D, Start2D, testcol, 1.7);
+				//SoulStar(Hit2D.x, Hit2D.y, 40, 40, 2, Black2);
+				if (deltaFade(2000, it->startTime) <= 0)
+					it = GlobalTrace.erase(it);
+				else
+					++it;
+			}
+		}
+	}
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
@@ -378,6 +407,7 @@ namespace BO2
 
 		if (Dvar_GetBool("cl_ingame"))
 		{
+			DrawTracer();
 			Esp();
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
@@ -409,11 +439,18 @@ namespace BO2
 		ServerInfo();
 	}
 
-	HRESULT RenderScene(DWORD a1) {
-		MinHook[4].Stub(a1);
+	void CG_BulletHitEvent(int localClientNum, int sourceEntityNum, int targetEntityNum, int weapon, vec3_t* startPos, vec3_t* position, vec3_t* normal, vec3_t* seeThruDecalNormal, int surfType, int event, int eventParam, int hitContents, char boneIndex)
+	{
+		MinHook[4].Stub(localClientNum, sourceEntityNum, targetEntityNum, weapon, startPos, position, normal, seeThruDecalNormal, surfType, event, eventParam, hitContents, boneIndex);
 
+		if (sourceEntityNum == cgGame->clientNum) {
+			cTracer Trace;
+			Trace.hit3D = *position;
+			Trace.startTime = cgGame->ServerTime;
+			Trace.start3D = *startPos;
 
-		return S_OK;
+			GlobalTrace.emplace_back(Trace);
+		}
 	}
 	void Rgb() {
 		if (options.RGB.state) {

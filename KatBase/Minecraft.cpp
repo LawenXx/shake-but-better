@@ -19,7 +19,7 @@ namespace Minecraft {
 
 	void HookMc(DWORD b)
 	{
-		printf("Minecraft all these blocks just form this way");
+		//printf("Minecraft all these blocks just form this way");
 		
 		MinHook[1].Stub( b);
 	}

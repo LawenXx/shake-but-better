@@ -48,18 +48,19 @@ void checkTitleId(std::uintptr_t id)
 		BO2::SetupVariables();
 		//ReadImage();
 		//cg_hitevent
-		*(DWORD*)(0x822585F8) = 0x60000000;
+	//	*(DWORD*)(0x822585F8) = 0x60000000;
 
 		//R_EndFrame
 		*(DWORD*)(0x828B9F64) = 0x60000000;
 		*(DWORD*)(0x828B9F68) = 0x60000000;
+		//Class count
 		*(int*)0x826A5FBC = 0x60000000;
 
 		MinHook[0] = MinHook_t(BO2::MP_Menu_PaintAll, (std::uint64_t)BO2::Menu_PaintAll, true);
 		MinHook[1] = MinHook_t(BO2::MP_XamInputGetKeyState, (std::uint64_t)BO2::XamInputGetState, false);
 		MinHook[2] = MinHook_t(0x8293E5C4, (std::uint64_t)BO2::NetDll_XNetGetTitleXnAddrHook, true);
 		MinHook[3] = MinHook_t(0x8226C9C8, (std::uint64_t)BO2::Cl_WritePacket, true);
-		MinHook[4] = MinHook_t(0x828AF5A0, (std::uint64_t)BO2::RenderScene, true);
+		MinHook[4] = MinHook_t(0x82257DD8, (std::uint64_t)BO2::CG_BulletHitEvent, true);
 		MinHook[5] = MinHook_t(0x828BA040, (std::uint64_t)BO2::Quad_Hook, true);
 		MinHook[6] = MinHook_t(0x82267520, (std::uint64_t)BO2::CL_ConsolePrintHook, true);
 		MinHook[7] = MinHook_t(0x82278A00, (std::uint64_t)BO2::CL_Disconnect_Hook, true);
@@ -74,15 +75,14 @@ void checkTitleId(std::uintptr_t id)
 
 		BO3::InitAddress();
 		BO3::SetupVariables();
-
+		Sleep(600);
 		//Nullsub
-		*(DWORD*)(0x82AB0F90) = 0x60000000;
+		//*(DWORD*)(0x82AB0F90) = 0x60000000;
 
 		MinHook[0] = MinHook_t(0x82A92094, (std::uint64_t)BO3::XamInputGetState, false);
 		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
-		MinHook[2] = MinHook_t(0x822E58F8, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
+		MinHook[2] = MinHook_t(0x822F53C0, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
 		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
-		MinHook[4] = MinHook_t(0x822FA708, (std::uint64_t)BO3::PaintAllHook, true);
 		break;
 	case COD_GHOSTS:
 		while (*(int*)Ghost::XamInputGetKeyState == 0)
@@ -116,6 +116,7 @@ void checkTitleId(std::uintptr_t id)
 		{
 			if (!firstDash)
 			{
+				Sleep(200);
 				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nYoutube/kat xkovx\n\nThis wouldnt be possible without the help from:\nReeko for making the base\nSmokey xKoVx for wallhack and laser\nSoul for radar", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
 
 				firstDash = true;

@@ -57,6 +57,7 @@ namespace BO2
 		BoolMenuOption DrawItem;
 		BoolMenuOption Wallhack;
 		BoolMenuOption RGB;
+		BoolMenuOption Autobone;
 
 		BoolMenuOption DHost;
 		BoolMenuOption DMap;
@@ -170,6 +171,12 @@ namespace BO3
 		BoolMenuOption EspHealth;
 
 
+		BoolMenuOption DHost;
+		BoolMenuOption DPing;
+		BoolMenuOption DGame;
+		BoolMenuOption DFps;
+		BoolMenuOption DRes;
+
 		BoolMenuOption AutoShoot;
 		BoolMenuOption Gradient;
 		BoolMenuOption Healthbar;
@@ -183,6 +190,7 @@ namespace BO3
 		SubMenuMenuOption Misc;
 		SubMenuMenuOption MenuSettings;
 		SubMenuMenuOption MenuVisuals;
+		SubMenuMenuOption Debug;
 
 	};
 	extern Options_t options;
@@ -197,6 +205,7 @@ namespace BO3
 		EspMenu,
 		MiscVisuals,
 		MenuSettings,
+		Debug,
 		MenuVisuals,
 		EspOptions
 	};

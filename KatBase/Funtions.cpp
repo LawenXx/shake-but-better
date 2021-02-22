@@ -138,7 +138,9 @@ namespace BO2
 	}
 	void RandomBulletDir(int seed, float* x, float* y)
 	{
+		BG_seedRandWithGameTime(&seed);
 		float f26 = (BG_seedRandWithGameTime(&seed) * 360.0f) * (M_PI / 180.0f);
+		TransformSeed(&seed);
 		float f28 = BG_seedRandWithGameTime(&seed);
 		*x = f28 * cosf(f26);
 		*y = f28 * sinf(f26);
@@ -157,6 +159,11 @@ namespace BO2
 
 		oldCmd->viewAngles[0] += ANGLE2SHORT(Spread.x * totalSpread);
 		oldCmd->viewAngles[1] += ANGLE2SHORT(Spread.y * totalSpread);
+	}
+	
+	const char* AutoBone(int client) {
+
+		
 	}
 
 	void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna)
@@ -315,6 +322,10 @@ namespace BO2
 				DrawLine(Screen, Screen2, color, 1);
 
 		}
+	}
+	float deltaFade(int ms, int tracerTime)
+	{
+		return float(1 - (cgGame->ServerTime - tracerTime) / ms);
 	}
 	bool Dvar_GetBool(const char* dvarName)
 	{

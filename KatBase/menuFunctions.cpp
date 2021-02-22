@@ -215,12 +215,13 @@ namespace BO2
 		SetupInt(&options.Fov, 65, 65, 150, 0);
 		SetupInt(&options.SnapPos, 720, 215, 720, 0);
 		SetupInt(&options.ShaderBlue, 255, 215, 255, 0);
-		SetupInt(&options.ShaderGreen, 108, 215, 255, 0);
+		SetupInt(&options.ShaderGreen, 0, 215, 255, 0);
 		SetupInt(&options.ShaderRed, 255, 215, 255, 0);
 		SetupInt(&options.menuBorder, 4, 4, 20, 1);
 		SetupInt(&options.menuFontIndex, 4, 4, numFonts, 0);
 		SetupInt(&options.MenuAimTargetIndex, 0, 4, NumBones, 0);
 		SetupInt(&options.ShaderIndex, 0, 4, NumShader, 0);
+
 		SetupFloat(&options.menuFontSize, 0.58, 0.58, 5.0f, 0.1f, 0.001f);
 		SetupSubMenu(&options.EspMenu, EspMenu, 8, 8);
 		SetupSubMenu(&options.HostOnly, HostOnly, 8, 8);
@@ -270,6 +271,7 @@ namespace BO2
 		SetupBool(&options.AntiBetty, false);
 		SetupBool(&options.Wallhack, false);
 		SetupBool(&options.RGB, false);
+		SetupBool(&options.Autobone, false);
 		SetupBool(&options.AutoShoot, false);
 
 	}
@@ -579,8 +581,14 @@ namespace BO3
 		SetupBool(&options.AutoShoot, false);
 		SetupBool(&options.testing, false);
 		SetupBool(&options.Aimbot, false);
+		SetupBool(&options.DFps, true);
+		SetupBool(&options.DGame, true);
+		SetupBool(&options.DHost, true);
+		SetupBool(&options.DPing, true);
+		SetupBool(&options.DRes, true);
 
 		SetupSubMenu(&options.EspView, EspMenu, 8, 8);
+		SetupSubMenu(&options.Debug, Debug, 8, 8);
 		SetupSubMenu(&options.EspOptions, EspOptions, 8, 8);
 		SetupSubMenu(&options.Misc, MiscVisuals, 8, 8);
 		SetupSubMenu(&options.MenuSettings, MenuSettings, 8, 8);

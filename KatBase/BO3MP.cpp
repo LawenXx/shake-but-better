@@ -64,6 +64,12 @@ namespace BO3
 			DrawIntSlider("MenuX", &options.menuX, "%i");
 			DrawIntSlider("MenuY", &options.menuY, "%i");
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
+			DrawSubMenu("Debug Info", &options.Debug, Debug);
+			break;
+		case Debug:
+			DrawToggle("Resolution", &options.DRes);
+			DrawToggle("Fps", &options.DFps);
+			DrawToggle("Ping", &options.DPing);
 			break;
 		case MenuVisuals:
 			DrawToggle("Gradient Menu", &options.Gradient);
@@ -81,7 +87,7 @@ namespace BO3
 		DrawMenuText();
 	}
 
-	
+
 	int nearestClient;
 	bool playerReady;
 	vec3_t anglesOut;
@@ -133,9 +139,12 @@ namespace BO3
 
 	void ServerInfo() {
 		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, Textwidth("Shake Beta v1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 18, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
-		DrawTextInBox(va("Resolution: %i x %i", cgDC->screenWidth, cgDC->screenHeight), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, Textwidth(va("Resolution:%i : %i", cgDC->screenWidth, cgDC->screenHeight), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 2, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
-		DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 71, Textwidth(va("Fps: %.f", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 10, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
-		DrawTextInBox(va("Ping: %ims", cgGame->Ping), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 104, Textwidth(va("Ping: %ims.", cgGame->Ping), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		if (options.DRes.state)
+			DrawTextInBox(va("Resolution: %i x %i", cgDC->screenWidth, cgDC->screenHeight), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, Textwidth(va("Resolution:%i : %i", cgDC->screenWidth, cgDC->screenHeight), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 2, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		if (options.DFps.state)
+			DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 71, Textwidth(va("Fps: %.f", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65 + 10, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
+		if (options.DPing.state)
+			DrawTextInBox(va("Ping: %ims", cgGame->Ping), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 104, Textwidth(va("Ping: %ims.", cgGame->Ping), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
 
 		if (options.menuOpen)
 			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, Textwidth("Press ^BXENONButtonB^ To ^1Close ^7The Menu..", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current)), 0) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))));
@@ -192,11 +201,7 @@ namespace BO3
 			float playerHeight = fabsf(head.y - BoxPos.y);
 			float playerWidth = (fabsf(head.y - BoxPos.y) * 0.65f);
 
-			//SoulsAmazingStar Esp
-			/*if (options.EspStar.state)
-				SoulStar(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, 2, blue);*/
-
-				//Souls amazing heart esp
+			//Souls amazing heart esp
 			if (options.EspHeart.state)
 				drawHeart(BoxPos.x - (Width)-6.f, BoxPos2.y - 4.f - Height / 2, Width * 2, Height * 2, isTeam(i) ? Green : Red, isTeam(i) ? Green : Red);
 			//Esp box
@@ -228,7 +233,7 @@ namespace BO3
 	{
 		MinHook[1].Stub();
 		readStructs();
-		
+
 		if (inGame) {
 			Esp();
 			*(uint32_t*)0x82214C5C = options.OverHeadNames.state ? 0x60000000 : 0x4BFFE9E5;
@@ -263,24 +268,26 @@ namespace BO3
 	void CL_ReadyToSendPacket(int local) {
 		MinHook[2].Stub(local);
 		readStructs();
-		doAimbot();
 
-		userCmd_t* curCmd = &UserCmd[ClientActive->cmdnumber & 0x7F];
-		userCmd_t* oldCmd = &UserCmd[(ClientActive->cmdnumber - 1) & 0x7F];
+		if (inGame) {
+			doAimbot();
 
-		*oldCmd = *curCmd;
-		oldCmd->serverTime -= 1;
+			userCmd_t* curCmd = &UserCmd[ClientActive->cmdnumber & 0x7F];
+			userCmd_t* oldCmd = &UserCmd[(ClientActive->cmdnumber - 1) & 0x7F];
 
-		if (options.AutoShoot.state)
-		{
-			if (options.Fire.state) {
-				oldCmd->buttonFlag &= ~0x80000000;
-				curCmd->buttonFlag |= 0x80000000;
-				options.Fire.state = false;
+			*oldCmd = *curCmd;
+			oldCmd->serverTime -= 1;
+
+			if (options.AutoShoot.state)
+			{
+				if (options.Fire.state) {
+					oldCmd->buttonFlag &= ~0x80000000;
+					curCmd->buttonFlag |= 0x80000000;
+					options.Fire.state = false;
+				}
+
 			}
-
 		}
-
 	}
 	std::vector<cTracer> GlobalTrace;
 	void DrawTracer() {
