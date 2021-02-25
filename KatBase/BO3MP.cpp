@@ -17,6 +17,7 @@ namespace BO3
 		case MAIN:
 			DrawToggle("No Recoil", &options.NoRecoil);
 			DrawToggle("No Sway", &options.NoSway);
+			DrawToggle("Ip Spoof", &options.IpSpoof);
 			DrawToggle("End Game", &options.EndGame);
 			break;
 		case AIMBOT:

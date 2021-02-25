@@ -39,7 +39,7 @@ namespace BO2
 		BoolMenuOption SilentAim;
 		BoolMenuOption NoSpread;
 		BoolMenuOption NoRecoil;
-		BoolMenuOption NoFlinch;
+		BoolMenuOption Name;
 		BoolMenuOption NoSway;
 		BoolMenuOption ChangeView;
 		BoolMenuOption AimRequired;
@@ -169,6 +169,8 @@ namespace BO3
 		BoolMenuOption EspNames;
 		BoolMenuOption EspFilled;
 		BoolMenuOption EspHealth;
+		BoolMenuOption Compass;
+		BoolMenuOption IpSpoof;
 
 
 		BoolMenuOption DHost;

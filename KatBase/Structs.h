@@ -819,29 +819,51 @@ namespace Ghost {
 	};
 	struct Centity
 	{
-		char pad_0000[20]; //0x0000
-		vec3_t Origin; //0x0014
-		vec3_t ViewAngles; //0x0020
-		char pad_002C[48]; //0x002C
-		uint8_t N000000AD; //0x005C
-		uint8_t Zoom; //0x005D
-		uint8_t InMenu; //0x005E
-		uint8_t pose; //0x005F
-		char pad_0060[12]; //0x0060
-		vec3_t mp2; //0x006C
-		char pad_0078[24]; //0x0078
-		vec3_t ViewAngle1; //0x0090
-		char pad_009C[44]; //0x009C
-		int32_t eType; //0x00C8
-		char pad_00CC[16]; //0x00CC
-		vec3_t mp3; //0x00DC
-		char pad_00E8[24]; //0x00E8
-		vec3_t ViewAngle2; //0x0100
-		char pad_010C[184]; //0x010C
-		uint8_t N000001EE; //0x01C4
-		char pad_01C5[2]; //0x01C5
-		uint8_t State; //0x01C7
-		char pad_01C8[632]; //0x01C8
+		//char pad_0000[20]; //0x0000
+		//vec3_t Origin; //0x0014
+		//vec3_t ViewAngles; //0x0020
+		//char pad_002C[48]; //0x002C
+		//uint8_t N000000AD; //0x005C
+		//uint8_t Zoom; //0x005D
+		//uint8_t InMenu; //0x005E
+		//uint8_t pose; //0x005F
+		//char pad_0060[12]; //0x0060
+		//vec3_t mp2; //0x006C
+		//char pad_0078[24]; //0x0078
+		//vec3_t ViewAngle1; //0x0090
+		//char pad_009C[44]; //0x009C
+		//int32_t eType; //0x00C8
+		//char pad_00CC[16]; //0x00CC
+		//vec3_t mp3; //0x00DC
+		//char pad_00E8[24]; //0x00E8
+		//vec3_t ViewAngle2; //0x0100
+		//char pad_010C[184]; //0x010C
+		//uint8_t N000001EE; //0x01C4
+		//char pad_01C5[2]; //0x01C5
+		//uint8_t State; //0x01C7
+		//char pad_01C8[632]; //0x01C8
+		char _0x0000[2];
+		short Valid; //0x0002 
+		char _0x0004[16];
+		vec3_t mPos; //0x0014 
+		vec3_t ViewAngles; //0x0020 
+		char _0x002C[49];
+		BYTE Zooming; //0x005D 
+		BYTE iMenu; //0x005E 
+		BYTE Pose; //0x005F 
+		char _0x0060[12];
+		vec3_t mPos2; //0x006C 
+		char _0x0078[24];
+		vec3_t ViewAngles1; //0x0090 
+		char _0x009C[64];
+		vec3_t mPos3; //0x00DC 
+		char _0x00E8[24];
+		vec3_t ViewAngles2; //0x0100 
+		char _0x010C[127];
+		BYTE WeaponID; //0x018B 
+		char _0x018C[59];
+		BYTE State; //0x01C7 
+		char _0x01C8[632];
 	};
 	extern Centity* cg_entitiesarray;
 	extern CgsArray* CgServer;

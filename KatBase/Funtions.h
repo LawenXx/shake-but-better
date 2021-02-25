@@ -34,7 +34,7 @@ typedef bool(*AimTarget_GetTagPos_Ghost_t)(Ghost::Centity* cen, unsigned int tag
 typedef int(*SL_GetString_t)(const char* string, unsigned int r4);
 typedef bool(*CG_IsEntityFriendlyNotEnemy_t)(int local, BO2::Centity* cent);
 typedef bool(*AimTarget_IsTargetVisible_t)(int local, BO2::Centity* cen);
-typedef void(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
+typedef int(*vectoAngles_t)(vec3_t& vec, vec3_t& angles);
 typedef const char* (*BG_GetFactionForTeam_t)(int team, const char* mapName);
 typedef void(*BG_seedRandWithGameTime_t)(int pHoldrand);
 typedef void(*BG_GetSpreadForWeapon_t)(BO2::playerstate_s* ps, int weapon, float* minSpread, float* maxSpread);
@@ -50,7 +50,11 @@ typedef void*(*Hunk_FindDataForFile_t)(int type, const char* name);
 typedef BO2::XModel_t(*R_RegisterModel_t)(const char* name);
 typedef const char*(*Hunk_SetDataForFile_t)(int type, const char* name, void* data, void* (__cdecl* alloc)(int));
 typedef void*(* CL_ConsolePrint_t)(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags);
+typedef void* (*R_AddCmdDrawStretchPicRotateSTInternal_t)(float x, float y, float w, float h, float centerS, float centerT, float radiusST, float scaleFinalS, float scaleFinalT, float angle, float* color, Material* material);
+typedef bool*(*CG_GetPlayerViewOrigin_t)(int localClientNum, BO2::playerstate_s* ps, vec3_t* origin);
 
+extern CG_GetPlayerViewOrigin_t CG_GetPlayerViewOrigin;
+extern R_AddCmdDrawStretchPicRotateSTInternal_t R_AddCmdDrawStretchPicRotateSTInternal;
 extern CG_DrawRotatedPicPhysical_GFX_t CG_DrawRotatedPicPhysical_GFX;
 extern CL_ConsolePrint_t CL_ConsolePrint;
 extern Hunk_SetDataForFile_t Hunk_SetDataForFile;
@@ -130,7 +134,6 @@ namespace BO2
 	extern void RandomBulletDir(int seed, float* x, float* y);
 	extern void FovSlider(int fov);
 	extern const char* GetWeaponName(int iD);
-	extern bool CanShootThroughWall(int i, const char* tag);
 	extern const char* AutoBone(int client);
 	extern float deltaFade(int ms, int tracerTime);
 }
@@ -156,6 +159,7 @@ namespace BO3
 	extern void FovSlider(int fov);
 	extern void DrawTracer();
 	extern float deltaFade(int ms, int tracerTime);
+	extern void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna);
 }
 
 namespace Ghost

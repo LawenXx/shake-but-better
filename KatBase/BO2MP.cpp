@@ -16,20 +16,28 @@ namespace BO2
 		switch (options.menuPageIndex)
 		{
 		case MAIN:
-			DrawToggle("No Recoil", &options.NoRecoil);
-			DrawToggle("No Sway", &options.NoSway);
-			DrawToggle("No Spread", &options.NoSpread);
-			DrawToggle("Laser", &options.Laser);
-			//DrawToggle("End Round", &options.EndGame);
-			DrawToggle("Crouch On Lethal", &options.AntiBetty);
-			DrawToggle("Change Name", &options.NoFlinch);
-			DrawToggle("IP Spoof", &options.IpSpoof);
-			DrawToggle("AntiFreeze", &options.AntiFreeze);
-			DrawToggle("XbO Godmode Fix", &options.XboGodmode);
-			DrawToggle("External Radar", &options.Radar);
-			DrawToggle("External Circle Radar", &options.CircleRadar);
-			if (cgGame->clientNum == 0)
-				DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
+			if (Dvar_GetBool("cl_ingame")) {
+				DrawToggle("No Recoil", &options.NoRecoil);
+				DrawToggle("No Sway", &options.NoSway);
+				DrawToggle("No Spread", &options.NoSpread);
+				DrawToggle("Laser", &options.Laser);
+				DrawToggle("Crouch On Lethal", &options.AntiBetty);
+				DrawToggle("Change Name", &options.Name);
+				DrawToggle("IP Spoof", &options.IpSpoof);
+				DrawToggle("AntiFreeze", &options.AntiFreeze);
+				DrawToggle("XbO Godmode Fix", &options.XboGodmode);
+				DrawToggle("External Radar", &options.Radar);
+				DrawToggle("External Circle Radar", &options.CircleRadar);
+				//DrawToggle("End Game", &options.EndGame);
+				if (cgGame->clientNum == 0)
+					DrawSubMenu("Host Only", &options.HostOnly, HostOnly);
+			}
+			else
+			{
+				DrawToggle("AntiFreeze", &options.AntiFreeze);
+				DrawToggle("Change Name", &options.Name);
+				DrawToggle("IP Spoof", &options.IpSpoof);
+			}
 			break;
 		case HostOnly:
 			DrawToggle("Spoof Rank", &options.BoolRank);
@@ -53,7 +61,7 @@ namespace BO2
 			DrawToggle("Esp Box Filled", &options.EspFilled);
 			DrawToggle("Esp Bones", &options.EspDrawBones);
 			DrawToggle("Esp Heart", &options.EspFrogChan);
-			DrawToggle("Esp Names", &options.EspNames);
+			DrawToggle("Esp Name", &options.EspNames);
 			DrawToggle("Esp SnapLines", &options.EspDrawLine);
 			DrawIntSlider("SnapLine Position", &options.SnapPos, "%i");
 			DrawToggle("Esp Item", &options.DrawItem);
@@ -69,11 +77,19 @@ namespace BO2
 			DrawToggle("RGB", &options.RGB);
 			break;
 		case PLAYERS:
-			for (int i = 0; i < 18; i++) {
-				if (!strcmp(cgGame->clientInfo[i].name, "")) {}
-				//DrawButton("N/A");
-				else
-					DrawSubMenu(va("%s [%s]", cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"), &options.SubPlayers, Playersub);
+			if (Dvar_GetBool("cl_ingame")) {
+				for (int i = 0; i < 18; i++) {
+					if (!strcmp(cgGame->clientInfo[i].name, "")) {}
+					else
+						DrawSubMenu(va("%s [%s]", cgGame->clientInfo[i].name, isTeam(&cg_entitiesArray[i]) ? "^2Friendly^7" : "^1Enemy^7"), &options.SubPlayers, Playersub);
+				}
+			}
+			else {
+				for (int i = 0; i < 20; i += 1)
+				{
+					if ((const char*)0x836FD72C != "")
+						DrawButton(va("%s", (const char*)0x836FD72C + i * 160 + 4));
+				}
 			}
 			break;
 		case Playersub:
@@ -82,10 +98,10 @@ namespace BO2
 			DrawButton("WIP");
 			break;
 		case SETTINGS:
+			DrawToggle("Gradient Menu", &options.Gradient);
 			DrawIntSlider("Menu X", &options.menuX, "%i");
 			DrawIntSlider("Menu Y", &options.menuY, "%i");
 			DrawStringSlider("Font", &options.menuFontIndex, FontForIndex(options.menuFontIndex.current));
-			DrawToggle("Gradient Menu", &options.Gradient);
 			DrawSubMenu("Debug Info", &options.Debug, Debug);
 			break;
 		case Debug:
@@ -103,7 +119,7 @@ namespace BO2
 		std::string strMap = cgServer->MapName;
 		strMap.erase(0, 3);
 		const char* map = strMap.c_str();
-		DrawTextInBox("Shake Beta v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "ShakeBeta v1.1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		DrawTextInBox("Shake v1.1.0", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5, R_TextWidth(0, "Shake v1.1.0", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		if (options.DHost.state)
 			DrawTextInBox(va("Host: %s", cgServer->hostName), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 37, R_TextWidth(0, va("Host: %s.", cgServer->hostName), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		if (options.DMap.state)
@@ -135,44 +151,77 @@ namespace BO2
 	vec3_t anglesOut;
 	const char* Tag;
 
-	bool isClientWallbangable(int client, const char* tag)
+	bool BulletCanHit(int clientIndex, const char* bone)
 	{
+		ReadStructs();
 		*(DWORD*)(0x82258D60) = 0x60000000;
 		*(DWORD*)(0x82258D68) = 0x60000000;
 		*(DWORD*)(0x82258D64) = 0x60000000;
 		*(DWORD*)(0x82258D6C) = 0x60000000;
 
-		vec3_t End;
-		End = AimTarget_GetTagPos(&cg_entitiesArray[client], tag);
+		Centity self = cg_entitiesArray[cgGame->clientNum];
 
-		BulletTraceResults_t bulletTraceResults;
-		BulletFireParams_t bulletFireParams;
-		memset(&bulletFireParams, 0x00, sizeof(bulletFireParams));
+		BulletFireParams_t bfp;
 
-		bulletFireParams.weaponEntIndex = 1022;
-		bulletFireParams.ignoreEntIndex = cgGame->clientNum;
-		bulletFireParams.damageMultiplier = 2.0f;
-		bulletFireParams.methodOfDeath = 1;
-		bulletFireParams.origStart = cgGame->refdef.viewOrigin;
-		bulletFireParams.start = cgGame->refdef.viewOrigin;
-		bulletFireParams.end = End;
+		vec3_t eyePos;
+		CG_GetPlayerViewOrigin(0, playerstate, &eyePos);
 
-		vec3_t EndDir;
-		End - cgGame->refdef.viewOrigin;
-		VecToAngels(End, EndDir);
-		AngleVectors(&EndDir, &bulletFireParams.dir, NULL, NULL);
+		vec3_t head;
+		AimTarget_GetTagPos(&cg_entitiesArray[clientIndex], bone);
 
-		cg_simulatebulletfire(0, &bulletFireParams, cgGame->ps.primaryWeapon, &cg_entitiesArray[cgGame->clientNum], &cgGame->refdef.viewOrigin, false, false, &bulletTraceResults, false);
+		//BulletTrace(&bfp, eyePos, head);
 
-		if (bulletTraceResults.trace.hitType != 1) {
-			return true;
+		//cg_simulatebulletfire(0, &bfp, self.WeaponID, )
+
+
+
+			//AuthProvider::GetFunction(AW_MP_TU17_FireBulletPenetrate)(0, &bfp, self->weaponId, 0, 0, (int)self, -1, eyePos, false);
+
+		return clientIndex == bfp.ignoreEntIndex;
+		return false;
+	}
+	bool isClientWallbangable(int client, const char* tag)
+	{
+		ReadStructs();
+		*(DWORD*)(0x82258D60) = 0x60000000;
+		*(DWORD*)(0x82258D68) = 0x60000000;
+		*(DWORD*)(0x82258D64) = 0x60000000;
+		*(DWORD*)(0x82258D6C) = 0x60000000;
+
+		if (cg_entitiesArray[client].nextState.Alive) {
+			vec3_t End;
+			End = AimTarget_GetTagPos(&cg_entitiesArray[client], tag);
+
+			BulletTraceResults_t bulletTraceResults;
+			BulletFireParams_t bulletFireParams;
+			memset(&bulletFireParams, 0x00, sizeof(bulletFireParams));
+
+			bulletFireParams.weaponEntIndex = 1022;
+			bulletFireParams.ignoreEntIndex = cgGame->clientNum;
+			bulletFireParams.damageMultiplier = 5.f;
+			bulletFireParams.methodOfDeath = 1;
+			bulletFireParams.origStart = cgGame->refdef.viewOrigin;
+			bulletFireParams.start = cgGame->refdef.viewOrigin;
+			bulletFireParams.end = End;
+
+			vec3_t EndDir;
+			End - cgGame->refdef.viewOrigin;
+			VecToAngels(End, EndDir);
+			AngleVectors(&EndDir, &bulletFireParams.dir, NULL, NULL);
+
+			cg_simulatebulletfire(0, &bulletFireParams, cgGame->ps.primaryWeapon, &cg_entitiesArray[cgGame->clientNum], &cgGame->refdef.viewOrigin, false, false, &bulletTraceResults, false);
+
+			if (bulletTraceResults.trace.hitType != 1 && cg_entitiesArray[client].nextState.Alive) {
+				return true;
+			}
 		}
-
 		return false;
 	}
 	bool CanShootThroughWall(int i, const char* tag) {
-		return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
+		if (cg_entitiesArray[i].nextState.Alive)
+			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
 	}
+
 
 	int GetNearestPlayer(int client)
 	{
@@ -192,7 +241,7 @@ namespace BO2
 
 			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
 
-			if (CanShootThroughWall(i, "j_neck") && Distance < nearestDistance)
+			if (CanShootThroughWall(i, AimTag(options.MenuAimTargetIndex.current)) && Distance < nearestDistance)
 			{
 				nearestDistance = Distance;
 				nearestClient = i;
@@ -218,7 +267,6 @@ namespace BO2
 			int nearestClient = GetNearestPlayer(cgGame->clientNum);
 			if (nearestClient == -1)
 				newAngles = ClientActive->baseAngle;
-
 
 			if (playerReady && nearestClient != -1)
 			{
@@ -278,6 +326,7 @@ namespace BO2
 
 			float playerHeight = fabsf(head.y - Pos.y);
 			float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+			float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
 
 			if (options.EspBoxToggle.state)
 				BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
@@ -287,10 +336,8 @@ namespace BO2
 				DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
 			if (options.EspFrogChan.state)
 				drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
-			if (options.EspNames.state) {
-				DrawText(va("%s", cgGame->clientInfo[i].name), Pos.x, head.y, "fonts/720/normalfont", 0.4, Red, align_center);
-			
-			}
+			if (options.EspNames.state)
+				DrawText(va("%s [%.fm]", cgGame->clientInfo[i].name, Distance), Pos.x, head.y - 9, FontForIndex(options.menuFontIndex.current), 0.4, isTeam(&cg_entitiesArray[i]) ? Green : Red, align_center);
 			if (options.EspFilled.state)
 				BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 		}
@@ -300,6 +347,9 @@ namespace BO2
 
 			if ((cg_entitiesArray[j].nextState.pickupId < 0))
 				continue;
+			if (!(cg_entitiesArray[j].nextState.Alive))
+				continue;
+
 
 			vec3_t origin = cg_entitiesArray[j].pose.Origin;
 			vec2_t Pos = vec2_t();
@@ -331,8 +381,8 @@ namespace BO2
 			if (strstr(txt, "[{+}]") || strstr(txt, "KEY_UNBOUND")
 				|| strstr(txt, "^H") || strstr(txt, "KEYUNBOUND") || strstr(txt, "^B{}")) {
 
-				//^H crash location
 				*(uint32_t*)0x82717D48 = 0x60000000;
+
 				//CG_GameMessage
 				*(uint32_t*)0x8222E27C = 0x60000000;
 				*(uint32_t*)0x8222A754 = 0x60000000;
@@ -379,9 +429,11 @@ namespace BO2
 		XSetThreadProcessor(Thread, 4);
 		ResumeThread(Thread);
 	}
+
 	std::vector<cTracer> GlobalTrace;
-	float testcol[] = { options.ShaderRed.current * 255, options.ShaderGreen.current * 255 ,options.ShaderBlue.current * 255, 1 };
 	void DrawTracer() {
+		float testcol[] = { options.ShaderRed.current / 255, options.ShaderGreen.current / 255 ,options.ShaderBlue.current / 255, 1 };
+
 		if (options.Tracer.state) {
 			auto it = GlobalTrace.begin();
 			while (it != GlobalTrace.end())
@@ -400,6 +452,7 @@ namespace BO2
 			}
 		}
 	}
+
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
@@ -416,6 +469,11 @@ namespace BO2
 			*(uint32_t*)0x821fc04c = options.Wallhack.state ? 0x38C0FFFF : 0x7FA6EB78;
 			*(uint32_t*)0x83c56038 = options.Wallhack.state ? 0xF51F0000DF : 0x3F800000;
 			*(uint32_t*)0x826BB50C = options.NoSpread.state ? 0x39600002 : 0x817B01EC;
+			*(uint32_t*)0x82717D48 = options.AntiFreeze.state ? 0x60000000 : 0x91370000;
+
+			//cg_hitevent
+			if (options.AutoWall.state)
+				*(uint32_t*)0x822585F8 = 0x60000000;
 
 			if (options.Healthbar.state)
 				HealthBar(cgDC->screenWidth - cgDC->screenWidth + 15, cgDC->CenterY(), 10);
@@ -423,15 +481,16 @@ namespace BO2
 				renderRadar(cgDC->screenWidth - 200, cgDC->screenHeight - cgDC->screenHeight + 5, 190, 20, 0.08, true);
 			if (options.Radar.state)
 				renderRadar(cgDC->screenWidth - 200, cgDC->screenHeight - cgDC->screenHeight + 5, 190, 20, 0.08, false);
+			//R_AddCmdDrawStretchPicRotateSTInternal(cgDC->CenterX(), cgDC->CenterY(), 100, 100, 10, 10, 5, 1, 1, 45, Green, Material_RegisterHandle((const char*)cgGame->compassMapMaterial, 0));
 
 			FovSlider(options.Fov.current);
 			SpoofLevel();
 			TargetDetails();
 		}
-		if (options.NoFlinch.state) {
+		if (options.Name.state) {
 			keyboard_thread(Thread);
 			CloseHandle(Thread);
-			options.NoFlinch.state = false;
+			options.Name.state = false;
 		}
 		options.menuHeight = options.menuTabHeight + (options.menuMaxScroll * (R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current)) + (options.menuBorder.current * 2) + 2;
 		if (options.menuOpen)
@@ -446,26 +505,18 @@ namespace BO2
 		if (sourceEntityNum == cgGame->clientNum) {
 			cTracer Trace;
 			Trace.hit3D = *position;
-			Trace.startTime = cgGame->ServerTime;
+			Trace.startTime = cgGame->ps.commandTime;
 			Trace.start3D = *startPos;
 
 			GlobalTrace.emplace_back(Trace);
 		}
 	}
-	void Rgb() {
-		if (options.RGB.state) {
 
-
-		}
-	}
+	float i = 0;
 	void Quad_Hook(Material* r3, short t, vec3_t* x, vec2_t* xx, GfxColor* Col, int c) {
 		const char* Material = r3->name;
-
-		/*	if (strstr(Material, "menu_mp") || strstr(Material, "globe")
-				|| strstr(Material, "fonts/") || strstr(Material, "compass_map"))*/
-		if (strstr(Material, Shader(options.ShaderIndex.current)))
+		if (strstr(Material, Shader(options.ShaderIndex.current)) || strstr(Material, "globe"))
 		{
-			Rgb();
 			byte r = options.ShaderRed.current;
 			byte g = options.ShaderGreen.current;
 			byte b = options.ShaderBlue.current;
@@ -473,6 +524,18 @@ namespace BO2
 			Col->g = g;
 			Col->b = b;
 			Col->a = 255;
+		}
+		if (options.RGB.state) {
+			if (strstr(Material, Shader(options.ShaderIndex.current)) || strstr(Material, "globe")) {		
+				i+= 0.009;
+				if (i > 255)
+					i = 0;
+
+					Col->r = (Col->r < 255) ? i : 255;
+					Col->g = (Col->g < 255) ? i : 255;
+					Col->b = (Col->b < 255) ? i : 255;
+					Col->a = 255;
+			}
 		}
 		MinHook[5].Stub(r3, t, x, xx, Col, c);
 	}

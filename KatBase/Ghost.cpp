@@ -69,14 +69,14 @@ namespace Ghost {
 				continue;
 			if (cgGame->ps.health < 1)
 				return;*/
-			if (!(cg_entitiesarray[i].eType == ET_PLAYER && (cg_entitiesarray[i].eType != ET_PLAYER_CORPSE)))
+			if (!(cg_entitiesarray[i].State == ET_PLAYER && (cg_entitiesarray[i].State != ET_PLAYER_CORPSE)))
 				continue;
 		/*	if (!cg_entitiesarray[i].state & (1 << 6) != 0)
 				continue;*/
 
 			vec2_t Pos = vec2_t();
 			vec2_t head = vec2_t();
-			vec3_t origin = cg_entitiesarray[i].Origin;
+			vec3_t origin = cg_entitiesarray[i].mPos;
 
 			vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesarray[i], "j_head");
 			headPos.z += 10;

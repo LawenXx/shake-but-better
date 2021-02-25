@@ -47,9 +47,7 @@ void checkTitleId(std::uintptr_t id)
 		BO2::InitAddress();
 		BO2::SetupVariables();
 		//ReadImage();
-		//cg_hitevent
-	//	*(DWORD*)(0x822585F8) = 0x60000000;
-
+		
 		//R_EndFrame
 		*(DWORD*)(0x828B9F64) = 0x60000000;
 		*(DWORD*)(0x828B9F68) = 0x60000000;
@@ -83,6 +81,8 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[1] = MinHook_t(0x822A06F0, (std::uint64_t)BO3::R_RenderScene, true);
 		MinHook[2] = MinHook_t(0x822F53C0, (std::uint64_t)BO3::CL_ReadyToSendPacket, true);
 		MinHook[3] = MinHook_t(0x8227CA40, (std::uint64_t)BO3::CG_BulletHitEvent, true);
+		MinHook[4] = MinHook_t(0x4156091D, (std::uint64_t)BO3::NetDll_XNetGetTitleXnAddrHook, true);
+
 		break;
 	case COD_GHOSTS:
 		while (*(int*)Ghost::XamInputGetKeyState == 0)

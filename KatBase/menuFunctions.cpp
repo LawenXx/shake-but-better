@@ -248,7 +248,8 @@ namespace BO2
 
 		SetupBool(&options.NoRecoil, false);
 		SetupBool(&options.NoSway, false);
-		SetupBool(&options.NoFlinch, false);
+		SetupBool(&options.Name, false);
+		SetupBool(&options.Name, false);
 		SetupBool(&options.ChangeView, false);
 		SetupBool(&options.AimbotToggle, false);
 		SetupBool(&options.AutoWall, false);
@@ -281,8 +282,8 @@ namespace BO2
 		int textHeight = R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current;
 		int textWidth = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
 		int textShaderW = R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 20;
-		DrawText("Shake", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 
+		DrawText(Dvar_GetBool("cl_ingame") ? "Shake" : "Shake - Pre Game", options.menuX.current + 155, options.menuY.current - 20, FontForIndex(options.menuFontIndex.current), .8, white, align_center);
 		DrawText("Main", options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == MAIN)
 			DrawShader(options.menuX.current + options.menuBorder.current + 10, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Main", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
@@ -299,7 +300,7 @@ namespace BO2
 		textWidth += R_TextWidth(0, "Visuals", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 		textShaderW += R_TextWidth(0, "Visuals", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
 
-		DrawText("Players", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
+		DrawText(Dvar_GetBool("cl_ingame") ? "Players" : "LBoard", options.menuX.current + options.menuBorder.current + 10 + textWidth, options.menuY.current + options.menuBorder.current + textHeight, FontForIndex(options.menuFontIndex.current), 0.6, white, align_left);
 		if (options.menuPageIndex == PLAYERS)
 			DrawShader(options.menuX.current + options.menuBorder.current + 10 + textShaderW, options.menuY.current + options.menuBorder.current + textHeight, 5 + R_TextWidth(0, "Players", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6, 3, blue);
 		textWidth += R_TextWidth(0, "Players", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.6 + 34;
@@ -317,20 +318,20 @@ namespace BO2
 
 		if (!options.Gradient.state) {
 			//MainShader
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current),0)) * options.menuFontSize.current), blue, "white");
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), blue, "white");
 			//Header
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, black);
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue, "white");
 		}
 		else
 		{
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current),0)) * options.menuFontSize.current), black, "gradient_fadein");
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current),0)) * options.menuFontSize.current), blue, "white");
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), black, "gradient_fadein");
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), blue, "white");
 
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, blue, "white");
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, black, "gradient_fadein");
 
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current),0)) * options.menuFontSize.current), 310, 5, blue, "gradient_fadein");
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) * options.menuFontSize.current), 310, 5, blue, "gradient_fadein");
 		}
 
 		//ScrollBar
@@ -572,6 +573,7 @@ namespace BO3
 		SetupBool(&options.EspNames, false);
 		SetupBool(&options.EspFilled, false);
 		SetupBool(&options.EspSnap, false);
+		SetupBool(&options.Compass, false);
 		SetupBool(&options.NoRecoil, false);
 		SetupBool(&options.NoSway, false);
 		SetupBool(&options.OverHeadNames, false);
@@ -586,6 +588,7 @@ namespace BO3
 		SetupBool(&options.DHost, true);
 		SetupBool(&options.DPing, true);
 		SetupBool(&options.DRes, true);
+		SetupBool(&options.IpSpoof, false);
 
 		SetupSubMenu(&options.EspView, EspMenu, 8, 8);
 		SetupSubMenu(&options.Debug, Debug, 8, 8);
@@ -645,10 +648,10 @@ namespace BO3
 		{
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), black, "gradient_fadein");
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 55, 310, 95 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), blue, "white");
-			
-			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, blue , "white");
+
+			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, blue, "white");
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12, 310, 48, black, "gradient_fadein");
-		
+
 			DrawShader(options.menuX.current + options.menuBorder.current, options.menuY.current - 12 + 78 + (options.menuMaxScroll * R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current))) * options.menuFontSize.current), 310, 5, blue, "gradient_fadein");
 		}
 

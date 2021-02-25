@@ -35,6 +35,8 @@ Hunk_SetDataForFile_t Hunk_SetDataForFile;
 CL_ConsolePrint_t CL_ConsolePrint;
 CG_DrawRotatedPicPhysical_GFX_t CG_DrawRotatedPicPhysical_GFX;
 AimTarget_GetTagPos_Ghost_t AimTarget_GetTagPos_Ghost;
+R_AddCmdDrawStretchPicRotateSTInternal_t R_AddCmdDrawStretchPicRotateSTInternal;
+CG_GetPlayerViewOrigin_t CG_GetPlayerViewOrigin;
 
 float white[] = { 1,1,1,1 };
 float white2[] = { 1,1,1,0.3 };
@@ -56,8 +58,8 @@ namespace BO2
 	gentity_t* g_entitiesArray;
 	Usercmd_t UserCmd;
 	XModel_t* xModel;
-	 BulletTraceResults_t BulletTraceResults;
-	 BulletFireParams_t BulletFireParams;
+	BulletTraceResults_t BulletTraceResults;
+	BulletFireParams_t BulletFireParams;
 
 	void InitAddress()
 	{
@@ -75,18 +77,19 @@ namespace BO2
 		AimTarget_IsTargetVisible = AimTarget_IsTargetVisible_t(0x821C47B8);
 		VecToAngels = vectoAngles_t(0x8248A470);
 		BG_GetFactionForTeam = BG_GetFactionForTeam_t(0x821A6AA8);
-	//	BG_seedRandWithGameTime = BG_seedRandWithGameTime_t(0x826961B8);
+		//BG_seedRandWithGameTime = BG_seedRandWithGameTime_t(0x826961B8);
 		BG_GetSpreadForWeapon = BG_GetSpreadForWeapon_t(0x826BB4E0);
 		AngleVectors = AngleVectors_t(0x8248E408);
 		CG_GetPredictedPlayerState = CG_GetPredictedPlayerState_t(0x821E64E0);
 		Cbuf_AddText = Cbuf_AddText_t(0x824015E0);
 		BG_srand = BG_srand_t(0x82697FC0);
-//		BG_random = BG_random_t(0x82696250);
+		//BG_random = BG_random_t(0x82696250);
 		CL_AddReliableCommand = CL_AddReliableCommand_t(0x822786E0);
 		cg_simulatebulletfire = cg_simulatebulletfire_t(0x82258840);
 		Hunk_FindDataForFile = Hunk_FindDataForFile_t(0x8248ECC8);
 		Hunk_SetDataForFile = Hunk_SetDataForFile_t(0x8248ED80);
 		CL_ConsolePrint = CL_ConsolePrint_t(0x8226AE80);
+		R_AddCmdDrawStretchPicRotateSTInternal = R_AddCmdDrawStretchPicRotateSTInternal_t(0x828B8718);
 	}
 
 	void ReadStructs()
@@ -130,7 +133,7 @@ namespace BO2
 		*seed = 214013 * (214013 * (214013 * (214013 * *seed + 2531011) + 2531011) + 2531011) + 2531011;
 	}
 
-	double BG_seedRandWithGameTime(int *Holdrand)
+	double BG_seedRandWithGameTime(int* Holdrand)
 	{
 		unsigned int r11 = 214013 * *Holdrand + 2531011;
 		*Holdrand = r11;
@@ -160,10 +163,10 @@ namespace BO2
 		oldCmd->viewAngles[0] += ANGLE2SHORT(Spread.x * totalSpread);
 		oldCmd->viewAngles[1] += ANGLE2SHORT(Spread.y * totalSpread);
 	}
-	
+
 	const char* AutoBone(int client) {
 
-		
+
 	}
 
 	void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna)
@@ -269,13 +272,13 @@ namespace BO2
 		case 87:
 			return "Knife";
 		case 88:
-			return "Minigun";
+			return "WarMachine";
 		case 89:
 			return "Riot Shield";
 		case 90:
 			return "Crossbow";
 		case 91:
-			return "Knife Ballist.";
+			return "Ballistic Knife.";
 		default:
 			return "N/A";
 		}
@@ -431,7 +434,16 @@ namespace BO3
 			DrawLine(vec2_t(x + (w / 100 * 100), y + (h / 100 * 45)), vec2_t(x + (w / 100 * 50), y + (h / 100 * 93)), outline, 2);
 		}
 	}
+	void NetDll_XNetGetTitleXnAddrHook(int xnc, XNADDR* pXna)
+	{
+		MinHook[4].Stub(xnc, pXna);
 
+		if (options.IpSpoof.state)
+		{
+			BYTE IP[] = { 0x2, 0x2, 0x33, 0x3 };
+			pXna->inaOnline.S_un.S_addr = *(DWORD*)&IP;
+		}
+	}
 	void ESP_ClientHealth(int cen)
 	{
 		vec3_t tagOriginHead;
@@ -467,12 +479,12 @@ namespace BO3
 	}
 	void NoSpreadThread(userCmd_t* cmd) {
 		float SpreadX, SpreadY, MinSpread, MaxSpread;
-	/*	int weapon = cg_entitiesArray[cgGame->MyClientNum].weapon;
-		BG_GetSpreadForWeapon(&cgGame., weapon, &MinSpread, &MaxSpread);
-		float SpreadScale = (cgGame->aimSpreadScale / 255.0f);
-		float SpreadAmount = (MinSpread + ((MaxSpread - MinSpread) * SpreadScale));
-		cmd->viewAngles[0] -= ANGLE2SHORT(SpreadAmount);
-		cmd->viewAngles[1] -= ANGLE2SHORT(SpreadAmount);*/
+		/*	int weapon = cg_entitiesArray[cgGame->MyClientNum].weapon;
+			BG_GetSpreadForWeapon(&cgGame., weapon, &MinSpread, &MaxSpread);
+			float SpreadScale = (cgGame->aimSpreadScale / 255.0f);
+			float SpreadAmount = (MinSpread + ((MaxSpread - MinSpread) * SpreadScale));
+			cmd->viewAngles[0] -= ANGLE2SHORT(SpreadAmount);
+			cmd->viewAngles[1] -= ANGLE2SHORT(SpreadAmount);*/
 	}
 	void DrawLine(vec2_t start, vec2_t end, float* color, float size)
 	{
@@ -507,7 +519,7 @@ namespace BO3
 	{
 		return float(1 - (cgGame->CmdTime - tracerTime) / ms);
 	}
-	
+
 	void FovSlider(int fov) {
 		Cbuf_AddText(0, va("cg_fov %i", fov));
 	}
@@ -541,7 +553,7 @@ namespace BO3
 	{
 		return Sl_GetStringOfSize(String, usr, strlen(String) + 1);
 	}
-	
+
 	Material* Material_RegisterHandle(const char* name)
 	{
 		return (Material*)DB_FindXAssetHeader(XASSET_MATERIAL, name, 0);
@@ -552,13 +564,13 @@ namespace BO3
 	}
 }
 
-namespace Ghost {	
+namespace Ghost {
 	CgsArray* CgServer;
 	RefDef* Ref;
 	Centity* cg_entitiesarray;
 
 	void InitAddress() {
-		
+
 		DB_FindXAssetHeader = DB_FindXAssetHeader_t(0x82376680); //wrong addr
 		R_AddCmdDrawText = R_AddCmdDrawText_t(0x8266CEB8);
 		CG_DrawRotatedPicPhysical = CG_DrawRotatedPicPhysical_t(0x82270138);
@@ -573,14 +585,14 @@ namespace Ghost {
 		Ref = *(RefDef**)0x82ACCCE8;
 		cg_entitiesarray = *(Centity**)0x82AD11AC;
 	}
-	
+
 	vec3_t AimTarget_GetTagPos(Centity* client, const char* tag)
 	{
 		vec3_t _Pos;
 		AimTarget_GetTagPos_Ghost(client, SL_GetString(tag, 0), _Pos);
 		return _Pos;
 	}
-	
+
 	bool WorldToScreen(vec3_t point, vec2_t* world)
 	{
 		vec3_t trans;
