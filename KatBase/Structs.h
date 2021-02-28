@@ -111,6 +111,17 @@ enum entityType_t
 
 namespace BO2
 {
+	enum eSessionModes_mode
+	{
+		SESSIONMODE_OFFLINE = 0x0,
+		SESSIONMODE_SYSTEMLINK = 0x1,
+		SESSIONMODE_ONLINE = 0x2,
+		SESSIONMODE_LOCAL = 0x3,
+		SESSIONMODE_ZOMBIES = 0x4,
+		SESSIONMODE_MAX = 0x5,
+		SESSIONMODE_INVALID = 0x6,
+	};
+
 	struct GfxColor {
 		byte a;
 		byte r;
@@ -657,7 +668,7 @@ namespace BO2
 	extern BulletTraceResults_t BulletTraceResults;
 	extern BulletFireParams_t BulletFireParams;
 	extern Usercmd_t UserCmd;
-	extern playerstate_s* playerstate;
+	extern playerstate_s playerstate;
 	extern UIContext* cgDC;
 	extern cg_s* cgGame;
 	extern Cgs_t* cgServer;

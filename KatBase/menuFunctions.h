@@ -62,7 +62,9 @@ namespace BO2
 		BoolMenuOption DHost;
 		BoolMenuOption DMap;
 		BoolMenuOption DGame;
+		BoolMenuOption Third;
 		BoolMenuOption DFps;
+		BoolMenuOption AntiAim;
 		BoolMenuOption DTarget;
 
 		BoolMenuOption Laser;

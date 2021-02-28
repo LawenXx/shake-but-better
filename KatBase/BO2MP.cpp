@@ -48,6 +48,7 @@ namespace BO2
 			DrawStringSlider("AimTag", &options.MenuAimTargetIndex, AimTag(options.MenuAimTargetIndex.current));
 			DrawToggle("AutoShoot", &options.AutoShoot);
 			DrawToggle("AutoWall", &options.AutoWall);
+			DrawToggle("Anti Aim", &options.AntiAim);
 			//	DrawToggle("AutoBone", &options.Autobone);
 				//	DrawToggle("Aim Required", &options.AimRequired);
 			break;
@@ -69,6 +70,7 @@ namespace BO2
 		case MiscVisuals:
 			DrawToggle("Wallhack", &options.Wallhack);
 			DrawToggle("Tracers", &options.Tracer);
+			DrawToggle("ThirdPerson", &options.Third);
 			DrawIntSlider("Fov", &options.Fov, "%i");
 			DrawStringSlider("Shader", &options.ShaderIndex, Shader(options.ShaderIndex.current));
 			DrawIntSlider("Shader Red", &options.ShaderRed, "%i");
@@ -128,7 +130,7 @@ namespace BO2
 			DrawTextInBox(va("Gametype: %s", cgServer->gametype), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 98, R_TextWidth(0, va("GameType: %s..", cgServer->gametype), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		if (options.DFps.state)
 			DrawTextInBox(va("Fps: %g", cgDC->FPS), cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - cgDC->screenHeight + 5 + 125, R_TextWidth(0, va("Fps: %g.", cgDC->FPS), MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-
+	
 		if (options.menuOpen)
 			DrawTextInBox("Press ^BXENONButtonB^ To ^1Close ^7The Menu.", cgDC->screenWidth - cgDC->screenWidth + 5, cgDC->screenHeight - 35, R_TextWidth(0, "Press ^BXENONButtonB^ To ^1Close ^7The Menu.", MAXLONG, R_RegisterFont(FontForIndex(options.menuFontSize.current), 0)) * 0.65, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
 		else
@@ -151,102 +153,54 @@ namespace BO2
 	vec3_t anglesOut;
 	const char* Tag;
 
-	bool BulletCanHit(int clientIndex, const char* bone)
-	{
-		ReadStructs();
-		*(DWORD*)(0x82258D60) = 0x60000000;
-		*(DWORD*)(0x82258D68) = 0x60000000;
-		*(DWORD*)(0x82258D64) = 0x60000000;
-		*(DWORD*)(0x82258D6C) = 0x60000000;
-
-		Centity self = cg_entitiesArray[cgGame->clientNum];
-
-		BulletFireParams_t bfp;
-
-		vec3_t eyePos;
-		CG_GetPlayerViewOrigin(0, playerstate, &eyePos);
-
-		vec3_t head;
-		AimTarget_GetTagPos(&cg_entitiesArray[clientIndex], bone);
-
-		//BulletTrace(&bfp, eyePos, head);
-
-		//cg_simulatebulletfire(0, &bfp, self.WeaponID, )
-
-
-
-			//AuthProvider::GetFunction(AW_MP_TU17_FireBulletPenetrate)(0, &bfp, self->weaponId, 0, 0, (int)self, -1, eyePos, false);
-
-		return clientIndex == bfp.ignoreEntIndex;
-		return false;
-	}
-	bool isClientWallbangable(int client, const char* tag)
-	{
-		ReadStructs();
-		*(DWORD*)(0x82258D60) = 0x60000000;
-		*(DWORD*)(0x82258D68) = 0x60000000;
-		*(DWORD*)(0x82258D64) = 0x60000000;
-		*(DWORD*)(0x82258D6C) = 0x60000000;
-
-		if (cg_entitiesArray[client].nextState.Alive) {
-			vec3_t End;
-			End = AimTarget_GetTagPos(&cg_entitiesArray[client], tag);
-
-			BulletTraceResults_t bulletTraceResults;
-			BulletFireParams_t bulletFireParams;
-			memset(&bulletFireParams, 0x00, sizeof(bulletFireParams));
-
-			bulletFireParams.weaponEntIndex = 1022;
-			bulletFireParams.ignoreEntIndex = cgGame->clientNum;
-			bulletFireParams.damageMultiplier = 5.f;
-			bulletFireParams.methodOfDeath = 1;
-			bulletFireParams.origStart = cgGame->refdef.viewOrigin;
-			bulletFireParams.start = cgGame->refdef.viewOrigin;
-			bulletFireParams.end = End;
-
-			vec3_t EndDir;
-			End - cgGame->refdef.viewOrigin;
-			VecToAngels(End, EndDir);
-			AngleVectors(&EndDir, &bulletFireParams.dir, NULL, NULL);
-
-			cg_simulatebulletfire(0, &bulletFireParams, cgGame->ps.primaryWeapon, &cg_entitiesArray[cgGame->clientNum], &cgGame->refdef.viewOrigin, false, false, &bulletTraceResults, false);
-
-			if (bulletTraceResults.trace.hitType != 1 && cg_entitiesArray[client].nextState.Alive) {
-				return true;
-			}
-		}
-		return false;
-	}
-	bool CanShootThroughWall(int i, const char* tag) {
-		if (cg_entitiesArray[i].nextState.Alive)
-			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
-	}
-
-
 	int GetNearestPlayer(int client)
 	{
 		nearestClient = -1;
 		float nearestDistance = FLT_MAX;
-
-		for (int i = 0; i < 18; ++i)
-		{
-			if (cgGame->clientNum == i)
-				continue;
-			if (cg_entitiesArray[i].pose.eType != ET_PLAYER)
-				continue;
-			if (!cg_entitiesArray[i].nextState.Alive)
-				continue;
-			if (isTeam(&cg_entitiesArray[i]))
-				continue;
-
-			float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
-
-			if (CanShootThroughWall(i, AimTag(options.MenuAimTargetIndex.current)) && Distance < nearestDistance)
+		if (!Com_SessionMode(SESSIONMODE_ZOMBIES)) {
+			for (int i = 0; i < 18; ++i)
 			{
-				nearestDistance = Distance;
-				nearestClient = i;
-				playerReady = true;
-				options.Fire.state = true;
+				if (cgGame->clientNum == i)
+					continue;
+				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+					continue;
+				if (!cg_entitiesArray[i].nextState.Alive)
+					continue;
+				if (isTeam(&cg_entitiesArray[i]))
+					continue;
+
+				float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
+
+				if (CanShootThroughWall(i, AimTag(options.MenuAimTargetIndex.current)) && Distance < nearestDistance)
+				{
+					nearestDistance = Distance;
+					nearestClient = i;
+					playerReady = true;
+					options.Fire.state = true;
+				}
+			}
+		}
+		if(Com_SessionMode(SESSIONMODE_ZOMBIES)) {
+			for (int i = 0; i < 1024; ++i)
+			{
+				if (cgGame->clientNum == i)
+					continue;
+				if (!(cg_entitiesArray[i].pose.eType == ET_ACTOR && (cg_entitiesArray[i].pose.eType != ET_ACTOR_CORPSE)))
+					continue;
+				if (!cg_entitiesArray[i].nextState.Alive)
+					continue;
+				if (isTeam(&cg_entitiesArray[i]))
+					continue;
+
+				float Distance = cg_entitiesArray[client].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
+
+				if (CanShootThroughWall(i, AimTag(options.MenuAimTargetIndex.current)) && Distance < nearestDistance)
+				{
+					nearestDistance = Distance;
+					nearestClient = i;
+					playerReady = true;
+					options.Fire.state = true;
+				}
 			}
 		}
 		return nearestClient;
@@ -296,20 +250,80 @@ namespace BO2
 			playerReady = false;
 		}
 	}
-	void Esp() {
-		for (int i = 0; i < 18; i++)
-		{
+	void EspMP() {
+			for (int i = 0; i < 18; i++)
+			{
+				if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
+					continue;
+				if (!(cg_entitiesArray[i].nextState.ClientNumber != cgGame->clientNum))
+					continue;
+				if (!(cg_entitiesArray[i].nextState.Alive))
+					continue;
+				if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
+					continue;
+				if (cgGame->ps.health < 1)
+					return;
 
-			if (!(cg_entitiesArray[i].pose.eType == ET_PLAYER && (cg_entitiesArray[i].pose.eType != ET_PLAYER_CORPSE)))
-				continue;
-			if (!(cg_entitiesArray[i].nextState.ClientNumber != cgGame->clientNum))
+				vec2_t Pos = vec2_t();
+				vec2_t head = vec2_t();
+				vec3_t origin = cg_entitiesArray[i].pose.Origin;
+
+				vec3_t headPos = AimTarget_GetTagPos(&cg_entitiesArray[i], "j_head");
+				headPos.z += 10;
+				origin.z -= 5;
+
+				if (!WorldToScreen(0, origin, &Pos))
+					continue;
+				if (!WorldToScreen(0, headPos, &head))
+					continue;
+
+				float playerHeight = fabsf(head.y - Pos.y);
+				float playerWidth = (fabsf(head.y - Pos.y) * 0.65f);
+				float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[i].pose.Origin);
+
+				if (options.EspBoxToggle.state)
+					BoundingBox(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
+				if (options.EspDrawBones.state)
+					drawBones(&cg_entitiesArray[i], blue);
+				if (options.EspDrawLine.state)
+					DrawLine(vec2_t(cgDC->screenWidth / 2, options.SnapPos.current), Pos, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1);
+				if (options.EspFrogChan.state)
+					drawHeart(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, isTeam(&cg_entitiesArray[i]) ? Green : Red);
+				if (options.EspNames.state)
+					DrawText(va("%s [%.fm]", cgGame->clientInfo[i].name, Distance), Pos.x, head.y - 9, FontForIndex(options.menuFontIndex.current), 0.4, isTeam(&cg_entitiesArray[i]) ? Green : Red, align_center);
+				if (options.EspFilled.state)
+					BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
+			}
+			for (int j = 0; j < 2048; j++) {
+				if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
+					continue;
+
+				if ((cg_entitiesArray[j].nextState.pickupId < 0))
+					continue;
+				if (!(cg_entitiesArray[j].nextState.Alive))
+					continue;
+
+				vec3_t origin = cg_entitiesArray[j].pose.Origin;
+				vec2_t Pos = vec2_t();
+
+				if (!WorldToScreen(0, origin, &Pos))
+					continue;
+
+				if (options.DrawItem.state)
+					DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
+			}
+		}
+
+	void EspZM() {
+		for (int i = 0; i < 1024; i++)
+		{
+			if (!(cg_entitiesArray[i].pose.eType == ET_ACTOR && (cg_entitiesArray[i].pose.eType != ET_ACTOR_CORPSE)))
 				continue;
 			if (!(cg_entitiesArray[i].nextState.Alive))
 				continue;
-			if (!cg_entitiesArray[i].nextState.State & (1 << 6) != 0)
-				continue;
-			if (cgGame->ps.health < 1)
-				return;
+			/*	if (!(cg_entitiesArray[i].nextState.ClientNumber != cgGame->clientNum))
+					continue;
+				*/
 
 			vec2_t Pos = vec2_t();
 			vec2_t head = vec2_t();
@@ -341,39 +355,20 @@ namespace BO2
 			if (options.EspFilled.state)
 				BoundingBoxFilled(Pos.x - (playerWidth / 2.f) - 6.f, head.y - 4.f, playerWidth, playerHeight, isTeam(&cg_entitiesArray[i]) ? Green : Red, 1.f);
 		}
-		for (int j = 0; j < 2048; j++) {
-			if (!(cg_entitiesArray[j].pose.eType == ET_MISSILE))
-				continue;
-
-			if ((cg_entitiesArray[j].nextState.pickupId < 0))
-				continue;
-			if (!(cg_entitiesArray[j].nextState.Alive))
-				continue;
-
-
-			vec3_t origin = cg_entitiesArray[j].pose.Origin;
-			vec2_t Pos = vec2_t();
-
-			if (!WorldToScreen(0, origin, &Pos))
-				continue;
-
-			if (options.DrawItem.state)
-				DrawLine(vec2_t(cgDC->screenWidth / 2, cgDC->screenHeight - 5), Pos, Red, 1);
-
-		}
 	}
 
 	void TargetDetails() {
 		int nearest = GetNearestPlayer(cgGame->clientNum);
 		float Distance = cg_entitiesArray[cgGame->clientNum].pose.Origin.GetDistance(cg_entitiesArray[nearest].pose.Origin);
-		if (options.DTarget.state) {
-			DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-			DrawTextInBox(va("Name: %s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - 5 - R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-			DrawTextInBox(va("Distance: %.fm", Distance), cgDC->screenWidth + 15 - R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 64, R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
-			DrawTextInBox(va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), cgDC->screenWidth + 15 - R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 96, R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+		if (!Com_SessionMode(SESSIONMODE_ZOMBIES)) {
+			if (options.DTarget.state) {
+				DrawTextInBox("Target Details:", cgDC->screenWidth - R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 30, cgDC->CenterY(), R_TextWidth(0, "Target Details", MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+				DrawTextInBox(va("Name: %s", cgGame->clientInfo[nearest].name), cgDC->screenWidth - 5 - R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 32, R_TextWidth(0, va("Name: %s", cgGame->clientInfo[nearest].name), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+				DrawTextInBox(va("Distance: %.fm", Distance), cgDC->screenWidth + 15 - R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 64, R_TextWidth(0, va("Distance: %.fm", Distance), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+				DrawTextInBox(va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), cgDC->screenWidth + 15 - R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) + 2, cgDC->CenterY() + 96, R_TextWidth(0, va("Weapon: %s", GetWeaponName(cgGame->clientInfo[nearest].primaryWeapon)), MAXCHAR, R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)) / 1.6, R_TextHeight(R_RegisterFont(FontForIndex(options.menuFontIndex.current), 0)));
+			}
 		}
 	}
-
 	void CL_ConsolePrintHook(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags) {
 		MinHook[6].Stub(localClientNum, channel, txt, duration, pixelWidth, color, flags);
 
@@ -452,7 +447,6 @@ namespace BO2
 			}
 		}
 	}
-
 	void Menu_PaintAll(int a, int b)
 	{
 		MinHook[0].Stub(a, b);
@@ -461,7 +455,11 @@ namespace BO2
 		if (Dvar_GetBool("cl_ingame"))
 		{
 			DrawTracer();
-			Esp();
+			if (Com_SessionMode(SESSIONMODE_ZOMBIES))
+				EspZM();
+			else
+				EspMP();
+
 			*(uint32_t*)0x82259BC8 = options.NoRecoil.state ? 0x60000000 : 0x48461341;
 			*(uint32_t*)0x82255E1C = options.Laser.state ? 0x2B000B01 : 0x2B0B0000;
 			*(uint32_t*)0x826C6E6C = options.NoSway.state ? 0x60000000 : 0x4BFFE975;
@@ -484,6 +482,7 @@ namespace BO2
 			//R_AddCmdDrawStretchPicRotateSTInternal(cgDC->CenterX(), cgDC->CenterY(), 100, 100, 10, 10, 5, 1, 1, 45, Green, Material_RegisterHandle((const char*)cgGame->compassMapMaterial, 0));
 
 			FovSlider(options.Fov.current);
+			ThirdPerson(options.Third.state);
 			SpoofLevel();
 			TargetDetails();
 		}
@@ -515,7 +514,7 @@ namespace BO2
 	float i = 0;
 	void Quad_Hook(Material* r3, short t, vec3_t* x, vec2_t* xx, GfxColor* Col, int c) {
 		const char* Material = r3->name;
-		if (strstr(Material, Shader(options.ShaderIndex.current)) || strstr(Material, "globe"))
+		if (strstr(Material, Shader(options.ShaderIndex.current)))
 		{
 			byte r = options.ShaderRed.current;
 			byte g = options.ShaderGreen.current;
@@ -526,15 +525,15 @@ namespace BO2
 			Col->a = 255;
 		}
 		if (options.RGB.state) {
-			if (strstr(Material, Shader(options.ShaderIndex.current)) || strstr(Material, "globe")) {		
-				i+= 0.009;
+			if (strstr(Material, Shader(options.ShaderIndex.current)) || strstr(Material, "globe")) {
+				i += 0.009;
 				if (i > 255)
 					i = 0;
 
-					Col->r = (Col->r < 255) ? i : 255;
-					Col->g = (Col->g < 255) ? i : 255;
-					Col->b = (Col->b < 255) ? i : 255;
-					Col->a = 255;
+				Col->r = (Col->r < 255) ? i : 255;
+				Col->g = (Col->g < 255) ? i : 255;
+				Col->b = (Col->b < 255) ? i : 255;
+				Col->a = 255;
 			}
 		}
 		MinHook[5].Stub(r3, t, x, xx, Col, c);
@@ -578,6 +577,8 @@ namespace BO2
 
 			if (options.NoSpread.state)
 				NoSpread(Cmd, oldCmd);
+			if (options.AntiAim.state)
+				AntiAim(Cmd);
 
 			bool betty = false;
 			for (int i = 0; i < 2048; i++) {

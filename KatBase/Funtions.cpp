@@ -37,6 +37,8 @@ CG_DrawRotatedPicPhysical_GFX_t CG_DrawRotatedPicPhysical_GFX;
 AimTarget_GetTagPos_Ghost_t AimTarget_GetTagPos_Ghost;
 R_AddCmdDrawStretchPicRotateSTInternal_t R_AddCmdDrawStretchPicRotateSTInternal;
 CG_GetPlayerViewOrigin_t CG_GetPlayerViewOrigin;
+Com_SessionMode_IsZombiesGame_t Com_SessionMode_IsZombiesGame;
+Com_SessionMode_t Com_SessionMode;
 
 float white[] = { 1,1,1,1 };
 float white2[] = { 1,1,1,0.3 };
@@ -49,7 +51,7 @@ float Green[4] = { 0,1,0,1 };
 namespace BO2
 {
 	BulletTrace_t* bulletTrace;
-	playerstate_s* playerstate;
+	playerstate_s playerstate;
 	UIContext* cgDC;
 	cg_s* cgGame;
 	Cgs_t* cgServer;
@@ -90,6 +92,8 @@ namespace BO2
 		Hunk_SetDataForFile = Hunk_SetDataForFile_t(0x8248ED80);
 		CL_ConsolePrint = CL_ConsolePrint_t(0x8226AE80);
 		R_AddCmdDrawStretchPicRotateSTInternal = R_AddCmdDrawStretchPicRotateSTInternal_t(0x828B8718);
+		Com_SessionMode_IsZombiesGame = Com_SessionMode_IsZombiesGame_t(0x82406578);
+		Com_SessionMode = Com_SessionMode_t(0x82406300);
 	}
 
 	void ReadStructs()
@@ -127,6 +131,42 @@ namespace BO2
 		*pHoldrand = temp;
 		return (double)(temp >> 17) * 0.000030517578;
 	}
+	bool isClientWallbangable(int clientIndex, const char* bone)
+	{
+		ReadStructs();
+		*(DWORD*)(0x82258D60) = 0x60000000;
+		*(DWORD*)(0x82258D68) = 0x60000000;
+		*(DWORD*)(0x82258D64) = 0x60000000;
+		*(DWORD*)(0x82258D6C) = 0x60000000;
+
+		Centity self = cg_entitiesArray[cgGame->clientNum];
+
+		BulletFireParams_t bfp;
+		BulletTraceResults_t Btr;
+		bfp.weaponEntIndex = 1022;
+		bfp.ignoreEntIndex = cgGame->clientNum;
+		bfp.damageMultiplier = 2.0f;
+		bfp.methodOfDeath = 1;
+		bfp.origStart = cgGame->refdef.viewOrigin;
+		bfp.start = cgGame->refdef.viewOrigin;
+		bfp.end = cgGame->refdef.viewOrigin;
+		vec3_t eyePos;
+		CG_GetPlayerViewOrigin(0, &playerstate, &eyePos);
+
+		AimTarget_GetTagPos(&cg_entitiesArray[clientIndex], bone);
+
+		//BulletTrace(&bfp, eyePos, head);
+
+		cg_simulatebulletfire(0, &bfp, self.WeaponID, &cg_entitiesArray[cgGame->clientNum], &cgGame->refdef.viewOrigin, false, false, &Btr, false);
+
+		return clientIndex == bfp.ignoreEntIndex;
+		return false;
+	}
+	bool CanShootThroughWall(int i, const char* tag) {
+		if (cg_entitiesArray[i].nextState.Alive)
+			return options.AutoWall.state ? AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]) || isClientWallbangable(i, tag) : AimTarget_IsTargetVisible(0, &cg_entitiesArray[i]);
+	}
+
 
 	void TransformSeed(int* seed)
 	{
@@ -163,9 +203,20 @@ namespace BO2
 		oldCmd->viewAngles[0] += ANGLE2SHORT(Spread.x * totalSpread);
 		oldCmd->viewAngles[1] += ANGLE2SHORT(Spread.y * totalSpread);
 	}
+	DWORD RandomInt(DWORD Minimum, DWORD Maximum)
+	{
+		return rand() % (Maximum - Minimum + 1) + Minimum;
+	}
+	void AntiAim(Usercmd_t* UserCmd) 
+	{
+		float AimAngle;
+		int Rand = 1;
+		if (Rand == 1)
+			AimAngle - -70.0f;
+		else
+			AimAngle - 70.0f;
 
-	const char* AutoBone(int client) {
-
+		UserCmd->viewAngles[0] - ANGLE2SHORT(AimAngle);
 
 	}
 
@@ -352,19 +403,15 @@ namespace BO2
 			return false;
 	}
 	void GodmodeFix() {
-		while (options.XboGodmode.state) {
-
-			if (!Dvar_GetBool("cl_ingame")) continue;
-
-			UINT_PTR ClientStatePtr = (0x83551A10 + (0x57f8 * 0) + 0x1b);
-			INT32 CurrentState = *(INT32*)(ClientStatePtr);
-
-			//if (CurrentState == 5)
-			*(char*)(ClientStatePtr) = 4;
-		}
+		UINT_PTR ClientStatePtr = (0x83551A2B);
+			if (ClientStatePtr)
+				*(char*)(ClientStatePtr) = 4;
 	}
 	void FovSlider(int fov) {
-		Cbuf_AddText(0, va("cg_fov %i", fov));
+		Cbuf_AddText(cgGame->localClientNum, va("cg_fov %i", fov));
+	}
+	void ThirdPerson(bool toggle) {
+		Cbuf_AddText(cgGame->localClientNum, toggle ? "cg_thirdPerson 1" : "cg_thirdPerson 0");
 	}
 }
 

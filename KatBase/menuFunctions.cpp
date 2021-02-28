@@ -239,9 +239,11 @@ namespace BO2
 		SetupBool(&options.EspFilled, false);
 		SetupBool(&options.XboGodmode, false);
 		SetupBool(&options.Healthbar, false);
+		SetupBool(&options.Third, false);
 
 		SetupBool(&options.DFps, true);
 		SetupBool(&options.DGame, true);
+		SetupBool(&options.AntiAim, false);
 		SetupBool(&options.DHost, true);
 		SetupBool(&options.DMap, true);
 		SetupBool(&options.DTarget, true);

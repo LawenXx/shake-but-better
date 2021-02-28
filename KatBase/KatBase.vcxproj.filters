@@ -15,9 +15,6 @@
     <Filter Include="BO2">
       <UniqueIdentifier>{cc0a5d66-97d6-45d8-89a1-8bcc45b2714a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Minecraft">
-      <UniqueIdentifier>{2e2588e1-27f5-4a12-ac11-b63df851d54d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ghost">
       <UniqueIdentifier>{f57ff6e6-b0be-4780-82fc-f76a67e10a5a}</UniqueIdentifier>
     </Filter>
@@ -49,9 +46,6 @@
     </ClCompile>
     <ClCompile Include="BO3MP.cpp">
       <Filter>BO3</Filter>
-    </ClCompile>
-    <ClCompile Include="Minecraft.cpp">
-      <Filter>Minecraft</Filter>
     </ClCompile>
     <ClCompile Include="Ghost.cpp">
       <Filter>ghost</Filter>
@@ -97,14 +91,8 @@
     <ClInclude Include="Addresses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Minecraft.h">
-      <Filter>Minecraft</Filter>
-    </ClInclude>
     <ClInclude Include="Ghost.h">
       <Filter>ghost</Filter>
-    </ClInclude>
-    <ClInclude Include="Models.h">
-      <Filter>BO2</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>BO2</Filter>

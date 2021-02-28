@@ -52,7 +52,11 @@ typedef const char*(*Hunk_SetDataForFile_t)(int type, const char* name, void* da
 typedef void*(* CL_ConsolePrint_t)(int localClientNum, int channel, const char* txt, int duration, int pixelWidth, char color, int flags);
 typedef void* (*R_AddCmdDrawStretchPicRotateSTInternal_t)(float x, float y, float w, float h, float centerS, float centerT, float radiusST, float scaleFinalS, float scaleFinalT, float angle, float* color, Material* material);
 typedef bool*(*CG_GetPlayerViewOrigin_t)(int localClientNum, BO2::playerstate_s* ps, vec3_t* origin);
+typedef bool* (*Com_SessionMode_IsZombiesGame_t)();
+typedef bool* (*Com_SessionMode_t)(int Mode);
 
+extern Com_SessionMode_t Com_SessionMode;
+extern Com_SessionMode_IsZombiesGame_t Com_SessionMode_IsZombiesGame;
 extern CG_GetPlayerViewOrigin_t CG_GetPlayerViewOrigin;
 extern R_AddCmdDrawStretchPicRotateSTInternal_t R_AddCmdDrawStretchPicRotateSTInternal;
 extern CG_DrawRotatedPicPhysical_GFX_t CG_DrawRotatedPicPhysical_GFX;
@@ -133,9 +137,11 @@ namespace BO2
 	extern void BG_seedRandWithGameTime(int Holdrand);
 	extern void RandomBulletDir(int seed, float* x, float* y);
 	extern void FovSlider(int fov);
+	extern void ThirdPerson(bool toggle);
 	extern const char* GetWeaponName(int iD);
-	extern const char* AutoBone(int client);
+	extern void AntiAim(Usercmd_t* Cmd);
 	extern float deltaFade(int ms, int tracerTime);
+	extern bool CanShootThroughWall(int i, const char* tag);
 }
 
 namespace BO3

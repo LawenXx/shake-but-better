@@ -4,7 +4,7 @@ std::uintptr_t CurrentId;
 bool unloading, onDash, firstDash;
 HANDLE Thread;
 DWORD ThreadId;
-LPCWSTR buttons[2] = { L"Zone likes big PP",L"Davide likes big PP" };
+LPCWSTR buttons[2] = { L"Load Menu",L"Load Menu x2" };
 MESSAGEBOX_RESULT result;
 XOVERLAPPED overlapped;
 
@@ -37,7 +37,6 @@ void checkTitleId(std::uintptr_t id)
 		goto nogame;
 		break;
 	case COD_BLACK_OPS_2:
-
 		while (*(int*)BO2::MP_XamInputGetKeyState == 0) //I Check XamInputGetState make sure the games xex is fully loaded before hooking
 		{
 			Sleep(100);
@@ -98,17 +97,6 @@ void checkTitleId(std::uintptr_t id)
 		MinHook[1] = MinHook_t(Ghost::XamInputGetKeyState, (std::uint64_t)Ghost::XamInputGetState, false);
 		MinHook[2] = MinHook_t(Ghost::Cl_WritePacket_MP, (std::uint64_t)Ghost::Cl_WritePacket, true);
 		break;
-	case MINECRAFT:
-		while (*(int*)Minecraft::XamInputGetKeyState == 0)
-		{
-			Sleep(100);
-		}
-		XNotify("Shake [Minecraft] Loaded", XNOTIFYUI_TYPE_SONGPLAYING);
-		Minecraft::fill();
-
-		//MinHook[0] = MinHook_t(0x8247D000, (std::uint64_t)Minecraft::HookMc, true);
-		MinHook[0] = MinHook_t(0x82A11D78, (std::uint64_t)Minecraft::print, true);
-		break;
 	default:
 		goto done;
 	nogame:
@@ -117,7 +105,7 @@ void checkTitleId(std::uintptr_t id)
 			if (!firstDash)
 			{
 				Sleep(200);
-				XShowMessageBoxUI(0, L"Shake", L"Shake by Kat xKoVx\nYoutube/kat xkovx\n\nThis wouldnt be possible without the help from:\nReeko for making the base\nSmokey xKoVx for wallhack and laser\nSoul for radar", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
+				XShowMessageBoxUI(0, L"Shake", L"Made by Kat xKoVx\n\nWith help from:\nSmokey xKoVx\nMrReeko\nSoul", 2, buttons, 0, XMB_ERRORICON, &result, &overlapped);
 
 				firstDash = true;
 			}
@@ -168,3 +156,60 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 	}
 	return true;
 }
+
+extern "C" int _CRT_INIT(...);
+extern "C" static int __proc_attached;
+
+
+#pragma code_seg(push, r1, ".ptext")
+
+BYTE bMetaData[] = { 'X', 'e', 'X', 'M', 'e', 't', 'a', '0', '0' };
+
+__declspec(noinline) BOOL __cdecl SecureEntry(HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
+{
+	BOOL retcode = TRUE;
+
+	DWORD dwStart = *(DWORD*)(bMetaData + 0);
+	DWORD dwEnd = *(DWORD*)(bMetaData + 4);
+	BYTE bKey = *(BYTE*)(bMetaData + 8);
+
+
+
+	if (dwStart != 'XeXM')
+	{
+		// small hax
+		for (DWORD i = (dwStart); i < (dwEnd); i++) {
+			*(BYTE*)(i) = *(BYTE*)(i) ^ (BYTE)(bKey);
+
+			if ((i % 4) == 0) {
+				__dcbst(0, (void*)i);
+				__sync();
+				__isync();
+			}
+		}
+	}
+
+	if ((dwReason == DLL_PROCESS_DETACH) && (__proc_attached == 0)) {
+		return FALSE;
+	}
+	if (dwReason == DLL_PROCESS_ATTACH || dwReason == DLL_THREAD_ATTACH) {
+		if (retcode) {
+			retcode = _CRT_INIT(hDllHandle, dwReason, lpreserved);
+		}
+		if (!retcode) {
+			return FALSE;
+		}
+	}
+	retcode = DllMain(hDllHandle, dwReason, lpreserved);
+	if ((dwReason == DLL_PROCESS_ATTACH) && !retcode) {
+		DllMain(hDllHandle, dwReason, lpreserved);
+		_CRT_INIT(hDllHandle, DLL_PROCESS_DETACH, lpreserved);
+	}
+	if ((dwReason == DLL_PROCESS_DETACH) || (dwReason == DLL_THREAD_DETACH)) {
+		if (_CRT_INIT(hDllHandle, dwReason, lpreserved) == FALSE) {
+			retcode = FALSE;
+		}
+	}
+	return retcode;
+}
+#pragma code_seg(pop, r1)
