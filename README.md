@@ -1,3 +1,3 @@
 # shake-but-better
 
-# enjoy skids an old version
+# Enjoy skids an old version
